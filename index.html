@@ -1,0 +1,490 @@
+<!DOCTYPE html>
+  <html lang="ko">
+  <head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
+  <title>⛳ 골프 스코어카드</title>
+  <style>
+  :root{--green:#1b6b3c;--green-dark:#124d2b;--green-light:#e6f2ea;--accent:#e8a33d;--bg:#f3f6f4;--card:#ffffff;--text:#1f2b24;--muted:#6b7a72;--danger:#c0392b;--radius:14px;}
+  *{box-sizing:border-box;}
+body{margin:0;font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,"Malgun Gothic",sans-serif;background:var(--bg);color:var(--text);}
+.app{max-width:720px;margin:0 auto;padding-bottom:40px;}
+.app-header{background:linear-gradient(135deg,var(--green),var(--green-dark));color:#fff;padding:16px 16px 20px;border-radius:0 0 20px 20px;}
+.app-header h1{margin:0 0 10px;font-size:20px;}
+.course-info{display:flex;gap:8px;}
+.course-info input{flex:1;padding:10px 12px;border-radius:10px;border:none;font-size:14px;}
+.tabbar{display:flex;gap:6px;padding:12px 16px 0;position:sticky;top:0;background:var(--bg);z-index:5;}
+.tabbtn{flex:1;padding:10px 6px;border:none;border-radius:10px 10px 0 0;background:#dde8e1;color:var(--muted);font-size:13px;font-weight:600;cursor:pointer;}
+.tabbtn.active{background:var(--card);color:var(--green-dark);}
+main{padding:0 16px 16px;}
+.panel{display:none;background:var(--card);border-radius:0 0 var(--radius) var(--radius);padding:16px;}
+.panel.active{display:block;}
+.card{background:var(--green-light);border-radius:var(--radius);padding:14px;margin-bottom:14px;}
+.card label{font-weight:700;font-size:13px;color:var(--green-dark);display:block;margin-bottom:8px;}
+.seg{display:flex;gap:8px;}
+.seg button{flex:1;padding:10px;border:2px solid var(--green);background:#fff;border-radius:10px;font-weight:700;color:var(--green-dark);cursor:pointer;}
+.seg button.active{background:var(--green);color:#fff;}
+.team-card{border:1px solid #d8e6dd;border-radius:var(--radius);padding:12px;margin-bottom:12px;background:#fbfdfc;}
+.team-card-header{display:flex;gap:8px;align-items:center;margin-bottom:10px;}
+.team-name-input{flex:1;padding:8px 10px;border-radius:8px;border:1px solid #cfe0d6;font-weight:700;font-size:14px;color:var(--green-dark);}
+.btn-remove-team{background:none;border:1px solid var(--danger);color:var(--danger);border-radius:8px;padding:6px 10px;font-size:12px;cursor:pointer;white-space:nowrap;}
+.players-grid{display:grid;grid-template-columns:1fr 1fr;gap:8px;}
+.player-name-input{padding:8px 10px;border-radius:8px;border:1px solid #cfe0d6;font-size:13px;}
+.btn-primary{width:100%;padding:12px;background:var(--green);color:#fff;border:none;border-radius:10px;font-weight:700;font-size:14px;cursor:pointer;margin-bottom:10px;}
+.btn-danger{width:100%;padding:10px;background:none;color:var(--danger);border:1px solid var(--danger);border-radius:10px;font-size:13px;cursor:pointer;}
+.hole-strip{display:flex;gap:6px;overflow-x:auto;padding-bottom:10px;margin-bottom:10px;}
+  .hole-chip{flex:0 0 auto;width:38px;height:38px;border-radius:50%;border:2px solid var(--green);background:#fff;color:var(--green-dark);font-weight:700;cursor:pointer;}
+.hole-chip.active{background:var(--green);color:#fff;}
+.hole-info-top{display:flex;justify-content:space-between;align-items:center;margin-bottom:10px;}
+.hole-info-top h2{margin:0;font-size:18px;color:var(--green-dark);}
+.par-select{display:flex;gap:6px;}
+.par-select button{width:34px;height:34px;border-radius:8px;border:2px solid var(--green);background:#fff;font-weight:700;color:var(--green-dark);cursor:pointer;}
+.par-select button.active{background:var(--accent);border-color:var(--accent);color:#fff;}
+  #holeNote{width:100%;min-height:60px;border-radius:10px;border:1px solid #cfe0d6;padding:10px;font-size:13px;resize:vertical;}
+.score-row{display:flex;justify-content:space-between;align-items:center;padding:10px 4px;border-bottom:1px solid #eef2ef;}
+.score-player-label{font-size:14px;font-weight:600;}
+.score-player-label small{display:block;color:var(--muted);font-weight:400;font-size:11px;}
+.counter{display:flex;align-items:center;gap:10px;}
+.counter button{width:34px;height:34px;border-radius:50%;border:none;background:var(--green-light);color:var(--green-dark);font-size:18px;font-weight:700;cursor:pointer;}
+.count-display{width:28px;text-align:center;font-size:18px;font-weight:700;}
+.hole-nav{display:flex;gap:10px;margin-top:14px;}
+.hole-nav button{flex:1;padding:12px;border-radius:10px;border:none;background:var(--green);color:#fff;font-weight:700;cursor:pointer;}
+#resultSummary{margin-bottom:12px;font-size:13px;color:var(--muted);}
+.table-wrap{overflow-x:auto;margin-bottom:14px;}
+table{border-collapse:collapse;width:100%;font-size:12px;}
+table th,table td{border:1px solid #e3ece6;padding:6px 5px;text-align:center;white-space:nowrap;}
+table th{background:var(--green-light);color:var(--green-dark);}
+table td.team-row{background:#f1f7f3;font-weight:700;color:var(--green-dark);text-align:left;}
+  .diff-plus{color:var(--danger);font-weight:700;}
+.diff-minus{color:#1a5fb4;font-weight:700;}
+.diff-even{color:var(--muted);}
+.toast{position:fixed;bottom:24px;left:50%;transform:translateX(-50%) translateY(20px);background:var(--green-dark);color:#fff;padding:12px 20px;border-radius:30px;font-size:13px;opacity:0;pointer-events:none;transition:all .25s;z-index:50;}
+.toast.show{opacity:1;transform:translateX(-50%) translateY(0);}
+footer.credit{text-align:center;color:var(--muted);font-size:11px;padding:14px;}
+</style>
+  </head>
+  <body>
+  <div class="app">
+  <header class="app-header">
+  <h1>⛳ 골프 스코어카드</h1>
+  <div class="course-info">
+  <input id="courseName" placeholder="코스명을 입력하세요">
+  <input id="playDate" type="date">
+  </div>
+  </header>
+  <nav class="tabbar">
+  <button class="tabbtn active" data-tab="setup">👥 팀 설정</button>
+  <button class="tabbtn" data-tab="play">🏌️ 스코어 입력</button>
+  <button class="tabbtn" data-tab="result">📋 결과</button>
+  </nav>
+  <main>
+  <section id="panel-setup" class="panel active">
+  <div class="card">
+  <label>홀 수 선택</label>
+  <div class="seg" id="holeCountSeg">
+  <button data-holecount="9">9홀</button>
+<button data-holecount="18" class="active">18홀</button>
+  </div>
+  </div>
+  <div id="teamsContainer"></div>
+  <button id="addTeamBtn" class="btn-primary">+ 팀 추가 (최대 20팀)</button>
+  <button id="resetBtn" class="btn-danger">전체 초기화</button>
+  </section>
+  <section id="panel-play" class="panel">
+  <div class="hole-strip" id="holeStrip"></div>
+  <div class="card hole-info">
+  <div class="hole-info-top">
+  <h2 id="holeTitle">1번 홀</h2>
+  <div class="par-select" id="parSelect"></div>
+  </div>
+  <textarea id="holeNote" placeholder="이 홀의 특징을 적어보세요 (도그렉, 벙커, OB, 그린 경사 등)"></textarea>
+  </div>
+  <div id="scoreInputList"></div>
+  <div class="hole-nav">
+  <button id="prevHoleBtn">◀ 이전 홀</button>
+  <button id="nextHoleBtn">다음 홀 ▶</button>
+  </div>
+  </section>
+  <section id="panel-result" class="panel">
+  <div id="resultSummary"></div>
+  <div class="table-wrap">
+  <table id="resultTable"></table>
+  </div>
+  <button id="copyBtn" class="btn-primary">📋 결과 복사하기 (SNS 공유)</button>
+  </section>
+</main>
+  <footer class="credit">Field Golf Scorecard · 데이터는 이 기기에만 저장됩니다</footer>
+</div>
+<div id="toast" class="toast"></div>
+<script>
+(function(){
+'use strict';
+var STORAGE_KEY = 'golfScorecardState_v1';
+var state = null;
+var currentHole = 1;
+
+function defaultHoles(count){
+  var arr = [];
+for(var i=0;i<count;i++) arr.push({par:4, note:''});
+return arr;
+}
+
+function defaultState(){
+  return {
+    courseName:'',
+    playDate:new Date().toISOString().slice(0,10),
+    holeCount:18,
+    holes:defaultHoles(18),
+    teams:[
+    {id:1, name:'Team 1', players:['플레이어1','플레이어2','플레이어3','플레이어4'], scores:[[],[],[],[]]}
+    ],
+    nextTeamId:2,
+    currentHole:1
+    };
+}
+
+function load(){
+  try{
+var raw = localStorage.getItem(STORAGE_KEY);
+if(raw){ state = JSON.parse(raw); } else { state = defaultState(); }
+  }catch(e){ state = defaultState(); }
+normalize();
+}
+
+function normalize(){
+  if(!state.holeCount) state.holeCount = 18;
+if(!state.holes) state.holes = defaultHoles(state.holeCount);
+while(state.holes.length < state.holeCount) state.holes.push({par:4, note:''});
+state.holes.length = state.holeCount;
+if(!state.teams || !state.teams.length) state.teams = defaultState().teams;
+state.teams.forEach(function(t){
+  if(!t.players) t.players = ['플레이어1','플레이어2','플레이어3','플레이어4'];
+if(!t.scores) t.scores = [[],[],[],[]];
+for(var i=0;i<4;i++){
+if(!t.scores[i]) t.scores[i] = [];
+while(t.scores[i].length < state.holeCount) t.scores[i].push(0);
+t.scores[i].length = state.holeCount;
+}
+});
+if(!state.nextTeamId) state.nextTeamId = state.teams.length+1;
+currentHole = state.currentHole || 1;
+if(currentHole > state.holeCount) currentHole = 1;
+}
+
+function save(){
+  state.currentHole = currentHole;
+localStorage.setItem(STORAGE_KEY, JSON.stringify(state));
+}
+
+function escapeHtml(str){
+  return String(str==null?'':str).replace(/[&<>"']/g, function(c){
+    return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c];
+  });
+}
+
+function toast(msg){
+  var el = document.getElementById('toast');
+el.textContent = msg;
+el.classList.add('show');
+clearTimeout(toast._t);
+toast._t = setTimeout(function(){ el.classList.remove('show'); }, 2200);
+}
+
+document.querySelectorAll('.tabbtn').forEach(function(btn){
+  btn.addEventListener('click', function(){
+    document.querySelectorAll('.tabbtn').forEach(function(b){ b.classList.remove('active'); });
+document.querySelectorAll('.panel').forEach(function(p){ p.classList.remove('active'); });
+btn.classList.add('active');
+document.getElementById('panel-'+btn.dataset.tab).classList.add('active');
+if(btn.dataset.tab === 'play') renderPlay();
+if(btn.dataset.tab === 'result') renderResult();
+  });
+});
+
+var courseNameInput = document.getElementById('courseName');
+var playDateInput = document.getElementById('playDate');
+courseNameInput.addEventListener('input', function(){ state.courseName = courseNameInput.value; save(); });
+playDateInput.addEventListener('input', function(){ state.playDate = playDateInput.value; save(); });
+
+function renderHeader(){
+  courseNameInput.value = state.courseName || '';
+playDateInput.value = state.playDate || '';
+}
+
+var holeCountSeg = document.getElementById('holeCountSeg');
+holeCountSeg.addEventListener('click', function(e){
+  var btn = e.target.closest('button[data-holecount]');
+if(!btn) return;
+var n = parseInt(btn.dataset.holecount, 10);
+if(n === state.holeCount) return;
+state.holeCount = n;
+normalize();
+if(currentHole > n) currentHole = n;
+save();
+renderSetup();
+renderPlay();
+renderResult();
+});
+
+var teamsContainer = document.getElementById('teamsContainer');
+
+function renderSetup(){
+  Array.prototype.forEach.call(holeCountSeg.children, function(b){
+b.classList.toggle('active', parseInt(b.dataset.holecount,10) === state.holeCount);
+});
+teamsContainer.innerHTML = state.teams.map(function(t, ti){
+  return '<div class="team-card"><div class="team-card-header">' +
+    '<input class="team-name-input" data-team-idx="'+ti+'" value="'+escapeHtml(t.name)+'" placeholder="팀 이름">' +
+    (state.teams.length > 1 ? '<button class="btn-remove-team" data-team-idx="'+ti+'">✕ 삭제</button>' : '') +
+    '</div><div class="players-grid">' +
+    t.players.map(function(p, pi){
+    return '<input class="player-name-input" data-team-idx="'+ti+'" data-player-idx="'+pi+'" value="'+escapeHtml(p)+'" placeholder="플레이어'+(pi+1)+'">';
+  }).join('') +
+    '</div></div>';
+}).join('');
+}
+
+teamsContainer.addEventListener('input', function(e){
+  var t = e.target;
+if(t.classList.contains('team-name-input')){
+var ti = parseInt(t.dataset.teamIdx,10);
+state.teams[ti].name = t.value;
+save();
+} else if(t.classList.contains('player-name-input')){
+var ti2 = parseInt(t.dataset.teamIdx,10);
+var pi = parseInt(t.dataset.playerIdx,10);
+state.teams[ti2].players[pi] = t.value;
+save();
+}
+});
+
+teamsContainer.addEventListener('click', function(e){
+  var btn = e.target.closest('.btn-remove-team');
+if(!btn) return;
+var ti = parseInt(btn.dataset.teamIdx,10);
+if(!confirm('"'+state.teams[ti].name+'" 팀을 삭제할까요?')) return;
+state.teams.splice(ti,1);
+save();
+renderSetup();
+});
+
+document.getElementById('addTeamBtn').addEventListener('click', function(){
+  if(state.teams.length >= 20){
+toast('팀은 최대 20개까지 만들 수 있어요');
+return;
+  }
+var n = state.teams.length + 1;
+state.teams.push({
+  id: state.nextTeamId++,
+  name: 'Team ' + n,
+  players: ['플레이어1','플레이어2','플레이어3','플레이어4'],
+  scores: [[],[],[],[]]
+  });
+normalize();
+save();
+renderSetup();
+});
+
+document.getElementById('resetBtn').addEventListener('click', function(){
+  if(!confirm('모든 팀, 스코어, 홀 정보를 초기화할까요? 이 작업은 되돌릴 수 없습니다.')) return;
+state = defaultState();
+currentHole = 1;
+save();
+renderAll();
+toast('초기화되었습니다');
+});
+
+var holeStrip = document.getElementById('holeStrip');
+var holeTitle = document.getElementById('holeTitle');
+var parSelect = document.getElementById('parSelect');
+var holeNote = document.getElementById('holeNote');
+var scoreInputList = document.getElementById('scoreInputList');
+
+function renderPlay(){
+  holeStrip.innerHTML = '';
+for(var i=1;i<=state.holeCount;i++){
+var chip = document.createElement('button');
+chip.className = 'hole-chip' + (i===currentHole ? ' active' : '');
+  chip.dataset.hole = i;
+chip.textContent = i;
+holeStrip.appendChild(chip);
+}
+renderHoleInfo();
+renderScoreList();
+}
+
+function renderHoleInfo(){
+  var hole = state.holes[currentHole-1];
+holeTitle.textContent = currentHole + '번 홀';
+var pars = [3,4,5,6];
+parSelect.innerHTML = pars.map(function(p){
+  return '<button data-par="'+p+'" class="'+(hole.par===p?'active':'')+'">'+p+'</button>';
+}).join('');
+  holeNote.value = hole.note || '';
+}
+
+holeStrip.addEventListener('click', function(e){
+  var chip = e.target.closest('.hole-chip');
+if(!chip) return;
+currentHole = parseInt(chip.dataset.hole,10);
+save();
+renderPlay();
+});
+
+parSelect.addEventListener('click', function(e){
+  var btn = e.target.closest('button[data-par]');
+if(!btn) return;
+state.holes[currentHole-1].par = parseInt(btn.dataset.par,10);
+save();
+renderHoleInfo();
+renderScoreList();
+});
+
+holeNote.addEventListener('input', function(){
+  state.holes[currentHole-1].note = holeNote.value;
+save();
+});
+
+function renderScoreList(){
+  var rows = '';
+state.teams.forEach(function(team){
+  team.players.forEach(function(pname, pi){
+    var score = team.scores[pi][currentHole-1] || 0;
+rows += '<div class="score-row">' +
+  '<span class="score-player-label">' + escapeHtml(pname||('플레이어'+(pi+1))) + '<small>' + escapeHtml(team.name) + '</small></span>' +
+  '<div class="counter">' +
+  '<button class="minus" data-team-id="'+team.id+'" data-player-idx="'+pi+'">−</button>' +
+  '<span class="count-display">' + (score>0?score:'-') + '</span>' +
+  '<button class="plus" data-team-id="'+team.id+'" data-player-idx="'+pi+'">+</button>' +
+  '</div></div>';
+  });
+});
+scoreInputList.innerHTML = rows;
+}
+
+scoreInputList.addEventListener('click', function(e){
+  var btn = e.target.closest('button.plus, button.minus');
+if(!btn) return;
+var teamId = parseInt(btn.dataset.teamId,10);
+var pi = parseInt(btn.dataset.playerIdx,10);
+var team = state.teams.find(function(t){ return t.id === teamId; });
+if(!team) return;
+var cur = team.scores[pi][currentHole-1] || 0;
+if(btn.classList.contains('plus')){
+cur = Math.min(cur+1, 15);
+} else {
+cur = Math.max(cur-1, 0);
+}
+team.scores[pi][currentHole-1] = cur;
+save();
+renderScoreList();
+});
+
+document.getElementById('prevHoleBtn').addEventListener('click', function(){
+  if(currentHole>1){ currentHole--; save(); renderPlay(); }
+});
+document.getElementById('nextHoleBtn').addEventListener('click', function(){
+  if(currentHole<state.holeCount){ currentHole++; save(); renderPlay(); }
+});
+
+var resultSummary = document.getElementById('resultSummary');
+var resultTable = document.getElementById('resultTable');
+
+function diffLabel(diff){
+  if(diff===0) return 'E';
+return diff>0 ? ('+'+diff) : String(diff);
+}
+function diffClass(diff){
+  if(diff===0) return 'diff-even';
+return diff>0 ? 'diff-plus' : 'diff-minus';
+}
+
+function renderResult(){
+  var n = state.holeCount;
+resultSummary.innerHTML =
+  '<strong>' + escapeHtml(state.courseName || '코스명 미입력') + '</strong> · ' +
+  escapeHtml(state.playDate || '') + ' · ' + n + '홀';
+
+var head = '<tr><th>구분</th>';
+for(var h=1; h<=n; h++){
+head += '<th>'+h+'<br><small style="font-weight:400;">P'+state.holes[h-1].par+'</small></th>';
+}
+head += '<th>합계</th><th>대비파</th></tr>';
+
+var body = '';
+state.teams.forEach(function(team){
+  body += '<tr><td class="team-row" colspan="'+(n+3)+'">'+escapeHtml(team.name)+'</td></tr>';
+team.players.forEach(function(pname, pi){
+  var total = 0, parTotal = 0, played=false;
+var cells = '';
+for(var h2=0; h2<n; h2++){
+var s = team.scores[pi][h2] || 0;
+if(s>0){ total += s; parTotal += state.holes[h2].par; played = true; }
+cells += '<td>' + (s>0?s:'-') + '</td>';
+}
+var diff = played ? (total-parTotal) : 0;
+body += '<tr><td style="text-align:left;">'+escapeHtml(pname||('플레이어'+(pi+1)))+'</td>' + cells +
+  '<td>'+(played?total:'-')+'</td>' +
+  '<td class="'+(played?diffClass(diff):'')+'">'+(played?diffLabel(diff):'-')+'</td></tr>';
+});
+});
+
+resultTable.innerHTML = '<thead>'+head+'</thead><tbody>'+body+'</tbody>';
+}
+
+document.getElementById('copyBtn').addEventListener('click', function(){
+  var n = state.holeCount;
+var lines = [];
+lines.push('⛳ ' + (state.courseName || '골프 스코어카드'));
+lines.push('📅 ' + (state.playDate || '') + ' · ' + n + '홀');
+lines.push('');
+  state.teams.forEach(function(team){
+    lines.push('[' + team.name + ']');
+team.players.forEach(function(pname, pi){
+  var total=0, parTotal=0, played=false;
+var scoresStr = [];
+for(var h=0; h<n; h++){
+var s = team.scores[pi][h] || 0;
+scoresStr.push(s>0?s:'-');
+if(s>0){ total+=s; parTotal += state.holes[h].par; played=true; }
+}
+var diff = played ? diffLabel(total-parTotal) : '-';
+lines.push((pname||('플레이어'+(pi+1))) + ': ' + scoresStr.join(',') + ' (합계 ' + (played?total:'-') + ', ' + diff + ')');
+});
+lines.push('');
+  });
+lines.push('- Field Golf Scorecard -');
+var text = lines.join('\n');
+
+function done(){ toast('결과가 복사되었습니다! SNS에 붙여넣기 하세요'); }
+if(navigator.clipboard && navigator.clipboard.writeText){
+navigator.clipboard.writeText(text).then(done).catch(function(){ fallbackCopy(text, done); });
+} else {
+fallbackCopy(text, done);
+}
+});
+
+function fallbackCopy(text, cb){
+  var ta = document.createElement('textarea');
+ta.value = text;
+ta.style.position = 'fixed';
+ta.style.left = '-9999px';
+document.body.appendChild(ta);
+ta.select();
+try{ document.execCommand('copy'); cb(); }catch(e){ toast('복사에 실패했습니다'); }
+document.body.removeChild(ta);
+}
+
+function renderAll(){
+  renderHeader();
+renderSetup();
+renderPlay();
+renderResult();
+}
+
+load();
+renderAll();
+})();
+</script>
+  </body>
+  </html>
