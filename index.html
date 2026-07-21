@@ -137,6 +137,10 @@ footer.credit{text-align:center;color:var(--muted);font-size:11px;padding:14px;}
 </div>
 </section>
 <section id="panel-result" class="panel">
+<div class="seg" id="sortToggle" style="margin-bottom:12px;">
+<button data-sort="team" class="active" id="sortTeamBtn">팀별 보기</button>
+<button data-sort="rank" id="sortRankBtn">🏆 순위별 보기</button>
+</div>
 <div id="resultCaptureArea">
 <div id="resultSummary"></div>
 <div class="table-wrap">
@@ -205,6 +209,9 @@ var I18N = {
     toastImageSaved:"이미지가 저장되었습니다. 갤러리에서 공유해보세요",
     toastImageFail:"이미지 생성에 실패했습니다",
     anonymizeLabel:"🙈 SNS 공유 시 이름 가리기",
+    sortTeamView:"팀별 보기",
+    sortRankView:"🏆 순위별 보기",
+    rankColumnHeader:"순위",
     footer:"Field Golf Scorecard · 데이터는 이 기기에만 저장됩니다",
     toastMaxTeams:"팀은 최대 20개까지 만들 수 있어요",
     toastReset:"초기화되었습니다",
@@ -250,6 +257,9 @@ var I18N = {
     toastImageSaved:"Image saved. Share it from your gallery",
     toastImageFail:"Failed to create image",
     anonymizeLabel:"🙈 Hide names when sharing",
+    sortTeamView:"By Team",
+    sortRankView:"🏆 By Ranking",
+    rankColumnHeader:"Rank",
     footer:"Field Golf Scorecard · Data is stored only on this device",
     toastMaxTeams:"You can create up to 20 teams",
     toastReset:"Reset complete",
@@ -295,6 +305,9 @@ var I18N = {
     toastImageSaved:"画像を保存しました。ギャラリーから共有してください",
     toastImageFail:"画像の作成に失敗しました",
     anonymizeLabel:"🙈 共有時に名前を隠す",
+    sortTeamView:"チーム別表示",
+    sortRankView:"🏆 順位別表示",
+    rankColumnHeader:"順位",
     footer:"Field Golf Scorecard · データはこの端末にのみ保存されます",
     toastMaxTeams:"チームは最大20個まで作成できます",
     toastReset:"初期化されました",
@@ -340,6 +353,9 @@ var I18N = {
     toastImageSaved:"图片已保存,请从相册分享",
     toastImageFail:"图片生成失败",
     anonymizeLabel:"🙈 分享时隐藏姓名",
+    sortTeamView:"按队伍显示",
+    sortRankView:"🏆 按排名显示",
+    rankColumnHeader:"排名",
     footer:"Field Golf Scorecard · 数据仅保存在本设备",
     toastMaxTeams:"最多可以创建20支队伍",
     toastReset:"已重置",
@@ -389,7 +405,8 @@ function defaultState(){
       {id:1, name:'Team 1', players:['플레이어1','플레이어2','플레이어3','플레이어4'], scores:[[],[],[],[]], entered:[[],[],[],[]], anonymize:[false,false,false,false]}
     ],
     nextTeamId:2,
-    currentHole:1
+    currentHole:1,
+    resultSortMode:'team'
   };
 }
 
@@ -403,6 +420,7 @@ function load(){
 
 function normalize(){
   if(!state.lang) state.lang = 'ko';
+  if(state.resultSortMode !== 'team' && state.resultSortMode !== 'rank') state.resultSortMode = 'team';
   if(!state.holeCount) state.holeCount = 18;
   if(!state.holes) state.holes = defaultHoles(state.holeCount);
   while(state.holes.length < state.holeCount) state.holes.push({par:4, note:''});
@@ -464,6 +482,22 @@ function maskName(name){
   var str = String(name == null ? '' : name);
   if(str.length <= 1) return str;
   return str.charAt(0) + '*'.repeat(str.length - 1);
+}
+
+/* Standard competition ranking (golf-style): equal scores share the same rank,
+   and the next distinct score jumps to (position + 1), e.g. 1,2,3,3,3,6,7 */
+function assignCompetitionRanks(sortedRows){
+  for(var i=0; i<sortedRows.length; i++){
+    if(i > 0 && sortedRows[i].grandTotal === sortedRows[i-1].grandTotal){
+      sortedRows[i].rank = sortedRows[i-1].rank;
+    } else {
+      sortedRows[i].rank = i+1;
+    }
+  }
+  var counts = {};
+  sortedRows.forEach(function(r){ counts[r.rank] = (counts[r.rank]||0) + 1; });
+  sortedRows.forEach(function(r){ r.rankLabel = (counts[r.rank] > 1 ? 'T' : '') + r.rank; });
+  return sortedRows;
 }
 
 /* ---------------- Language switcher ---------------- */
@@ -529,6 +563,8 @@ function applyStaticTranslations(){
   document.getElementById('shareAsImageBtn').textContent = t('shareAsImage');
   document.getElementById('shareCancelBtn').textContent = t('shareCancel');
   document.getElementById('anonymizeLabel').textContent = t('anonymizeLabel');
+  document.getElementById('sortTeamBtn').textContent = t('sortTeamView');
+  document.getElementById('sortRankBtn').textContent = t('sortRankView');
   document.getElementById('footerText').textContent = t('footer');
   Array.prototype.forEach.call(langDropdown.querySelectorAll('button[data-lang]'), function(b){
     b.classList.toggle('active', b.dataset.lang === state.lang);
@@ -572,6 +608,20 @@ holeCountSeg.addEventListener('click', function(e){
 });
 
 var teamsContainer = document.getElementById('teamsContainer');
+
+var sortToggle = document.getElementById('sortToggle');
+sortToggle.addEventListener('click', function(e){
+  var btn = e.target.closest('button[data-sort]');
+  if(!btn) return;
+  var mode = btn.dataset.sort;
+  if(mode === state.resultSortMode) return;
+  state.resultSortMode = mode;
+  save();
+  Array.prototype.forEach.call(sortToggle.children, function(b){
+    b.classList.toggle('active', b.dataset.sort === mode);
+  });
+  renderResult();
+});
 
 function renderSetup(){
   Array.prototype.forEach.call(holeCountSeg.children, function(b){
@@ -746,12 +796,20 @@ var resultTable = document.getElementById('resultTable');
 function renderResult(){
   var n = state.holeCount;
   var showSplit = (n === 18);
+  var rankMode = (state.resultSortMode === 'rank');
+
+  Array.prototype.forEach.call(sortToggle.children, function(b){
+    b.classList.toggle('active', b.dataset.sort === state.resultSortMode);
+  });
+
   resultSummary.innerHTML =
     '<strong>' + escapeHtml(state.courseName || t('courseNameEmpty')) + '</strong> · ' +
     escapeHtml(state.playDate || '') + ' · ' + n + t('holesSuffix');
 
   var extraCols = showSplit ? 3 : 1; // OUT, IN, TOTAL  vs just TOTAL
-  var head = '<tr><th>'+escapeHtml(t('tableCategory'))+'</th>';
+  var head = '<tr>';
+  if(rankMode) head += '<th>'+escapeHtml(t('rankColumnHeader'))+'</th>';
+  head += '<th>'+escapeHtml(t('tableCategory'))+'</th>';
   for(var h=1; h<=n; h++){
     head += '<th>'+h+'<br><small style="font-weight:400;">P'+state.holes[h-1].par+'</small></th>';
     if(showSplit && h === 9){
@@ -761,9 +819,9 @@ function renderResult(){
   if(showSplit) head += '<th>'+escapeHtml(t('inLabel'))+'</th>';
   head += '<th>'+escapeHtml(t('tableTotal'))+'</th></tr>';
 
-  var body = '';
+  /* Build one row-data entry per player, independent of grouping/sorting */
+  var rows = [];
   state.teams.forEach(function(team){
-    body += '<tr><td class="team-row" colspan="'+(n+1+extraCols)+'">'+escapeHtml(team.name)+'</td></tr>';
     team.players.forEach(function(pname, pi){
       var outTotal = 0, inTotal = 0;
       var cells = '';
@@ -783,9 +841,28 @@ function renderResult(){
       var grandTotal = outTotal + inTotal;
       if(showSplit) cells += '<td class="'+(inTotal>0?'plus':(inTotal<0?'minus':'even'))+'">'+signedLabel(inTotal)+'</td>';
       cells += '<td class="'+(grandTotal>0?'plus':(grandTotal<0?'minus':'even'))+'">'+signedLabel(grandTotal)+'</td>';
-      body += '<tr><td class="player-name-cell" data-team-id="'+team.id+'" data-player-idx="'+pi+'" style="text-align:left;">'+escapeHtml(pname||t('playerPlaceholder',pi+1))+'</td>' + cells + '</tr>';
+      rows.push({team:team, pname:pname, pi:pi, cells:cells, grandTotal:grandTotal});
     });
   });
+
+  var body = '';
+  if(rankMode){
+    var sorted = rows.slice().sort(function(a,b){ return a.grandTotal - b.grandTotal; });
+    assignCompetitionRanks(sorted);
+    sorted.forEach(function(row){
+      var nameCell = '<td class="player-name-cell" data-team-id="'+row.team.id+'" data-player-idx="'+row.pi+'" style="text-align:left;">' +
+        escapeHtml(row.pname||t('playerPlaceholder',row.pi+1)) +
+        ' <small style="color:var(--muted);">('+escapeHtml(row.team.name)+')</small></td>';
+      body += '<tr><td>'+row.rankLabel+'</td>' + nameCell + row.cells + '</tr>';
+    });
+  } else {
+    state.teams.forEach(function(team){
+      body += '<tr><td class="team-row" colspan="'+(n+1+extraCols)+'">'+escapeHtml(team.name)+'</td></tr>';
+      rows.filter(function(r){ return r.team.id === team.id; }).forEach(function(row){
+        body += '<tr><td class="player-name-cell" data-team-id="'+row.team.id+'" data-player-idx="'+row.pi+'" style="text-align:left;">'+escapeHtml(row.pname||t('playerPlaceholder',row.pi+1))+'</td>' + row.cells + '</tr>';
+      });
+    });
+  }
 
   resultTable.innerHTML = '<thead>'+head+'</thead><tbody>'+body+'</tbody>';
   renderAnonymizeList();
@@ -842,16 +919,18 @@ document.getElementById('shareAsImageBtn').addEventListener('click', function(){
 
 function buildResultText(){
   var n = state.holeCount;
+  var showSplit = (n === 18);
+  var rankMode = (state.resultSortMode === 'rank');
   var lines = [];
   lines.push('⛳ ' + (state.courseName || t('title')));
   lines.push(t('copyDatePrefix') + ' ' + (state.playDate || '') + ' · ' + n + t('holesSuffix'));
   lines.push('');
+
+  var rows = [];
   state.teams.forEach(function(team){
-    lines.push('[' + team.name + ']');
     team.players.forEach(function(pname, pi){
       var outTotal = 0, inTotal = 0;
       var scoresStr = [];
-      var showSplit = (n === 18);
       for(var h=0; h<n; h++){
         var rel = team.scores[pi][h] || 0;
         var played = !!team.entered[pi][h];
@@ -867,10 +946,26 @@ function buildResultText(){
       var isAnon = team.anonymize && team.anonymize[pi];
       var baseName = pname || t('playerPlaceholder', pi+1);
       var displayName = isAnon ? maskName(baseName) : baseName;
-      lines.push(displayName + ': ' + scoresStr.join(',') + ' (' + totalStr + ')');
+      rows.push({team:team, displayName:displayName, scoresStr:scoresStr, totalStr:totalStr, grandTotal:grandTotal});
     });
-    lines.push('');
   });
+
+  if(rankMode){
+    var sorted = rows.slice().sort(function(a,b){ return a.grandTotal - b.grandTotal; });
+    assignCompetitionRanks(sorted);
+    sorted.forEach(function(row){
+      lines.push(row.rankLabel+'. '+row.displayName+' ('+row.team.name+'): '+row.scoresStr.join(',')+' ('+row.totalStr+')');
+    });
+  } else {
+    state.teams.forEach(function(team){
+      lines.push('[' + team.name + ']');
+      rows.filter(function(r){ return r.team.id === team.id; }).forEach(function(row){
+        lines.push(row.displayName + ': ' + row.scoresStr.join(',') + ' (' + row.totalStr + ')');
+      });
+      lines.push('');
+    });
+  }
+
   lines.push(t('copyFooter'));
   return lines.join('\n');
 }
