@@ -482,11 +482,30 @@ langDropdown.addEventListener('click', function(e){
   if(!btn) return;
   e.stopPropagation();
   state.lang = btn.dataset.lang;
+  relocalizeDefaultPlayerNames();
   save();
   langDropdown.classList.remove('show');
   applyStaticTranslations();
   renderAll();
 });
+
+/* True if this name is still one of the auto-generated default names (in any supported language),
+   i.e. the user never customized it, so it's safe to translate. */
+function isDefaultPlayerName(name, idx){
+  return Object.keys(I18N).some(function(lang){
+    return I18N[lang].playerPlaceholder(idx+1) === name;
+  });
+}
+
+function relocalizeDefaultPlayerNames(){
+  state.teams.forEach(function(team){
+    team.players.forEach(function(pname, pi){
+      if(isDefaultPlayerName(pname, pi)){
+        team.players[pi] = t('playerPlaceholder', pi+1);
+      }
+    });
+  });
+}
 
 function applyStaticTranslations(){
   document.documentElement.lang = state.lang;
