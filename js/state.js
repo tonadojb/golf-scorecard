@@ -24,7 +24,9 @@ function defaultState(){
   return {
     lang:'ko',
     courseName:'',
+    courseSub:'',
     playDate:new Date().toISOString().slice(0,10),
+    teeOffTime:'',
     holeCount:18,
     holes:defaultHoles(18),
     teams:[
@@ -46,6 +48,8 @@ function load(){
 
 function normalize(){
   if(!state.lang) state.lang = 'ko';
+  if(state.courseSub === undefined) state.courseSub = '';
+  if(state.teeOffTime === undefined) state.teeOffTime = '';
   if(state.resultSortMode !== 'team' && state.resultSortMode !== 'rank') state.resultSortMode = 'team';
   if(!state.holeCount) state.holeCount = 18;
   if(!state.holes) state.holes = defaultHoles(state.holeCount);

@@ -1,11 +1,17 @@
 var courseNameInput = document.getElementById('courseName');
 var playDateInput = document.getElementById('playDate');
+var courseSubInput = document.getElementById('courseSub');
+var teeOffTimeInput = document.getElementById('teeOffTime');
 courseNameInput.addEventListener('input', function(){ state.courseName = courseNameInput.value; save(); });
 playDateInput.addEventListener('input', function(){ state.playDate = playDateInput.value; save(); });
+courseSubInput.addEventListener('input', function(){ state.courseSub = courseSubInput.value; save(); });
+teeOffTimeInput.addEventListener('input', function(){ state.teeOffTime = teeOffTimeInput.value; save(); });
 
 function renderHeader(){
   courseNameInput.value = state.courseName || '';
   playDateInput.value = state.playDate || '';
+  courseSubInput.value = state.courseSub || '';
+  teeOffTimeInput.value = state.teeOffTime || '';
 }
 
 var holeCountSeg = document.getElementById('holeCountSeg');

@@ -2,6 +2,7 @@ var I18N = {
   ko:{
     title:"⛳ 골프 스코어카드",
     courseNamePlaceholder:"코스명을 입력하세요",
+    courseSubPlaceholder:"코스(전반/후반) 예: 토마토,애플",
     langBtn:"🌐 Language",
     tabSetup:"👥 팀 설정",
     tabPlay:"🏌️ 스코어 입력",
@@ -50,6 +51,7 @@ var I18N = {
   en:{
     title:"⛳ Golf Scorecard",
     courseNamePlaceholder:"Enter course name",
+    courseSubPlaceholder:"Nine names, e.g. Tomato, Apple",
     langBtn:"🌐 Language",
     tabSetup:"👥 Teams",
     tabPlay:"🏌️ Enter Score",
@@ -98,6 +100,7 @@ var I18N = {
   ja:{
     title:"⛳ ゴルフスコアカード",
     courseNamePlaceholder:"コース名を入力してください",
+    courseSubPlaceholder:"コース(前半/後半) 例: トマト、アップル",
     langBtn:"🌐 Language",
     tabSetup:"👥 チーム設定",
     tabPlay:"🏌️ スコア入力",
@@ -146,6 +149,7 @@ var I18N = {
   zh:{
     title:"⛳ 高尔夫记分卡",
     courseNamePlaceholder:"请输入球场名称",
+    courseSubPlaceholder:"球道(前九/后九) 例: 番茄,苹果",
     langBtn:"🌐 Language",
     tabSetup:"👥 队伍设置",
     tabPlay:"🏌️ 输入成绩",
@@ -250,6 +254,7 @@ function applyStaticTranslations(){
   document.title = t('title');
   document.getElementById('appTitle').textContent = t('title');
   document.getElementById('courseName').placeholder = t('courseNamePlaceholder');
+  document.getElementById('courseSub').placeholder = t('courseSubPlaceholder');
   document.getElementById('tabSetupBtn').textContent = t('tabSetup');
   document.getElementById('tabPlayBtn').textContent = t('tabPlay');
   document.getElementById('tabResultBtn').textContent = t('tabResult');
