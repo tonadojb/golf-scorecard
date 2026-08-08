@@ -203,9 +203,8 @@ function t(key){
   return v;
 }
 
-/* 
 
-Language switcher ---------------- */
+/* ---------------- Language switcher ---------------- */
 var langBtn = document.getElementById('langBtn');
 var langDropdown = document.getElementById('langDropdown');
 
@@ -276,4 +275,4 @@ function applyStaticTranslations(){
   });
 }
 
-document.
+
