@@ -1,7 +1,7 @@
 var I18N = {
   ko:{
     title:"⛳ 골프 스코어카드",
-    courseNamePlaceholder:"코스명을 입력하세요",
+    courseNamePlaceholder:"골프장 이름을 입력하세요",
     courseSubPlaceholder:"코스(전반/후반) 예: 토마토,애플",
     langBtn:"🌐 Language",
     tabSetup:"👥 팀 설정",
