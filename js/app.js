@@ -1,4 +1,4 @@
-querySelectorAll('.tabbtn').forEach(function(btn){
+document.querySelectorAll('.tabbtn').forEach(function(btn){
   btn.addEventListener('click', function(){
     document.querySelectorAll('.tabbtn').forEach(function(b){ b.classList.remove('active'); });
     document.querySelectorAll('.panel').forEach(function(p){ p.classList.remove('active'); });
@@ -48,4 +48,3 @@ renderAll();
     },
     refresh: function(){ renderAll(); }
   };
-
