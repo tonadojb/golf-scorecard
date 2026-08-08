@@ -1,10 +1,11 @@
-STORAGE_KEY = 'golfScorecardState_v1';
+var STORAGE_KEY = 'golfScorecardState_v1';
 var state = null;
 var currentHole = 1;
 
 /* ---------------- i18n ---------------- */
 
-SCORE_MIN / SCORE_MAX: score is stored RELATIVE TO PAR.
+
+/* SCORE_MIN / SCORE_MAX: score is stored RELATIVE TO PAR.
    0 = par, -1 = birdie, -2 = eagle, -3 = albatross, +1 = bogey, etc. */
 var SCORE_MIN = -5;
 var SCORE_MAX = 20;
@@ -111,4 +112,3 @@ function maskName(name){
 
 /* Standard competition ranking (golf-style): equal scores share the same rank,
    and the next distinct score jumps to (position + 1), e.g. 1,2,3,3,3,6,7 */
-
