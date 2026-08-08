@@ -61,7 +61,13 @@ function renderResult(){
   var rows = [];
   state.teams.forEach(function(team){
     team.players.forEach(function(pname, pi){
-      var outTotal = 0, inTotal = 0;
+      /* outTotal/inTotal/grandTotal stay relative-to-par (used for sorting/
+         ranking, which is unaffected either way since every player in a
+         round shares the same par baseline). The OUT/IN/TOTAL subtotal
+         CELLS, however, are displayed as absolute strokes (par of the
+         holes actually played + the relative total) so they read like a
+         real scorecard's TOTAL column, e.g. 36 par + 18 over = "54". */
+      var outTotal = 0, inTotal = 0, outPar = 0, inPar = 0;
       var cells = '';
       for(var h2=0; h2<n; h2++){
         var rel = team.scores[pi][h2] || 0;
@@ -70,15 +76,16 @@ function renderResult(){
         var cls = rel > 0 ? 'plus' : (rel < 0 ? 'minus' : 'even');
         cells += '<td class="'+cls+'">' + label + '</td>';
         if(played){
-          if(h2 < 9) outTotal += rel; else inTotal += rel;
+          if(h2 < 9){ outTotal += rel; outPar += state.holes[h2].par; }
+          else { inTotal += rel; inPar += state.holes[h2].par; }
         }
         if(showSplit && h2 === 8){
-          cells += '<td class="'+(outTotal>0?'plus':(outTotal<0?'minus':'even'))+'">'+signedLabel(outTotal)+'</td>';
+          cells += '<td class="'+(outTotal>0?'plus':(outTotal<0?'minus':'even'))+'">'+(outPar+outTotal)+'</td>';
         }
       }
       var grandTotal = outTotal + inTotal;
-      if(showSplit) cells += '<td class="'+(inTotal>0?'plus':(inTotal<0?'minus':'even'))+'">'+signedLabel(inTotal)+'</td>';
-      cells += '<td class="'+(grandTotal>0?'plus':(grandTotal<0?'minus':'even'))+'">'+signedLabel(grandTotal)+'</td>';
+      if(showSplit) cells += '<td class="'+(inTotal>0?'plus':(inTotal<0?'minus':'even'))+'">'+(inPar+inTotal)+'</td>';
+      cells += '<td class="'+(grandTotal>0?'plus':(grandTotal<0?'minus':'even'))+'">'+(outPar+inPar+grandTotal)+'</td>';
       rows.push({team:team, pname:pname, pi:pi, cells:cells, grandTotal:grandTotal});
     });
   });
