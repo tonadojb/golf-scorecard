@@ -1,5 +1,5 @@
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
-import { getAuth, GoogleAuthProvider, signInWithPopup, signInWithCustomToken, signOut, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
+import { getAuth, GoogleAuthProvider, signInWithPopup, signInWithCustomToken, signOut, onAuthStateChanged, updateProfile } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
 import { getFirestore, doc, setDoc, serverTimestamp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
 
 var firebaseConfig = {
@@ -12,15 +12,16 @@ var firebaseConfig = {
   measurementId: "G-DE6K44EJ9M"
 };
 
-// TODO: 카카오/네이버 로그인을 사용하려면 아래 두 URL을 실제 백엔드(Cloud Functions 등) 엔드포인트로 교체하세요.
-// 각 엔드포인트는 전달받은 액세스 토큰을 카카오/네이버 서버에 검증한 뒤,
+// 카카오 로그인은 firebase-backend/functions/kakaoAuth.js 로 연결되어 있습니다.
+// 그 함수가 전달받은 액세스 토큰을 카카오 서버에 검증한 뒤,
 // admin.auth().createCustomToken(uid) 로 발급한 Firebase 커스텀 토큰을
-// { customToken: "..." } 형태의 JSON으로 응답해야 합니다.
-var KAKAO_AUTH_URL = "https://YOUR_CLOUD_FUNCTION_URL/kakaoAuth";
+// { customToken, displayName, photoURL } 형태의 JSON으로 응답합니다.
+var KAKAO_AUTH_URL = "https://asia-northeast3-skyjang-golfscore.cloudfunctions.net/kakaoAuth";
+// TODO: 네이버 앱 등록 후 firebase-backend/functions/naverAuth.js 를 추가하고 여기를 교체하세요.
 var NAVER_AUTH_URL = "https://YOUR_CLOUD_FUNCTION_URL/naverAuth";
 
-// TODO: 카카오/네이버 개발자 콘솔에서 발급받은 본인의 앱 키로 교체하세요.
-var KAKAO_JS_KEY = "YOUR_KAKAO_JS_KEY";
+var KAKAO_JS_KEY = "e73a39b4f944bc251c449f0535d5f39b";
+// TODO: 네이버 개발자센터에서 발급받은 Client ID로 교체하세요.
 var NAVER_CLIENT_ID = "YOUR_NAVER_CLIENT_ID";
 
 var app = initializeApp(firebaseConfig);
@@ -92,9 +93,19 @@ if(kakaoBtn){
         }).then(function(res){ return res.json(); })
           .then(function(data){
             if(data && data.error){ throw new Error(data.error); }
-            return signInWithCustomToken(auth, data.customToken);
-          }).then(function(result){
-            return saveUserProfile(result.user, { provider: "kakao" });
+            return signInWithCustomToken(auth, data.customToken).then(function(result){
+              return { result: result, displayName: data.displayName, photoURL: data.photoURL };
+            });
+          }).then(function(o){
+            // custom-token sign-ins don't carry a profile, unlike Google's
+            // popup flow -- fill it in from what kakaoAuth looked up.
+            var profileUpdate = {};
+            if(o.displayName) profileUpdate.displayName = o.displayName;
+            if(o.photoURL) profileUpdate.photoURL = o.photoURL;
+            var p = Object.keys(profileUpdate).length ? updateProfile(o.result.user, profileUpdate) : Promise.resolve();
+            return p.then(function(){
+              return saveUserProfile(o.result.user, { provider: "kakao", displayName: o.displayName || "" });
+            });
           }).then(function(){
             setStatus("로그인 성공!");
             closeAuthModal();
