@@ -1,6 +1,6 @@
 (function(){
   function sj(id){ return document.getElementById(id); }
-  var ANALYZE_URL = "https://analyze-scorecard-162951012751.asia-northeast3.run.app";
+  var ANALYZE_URL = "https://asia-northeast3-skyjang-golfscore.cloudfunctions.net/analyzeScorecard";
   var lastOcrUsed = false;
 
   function fileToBase64(file){
