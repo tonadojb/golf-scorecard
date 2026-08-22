@@ -1,7 +1,6 @@
 (function(){
   function sj(id){ return document.getElementById(id); }
   var LIST_URL = "https://asia-northeast3-skyjang-golfscore.cloudfunctions.net/listRounds";
-  var DELETE_URL = "https://asia-northeast3-skyjang-golfscore.cloudfunctions.net/deleteRound";
   var cachedRounds = [];
 
   function tt(key, fallback){
@@ -78,9 +77,7 @@
       var playersLine = (r.players || []).map(function(p){
         return escapeHtml(p.name || "") + " " + p.totalScore + "(" + signedLabel(p.scoreToPar) + ")";
       }).join(" · ");
-      return '<div class="sj-load-item" data-idx="'+entry.idx+'" style="position:relative;border:1px solid #e5e7eb;border-radius:10px;padding:10px 40px 10px 12px;margin-bottom:8px;cursor:pointer;">' +
-        '<button type="button" class="sj-load-delete" data-idx="'+entry.idx+'" title="삭제" ' +
-          'style="position:absolute;top:8px;right:8px;width:26px;height:26px;line-height:1;border:none;border-radius:8px;background:#fee2e2;color:#b91c1c;font-size:14px;cursor:pointer;">×</button>' +
+      return '<div class="sj-load-item" data-idx="'+entry.idx+'" style="border:1px solid #e5e7eb;border-radius:10px;padding:10px 12px;margin-bottom:8px;cursor:pointer;">' +
         '<div style="font-weight:600;font-size:14px;color:#1f2b24;">' + titleLine + '</div>' +
         '<div style="font-size:12px;color:#666;margin-top:2px;">' + date + '</div>' +
         (playersLine ? '<div style="font-size:12px;color:#1b6b3c;margin-top:4px;">' + playersLine + '</div>' : '') +
@@ -138,45 +135,10 @@
     if(typeof renderAll === "function") renderAll();
   }
 
-  function handleDelete(idx){
-    var r = cachedRounds[idx];
-    if(!r) return;
-    var label = (r.courseName ? r.courseName : tt("loadNoCourseName", "골프장 미입력")) +
-      (r.roundDate ? " (" + r.roundDate + ")" : "");
-    if(!confirm('"' + label + '" 라운드를 삭제할까요? 되돌릴 수 없습니다.')) return;
-    var currentUser = window.__sjAuth && window.__sjAuth.getCurrentUser();
-    if(!currentUser){
-      alert("로그인이 필요합니다.");
-      return;
-    }
-    currentUser.getIdToken().then(function(idToken){
-      return fetch(DELETE_URL, {
-        method: "POST",
-        headers: { "Content-Type": "application/json", "Authorization": "Bearer " + idToken },
-        body: JSON.stringify({ id: r.id })
-      });
-    }).then(function(res){ return res.json(); })
-      .then(function(data){
-        if(data && data.error){ throw new Error(data.error); }
-        cachedRounds.splice(idx, 1);
-        populateYearFilter();
-        renderList();
-        if(typeof toast === "function"){ toast("삭제되었습니다"); }
-      })
-      .catch(function(e){
-        alert("삭제 실패: " + (e && e.message ? e.message : e));
-      });
-  }
-
   function bindListClick(){
     var listEl = sj("sjLoadList");
     if(!listEl) return;
     listEl.addEventListener("click", function(e){
-      var delBtn = e.target.closest(".sj-load-delete");
-      if(delBtn){
-        handleDelete(parseInt(delBtn.dataset.idx, 10));
-        return;
-      }
       var item = e.target.closest(".sj-load-item");
       if(!item) return;
       var idx = parseInt(item.dataset.idx, 10);
