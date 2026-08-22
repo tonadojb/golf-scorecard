@@ -207,17 +207,11 @@ function handleNaverLoginSuccess(){
     });
 }
 
-// 네이버 로그인 후 이 페이지로 돌아왔을 때(=주소 뒤에 "#access_token=..."이 실제로
-// 붙어있을 때)만 로그인 처리를 이어갑니다.
-//
-// 처음엔 naverLoginInstance.getLoginStatus()로 확인했는데, 이 함수는 "네이버 쪽에
-// 로그인 세션이 지금 남아있냐"를 확인하는 것이라서, 우리 앱에서 로그아웃(Firebase
-// signOut)해도 네이버 자체 세션은 그대로 남아있어 페이지를 새로고침할 때마다 계속
-// "로그인됨"으로 판단되어 자동으로 다시 로그인되어버리는 문제가 있었습니다
-// (로그아웃해도 로그인 상태가 유지되는 것처럼 보였던 원인). 방금 리다이렉트되어
-// 돌아온 순간에만 정확히 반응하도록 조건을 바꿨습니다.
-if(window.location.hash && window.location.hash.indexOf("access_token=") !== -1){
-  handleNaverLoginSuccess();
+// 네이버 로그인 후 이 페이지로 돌아왔을 때 자동으로 로그인 처리를 이어갑니다.
+if(naverLoginInstance){
+  naverLoginInstance.getLoginStatus(function(status){
+    if(status){ handleNaverLoginSuccess(); }
+  });
 }
 
 var naverBtn = sj("sjNaverLogin");
@@ -238,12 +232,6 @@ if(logoutBtn){
     signOut(auth).then(function(){
       // "로그인 성공!" 같은 이전 상태 문구가 로그아웃 후에도 남아있지 않도록 지워줍니다.
       setStatus("");
-      // 네이버 SDK 쪽 로그인 세션도 같이 끊어줍니다 (Firebase 로그아웃만 하면 네이버
-      // 자체 세션은 남아있어서, 나중에 "네이버로 로그인"을 다시 누르면 확인 절차 없이
-      // 바로 이전 계정으로 재로그인될 수 있습니다).
-      if(naverLoginInstance && typeof naverLoginInstance.logout === "function"){
-        naverLoginInstance.logout();
-      }
     });
   });
 }
