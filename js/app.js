@@ -63,7 +63,7 @@ function parsePar(v){
 
 window.__golfScorecardAPI = {
   getState: function(){ return state; },
-  hydrateFromOCR: function(data){
+  hydrateFromOCR: function(data, teamIndex){
     if(data.courseName){ state.courseName = data.courseName; }
     if(data.courseSub){ state.courseSub = data.courseSub; }
     if(data.roundDate){
@@ -86,7 +86,11 @@ window.__golfScorecardAPI = {
         if(pv){ state.holes[hpi].par = pv; }
       }
     }
-    var t0 = state.teams[0];
+    /* Which team this OCR result should be applied to. Defaults to the first
+       team (team 0) so behavior is unchanged when only one team exists or
+       no target was specified (e.g. older callers). */
+    var ti = (typeof teamIndex === 'number' && state.teams[teamIndex]) ? teamIndex : 0;
+    var t0 = state.teams[ti];
     if(data.players && data.players.length){
       var selfPlayer = null;
       for(var pi=0; pi<data.players.length; pi++){ if(data.players[pi].isSelf){ selfPlayer = data.players[pi]; break; } }

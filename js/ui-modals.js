@@ -10,7 +10,10 @@
   });
 
   sj("sjAuthFab").addEventListener("click", function(){ sjOpen("sjAuthModal"); });
-  sj("sjOcrFab").addEventListener("click", function(){ sjOpen("sjOcrModal"); });
+  sj("sjOcrFab").addEventListener("click", function(){
+    if(window.__sjOcr && window.__sjOcr.onOpen){ window.__sjOcr.onOpen(); }
+    sjOpen("sjOcrModal");
+  });
   sj("sjSaveFab").addEventListener("click", function(){
     var currentUser = window.__sjAuth && window.__sjAuth.getCurrentUser();
     if(!currentUser){
@@ -20,5 +23,15 @@
     }
     if(window.__sjCloudSave){ window.__sjCloudSave.populatePlayerSelect(); }
     sjOpen("sjSaveModal");
+  });
+  sj("sjLoadFab").addEventListener("click", function(){
+    var currentUser = window.__sjAuth && window.__sjAuth.getCurrentUser();
+    if(!currentUser){
+      alert("먼저 로그인해주세요.");
+      sjOpen("sjAuthModal");
+      return;
+    }
+    if(window.__sjCloudLoad){ window.__sjCloudLoad.onOpen(); }
+    sjOpen("sjLoadModal");
   });
 })();

@@ -46,7 +46,21 @@ var I18N = {
     confirmReset:"모든 팀, 스코어, 홀 정보를 초기화할까요? 이 작업은 되돌릴 수 없습니다.",
     copyDatePrefix:"📅",
     copyTotalLabel:"합계",
-    copyFooter:"- Field Golf Scorecard -"
+    copyFooter:"- Field Golf Scorecard -",
+    ocrTeamLabel:"어느 팀 사진인가요?",
+    ocrAddTeamBtn:"+ 팀 추가",
+    loadFabTitle:"불러오기",
+    loadModalTitle:"저장된 라운드 불러오기",
+    loadEmpty:"저장된 라운드가 없습니다",
+    loadBackBtn:"◀ 목록으로",
+    loadCompanionsLabel:"동반자",
+    loadTotalLabel:"합계",
+    loadHoleLabel:"홀",
+    loadParLabel:"파",
+    loadScoreLabel:"스코어",
+    loadNoCourseName:"골프장 미입력",
+    loadNoDate:"날짜 미입력",
+    loadFetchFail:"불러오기 실패"
   },
   en:{
     title:"⛳ Golf Scorecard",
@@ -95,7 +109,21 @@ var I18N = {
     confirmReset:"Reset all teams, scores, and hole info? This cannot be undone.",
     copyDatePrefix:"📅",
     copyTotalLabel:"Total",
-    copyFooter:"- Field Golf Scorecard -"
+    copyFooter:"- Field Golf Scorecard -",
+    ocrTeamLabel:"Which team is this photo for?",
+    ocrAddTeamBtn:"+ Add Team",
+    loadFabTitle:"Load",
+    loadModalTitle:"Load Saved Rounds",
+    loadEmpty:"No saved rounds yet",
+    loadBackBtn:"◀ Back to list",
+    loadCompanionsLabel:"Companions",
+    loadTotalLabel:"Total",
+    loadHoleLabel:"Hole",
+    loadParLabel:"Par",
+    loadScoreLabel:"Score",
+    loadNoCourseName:"No course name",
+    loadNoDate:"No date",
+    loadFetchFail:"Failed to load"
   },
   ja:{
     title:"⛳ ゴルフスコアカード",
@@ -144,7 +172,21 @@ var I18N = {
     confirmReset:"すべてのチーム、スコア、ホール情報を初期化しますか?この操作は元に戻せません。",
     copyDatePrefix:"📅",
     copyTotalLabel:"合計",
-    copyFooter:"- Field Golf Scorecard -"
+    copyFooter:"- Field Golf Scorecard -",
+    ocrTeamLabel:"どのチームの写真ですか?",
+    ocrAddTeamBtn:"+ チーム追加",
+    loadFabTitle:"読み込み",
+    loadModalTitle:"保存したラウンドを読み込む",
+    loadEmpty:"保存されたラウンドがありません",
+    loadBackBtn:"◀ リストに戻る",
+    loadCompanionsLabel:"同伴者",
+    loadTotalLabel:"合計",
+    loadHoleLabel:"ホール",
+    loadParLabel:"パー",
+    loadScoreLabel:"スコア",
+    loadNoCourseName:"コース名未入力",
+    loadNoDate:"日付未入力",
+    loadFetchFail:"読み込みに失敗しました"
   },
   zh:{
     title:"⛳ 高尔夫记分卡",
@@ -193,7 +235,21 @@ var I18N = {
     confirmReset:"要重置所有队伍、成绩和球洞信息吗?此操作无法撤销。",
     copyDatePrefix:"📅",
     copyTotalLabel:"总计",
-    copyFooter:"- Field Golf Scorecard -"
+    copyFooter:"- Field Golf Scorecard -",
+    ocrTeamLabel:"这是哪个队伍的照片?",
+    ocrAddTeamBtn:"+ 添加队伍",
+    loadFabTitle:"加载",
+    loadModalTitle:"加载已保存的回合",
+    loadEmpty:"暂无已保存的回合",
+    loadBackBtn:"◀ 返回列表",
+    loadCompanionsLabel:"同伴",
+    loadTotalLabel:"总计",
+    loadHoleLabel:"洞",
+    loadParLabel:"标准杆",
+    loadScoreLabel:"成绩",
+    loadNoCourseName:"未输入球场名称",
+    loadNoDate:"未输入日期",
+    loadFetchFail:"加载失败"
   }
 };
 
@@ -275,9 +331,18 @@ function applyStaticTranslations(){
   document.getElementById('sortTeamBtn').textContent = t('sortTeamView');
   document.getElementById('sortRankBtn').textContent = t('sortRankView');
   document.getElementById('footerText').textContent = t('footer');
+  var ocrTeamLabelEl = document.getElementById('sjOcrTeamLabel');
+  if(ocrTeamLabelEl) ocrTeamLabelEl.textContent = t('ocrTeamLabel');
+  var ocrAddTeamBtnEl = document.getElementById('sjOcrAddTeamBtn');
+  if(ocrAddTeamBtnEl) ocrAddTeamBtnEl.textContent = t('ocrAddTeamBtn');
+  var loadFabEl = document.getElementById('sjLoadFab');
+  if(loadFabEl) loadFabEl.title = t('loadFabTitle');
+  var loadModalTitleEl = document.getElementById('sjLoadModalTitle');
+  if(loadModalTitleEl) loadModalTitleEl.textContent = t('loadModalTitle');
+  var loadBackBtnEl = document.getElementById('sjLoadBackBtn');
+  if(loadBackBtnEl) loadBackBtnEl.textContent = t('loadBackBtn');
   Array.prototype.forEach.call(langDropdown.querySelectorAll('button[data-lang]'), function(b){
     b.classList.toggle('active', b.dataset.lang === state.lang);
   });
 }
-
 

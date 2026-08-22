@@ -1,7 +1,7 @@
 (function(){
   function sj(id){ return document.getElementById(id); }
 
-  var COMMIT_URL = "https://commit-round-162951012751.asia-northeast3.run.app";
+  var COMMIT_URL = "https://asia-northeast3-skyjang-golfscore.cloudfunctions.net/saveRound";
 
   function populatePlayerSelect(){
     var state = window.__golfScorecardAPI.getState();
@@ -57,6 +57,9 @@
           if(!(ti2 === ti && pi2 === pi)){ companions.push(name); }
         });
       });
+      var parsArr = [];
+      for(var hp=0; hp<state.holeCount; hp++){ parsArr.push((holes[hp] && holes[hp].par) || 4); }
+      var holeScoresArr = myScores.slice(0, state.holeCount);
       status.className = "sj-status";
       status.textContent = "저장 중...";
       currentUser.getIdToken().then(function(idToken){
@@ -65,9 +68,13 @@
           headers: { "Content-Type": "application/json", "Authorization": "Bearer " + idToken },
           body: JSON.stringify({
             courseName: state.courseName || "",
+            courseSub: state.courseSub || null,
+            teeOffTime: state.teeOffTime || null,
             companions: companions,
             roundDate: state.playDate || null,
             holeCount: state.holeCount,
+            pars: parsArr,
+            holeScores: holeScoresArr,
             totalScore: totalScore,
             scoreToPar: scoreToPar,
             scoreBreakdown: breakdown,

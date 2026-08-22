@@ -156,7 +156,6 @@
 <button class="sj-fab" id="sjAuthFab" title="계정">👤</button>
 <button class="sj-fab" id="sjOcrFab" title="사진으로 입력">📷</button>
 <button class="sj-fab" id="sjSaveFab" title="클라우드 저장">☁</button>
-<button class="sj-fab" id="sjLoadFab" title="불러오기">📂</button>
 </div>
 
 <div class="sj-modal-overlay" id="sjAuthModal"><div class="sj-modal">
@@ -200,19 +199,6 @@
 <div class="sj-status" id="sjSaveStatus"></div>
 </div></div>
 
-<div class="sj-modal-overlay" id="sjLoadModal"><div class="sj-modal">
-<button class="sj-close" data-close>×</button>
-<h3 id="sjLoadModalTitle">저장된 라운드 불러오기</h3>
-<div id="sjLoadListView">
-<div id="sjLoadList"></div>
-<div class="sj-status" id="sjLoadStatus"></div>
-</div>
-<div id="sjLoadDetailView" style="display:none;">
-<button type="button" id="sjLoadBackBtn" class="sj-secondary" style="margin-top:0;">◀ 목록으로</button>
-<div id="sjLoadDetailContent"></div>
-</div>
-</div></div>
-
 <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
 <script src="js/i18n.js" defer></script>
 <script src="js/state.js" defer></script>
@@ -227,7 +213,6 @@
 <script type="module" src="js/auth.js"></script>
 <script src="js/ocr.js" defer></script>
 <script src="js/cloud-save.js" defer></script>
-<script src="js/cloud-load.js" defer></script>
 
 </body>
 </html>
