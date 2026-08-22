@@ -30,7 +30,7 @@
         return;
       }
       status.className = "sj-status";
-      status.textContent = "인식 중입니다... (최대 60초 소요, 검산 때문에 조금 더 걸릴 수 있어요)";
+      status.textContent = "인식 중입니다... (최대 30초 소요)";
       var file = fileInput.files[0];
       fileToBase64(file).then(function(base64){
         return currentUser.getIdToken().then(function(idToken){
