@@ -3,17 +3,19 @@
 
   var COMMIT_URL = "https://asia-northeast3-skyjang-golfscore.cloudfunctions.net/saveRound";
 
-  function populatePlayerSelect(){
+  /* Save always captures the WHOLE selected team's data -- every
+     player's name and full hole-by-hole scores, not just one "my
+     player" -- so 불러오기 can restore the exact same scorecard later. */
+  function populateTeamSelect(){
     var state = window.__golfScorecardAPI.getState();
-    var sel = sj("sjMyPlayerSelect");
+    var sel = sj("sjSaveTeamSelect");
+    if(!sel) return;
     sel.innerHTML = "";
     state.teams.forEach(function(team, ti){
-      team.players.forEach(function(name, pi){
-        var opt = document.createElement("option");
-        opt.value = ti + "_" + pi;
-        opt.textContent = (team.name || ("Team" + (ti + 1))) + " - " + name;
-        sel.appendChild(opt);
-      });
+      var opt = document.createElement("option");
+      opt.value = String(ti);
+      opt.textContent = team.name || ("Team " + (ti + 1));
+      sel.appendChild(opt);
     });
   }
 
@@ -29,37 +31,25 @@
         return;
       }
       var state = window.__golfScorecardAPI.getState();
-      var parts = sj("sjMyPlayerSelect").value.split("_");
-      var ti = Number(parts[0]);
-      var pi = Number(parts[1]);
+      var sel = sj("sjSaveTeamSelect");
+      var ti = sel ? parseInt(sel.value, 10) : 0;
+      if(isNaN(ti) || !state.teams[ti]){ ti = 0; }
       var team = state.teams[ti];
-      var myScores = team.scores[pi] || [];
-      var holes = state.holes || [];
-      var totalScore = 0;
-      var scoreToPar = 0;
-      var breakdown = { eagle: 0, birdie: 0, par: 0, bogey: 0, doubleOrWorse: 0 };
-      for(var h=0; h<state.holeCount; h++){
-        var sc = myScores[h];
-        if(typeof sc !== "number"){ continue; }
-        var par = (holes[h] && holes[h].par) || 4;
-        totalScore += sc;
-        var diff = sc - par;
-        scoreToPar += diff;
-        if(diff <= -2){ breakdown.eagle++; }
-        else if(diff === -1){ breakdown.birdie++; }
-        else if(diff === 0){ breakdown.par++; }
-        else if(diff === 1){ breakdown.bogey++; }
-        else { breakdown.doubleOrWorse++; }
+      if(!team){
+        status.className = "sj-status error";
+        status.textContent = "저장할 팀이 없습니다.";
+        return;
       }
-      var companions = [];
-      state.teams.forEach(function(t2, ti2){
-        t2.players.forEach(function(name, pi2){
-          if(!(ti2 === ti && pi2 === pi)){ companions.push(name); }
-        });
+      var holes = (state.holes || []).slice(0, state.holeCount).map(function(h){
+        return { par: h.par, note: h.note || "" };
       });
-      var parsArr = [];
-      for(var hp=0; hp<state.holeCount; hp++){ parsArr.push((holes[hp] && holes[hp].par) || 4); }
-      var holeScoresArr = myScores.slice(0, state.holeCount);
+      var players = team.players.map(function(name, pi){
+        return {
+          name: name,
+          holeScores: (team.scores[pi] || []).slice(0, state.holeCount),
+          entered: (team.entered[pi] || []).slice(0, state.holeCount)
+        };
+      });
       status.className = "sj-status";
       status.textContent = "저장 중...";
       currentUser.getIdToken().then(function(idToken){
@@ -70,24 +60,19 @@
             courseName: state.courseName || "",
             courseSub: state.courseSub || null,
             teeOffTime: state.teeOffTime || null,
-            companions: companions,
             roundDate: state.playDate || null,
             holeCount: state.holeCount,
-            pars: parsArr,
-            holeScores: holeScoresArr,
-            totalScore: totalScore,
-            scoreToPar: scoreToPar,
-            scoreBreakdown: breakdown,
-            inputMethod: (window.__sjOcr && window.__sjOcr.wasLastInputFromOcr && window.__sjOcr.wasLastInputFromOcr()) ? "photo" : "manual",
-            photoUrl: ""
+            holes: holes,
+            teamName: team.name || "",
+            players: players
           })
         });
       }).then(function(res){ return res.json(); })
         .then(function(data){
           if(data && data.error){ throw new Error(data.error); }
-          status.textContent = "저장 완료! 통계에 반영됩니다.";
+          status.textContent = "저장 완료! (본인 + 동반자 전체 스코어가 저장되었습니다)";
           if(window.__sjOcr && window.__sjOcr.resetLastInputFlag){ window.__sjOcr.resetLastInputFlag(); }
-          setTimeout(function(){ sj("sjSaveModal").classList.remove("open"); }, 1200);
+          setTimeout(function(){ sj("sjSaveModal").classList.remove("open"); }, 1400);
         })
         .catch(function(e){
           status.className = "sj-status error";
@@ -97,5 +82,5 @@
   }
 
   bindConfirmSave();
-  window.__sjCloudSave = { populatePlayerSelect: populatePlayerSelect };
+  window.__sjCloudSave = { populateTeamSelect: populateTeamSelect };
 })();

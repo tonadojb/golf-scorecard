@@ -72,67 +72,39 @@
       var r = entry.r;
       var course = r.courseName ? escapeHtml(r.courseName) : tt("loadNoCourseName", "골프장 미입력");
       if(r.courseSub){ course += " (" + escapeHtml(r.courseSub) + ")"; }
-      var titleLine = course + (r.teamName ? ' · ' + escapeHtml(r.teamName) : '');
       var date = r.roundDate ? escapeHtml(r.roundDate) : tt("loadNoDate", "날짜 미입력");
-      var playersLine = (r.players || []).map(function(p){
-        return escapeHtml(p.name || "") + " " + p.totalScore + "(" + signedLabel(p.scoreToPar) + ")";
-      }).join(" · ");
+      var toPar = signedLabel(r.scoreToPar);
       return '<div class="sj-load-item" data-idx="'+entry.idx+'" style="border:1px solid #e5e7eb;border-radius:10px;padding:10px 12px;margin-bottom:8px;cursor:pointer;">' +
-        '<div style="font-weight:600;font-size:14px;color:#1f2b24;">' + titleLine + '</div>' +
+        '<div style="font-weight:600;font-size:14px;color:#1f2b24;">' + course + '</div>' +
         '<div style="font-size:12px;color:#666;margin-top:2px;">' + date + '</div>' +
-        (playersLine ? '<div style="font-size:12px;color:#1b6b3c;margin-top:4px;">' + playersLine + '</div>' : '') +
+        '<div style="font-size:13px;color:#1b6b3c;margin-top:4px;font-weight:600;">' + r.totalScore + ' (' + toPar + ')</div>' +
         '</div>';
     }).join("");
   }
 
-  /* Restores a saved round's FULL data (course/hole setup + every
-     player's name and complete hole-by-hole scores) back onto team 0,
-     exactly as it was at save time -- not a partial/summary merge.
-     Writes directly to the shared `state` global (same one state.js /
-     app.js use) rather than going through hydrateFromOCR, since OCR's
-     merge-only-if-present semantics don't fit a full restore. */
+  /* Applies a saved round directly onto the live scorecard (team 0) --
+     reuses the same merge logic OCR results go through, since the shape
+     (courseName/courseSub/roundDate/teeOffTime/pars/players[]) matches.
+     Self player's name isn't stored server-side (only companions are), so
+     it's passed as null and hydrateFromOCR leaves whatever name is
+     already there untouched. */
   function applyRoundToState(r){
-    if(typeof state === "undefined" || !state) return;
+    if(typeof state === "undefined" || !state || !window.__golfScorecardAPI) return;
     if(r.holeCount === 9 || r.holeCount === 18){
       state.holeCount = r.holeCount;
       if(typeof normalize === "function") normalize();
     }
-    state.courseName = r.courseName || "";
-    state.courseSub = r.courseSub || "";
-    if(r.roundDate) state.playDate = r.roundDate;
-    state.teeOffTime = r.teeOffTime || "";
-
-    var holesIn = r.holes || [];
-    for(var hi = 0; hi < state.holeCount; hi++){
-      if(holesIn[hi]){
-        if(typeof holesIn[hi].par === "number"){ state.holes[hi].par = holesIn[hi].par; }
-        state.holes[hi].note = holesIn[hi].note || "";
-      }
-    }
-
-    if(!state.teams[0]){
-      state.teams[0] = { id: state.nextTeamId++, name: "Team 1", players: [], scores: [], entered: [], anonymize: [] };
-      if(typeof normalize === "function") normalize();
-    }
-    var team = state.teams[0];
-    team.name = r.teamName || team.name;
-    var playersIn = r.players || [];
-    for(var pi = 0; pi < team.players.length; pi++){
-      var p = playersIn[pi];
-      if(!p) continue;
-      team.players[pi] = p.name || team.players[pi];
-      var scArr = [], entArr = [];
-      for(var h = 0; h < state.holeCount; h++){
-        var sc = (p.holeScores && p.holeScores[h]);
-        scArr.push(typeof sc === "number" ? sc : 0);
-        entArr.push(!!(p.entered && p.entered[h]));
-      }
-      team.scores[pi] = scArr;
-      team.entered[pi] = entArr;
-    }
-
-    if(typeof save === "function") save();
-    if(typeof renderAll === "function") renderAll();
+    var players = [{ name: null, isSelf: true, holeScores: r.holeScores || [] }]
+      .concat((r.companions || []).map(function(name){ return { name: name, isSelf: false, holeScores: [] }; }));
+    var data = {
+      courseName: r.courseName || null,
+      courseSub: r.courseSub || null,
+      roundDate: r.roundDate || null,
+      teeOffTime: r.teeOffTime || null,
+      pars: (r.pars && r.pars.length) ? r.pars : null,
+      players: players
+    };
+    window.__golfScorecardAPI.hydrateFromOCR(data, 0);
   }
 
   function bindListClick(){

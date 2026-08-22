@@ -21,7 +21,7 @@
       sjOpen("sjAuthModal");
       return;
     }
-    if(window.__sjCloudSave){ window.__sjCloudSave.populatePlayerSelect(); }
+    if(window.__sjCloudSave){ window.__sjCloudSave.populateTeamSelect(); }
     sjOpen("sjSaveModal");
   });
   sj("sjLoadFab").addEventListener("click", function(){
