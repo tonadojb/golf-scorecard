@@ -81,11 +81,11 @@ function copyResultAsText(){
   }
 }
 
-function copyResultAsImage(){
-  if(typeof html2canvas !== 'function'){
-    toast(t('toastImageFail'));
-    return;
-  }
+/* Builds the result-card screenshot and resolves to a PNG Blob. Split out
+   from copyResultAsImage() so the Blob can be produced as a *pending
+   Promise* that gets handed to ClipboardItem immediately -- see the note
+   in copyResultAsImage() for why that ordering matters on Android. */
+function buildResultImageBlob(){
   var original = document.getElementById('resultCaptureArea');
   var clone = original.cloneNode(true);
   clone.style.position = 'fixed';
@@ -108,22 +108,69 @@ function copyResultAsImage(){
 
   document.body.appendChild(clone);
 
-  html2canvas(clone, {backgroundColor:'#ffffff', scale:2}).then(function(canvas){
+  return html2canvas(clone, {backgroundColor:'#ffffff', scale:2}).then(function(canvas){
     document.body.removeChild(clone);
-    canvas.toBlob(function(blob){
-      if(!blob){ toast(t('toastImageFail')); return; }
-      if(navigator.clipboard && window.ClipboardItem){
-        navigator.clipboard.write([new ClipboardItem({'image/png': blob})]).then(function(){
-          toast(t('toastImageCopied'));
-        }).catch(function(){
-          downloadImageBlob(blob);
-        });
-      } else {
-        downloadImageBlob(blob);
-      }
-    }, 'image/png');
-  }).catch(function(){
+    return new Promise(function(resolve, reject){
+      canvas.toBlob(function(blob){
+        if(blob) resolve(blob); else reject(new Error('toBlob returned null'));
+      }, 'image/png');
+    });
+  }).catch(function(err){
     if(clone.parentNode) document.body.removeChild(clone);
+    throw err;
+  });
+}
+
+function copyResultAsImage(){
+  if(typeof html2canvas !== 'function'){
+    toast(t('toastImageFail'));
+    return;
+  }
+  var blobPromise = buildResultImageBlob();
+
+  /* Android Chrome only allows navigator.clipboard.write() while the
+     click's "user activation" is still fresh. html2canvas + canvas.toBlob()
+     can easily take longer than that window (especially on slower Android
+     phones with an 18-hole table to render), so by the time the old code
+     called write() with the *resolved* blob, Android had often already
+     expired activation and silently rejected the write -- while iOS Safari
+     tolerates the delay fine, which is why this only broke on Android.
+     The fix: hand ClipboardItem the *pending* blobPromise directly and
+     call write() synchronously, right now, before the image is even
+     rendered. Chrome/Safari support a Promise as a ClipboardItem value
+     specifically so activation is preserved like this; the actual pixel
+     data streams in once buildResultImageBlob() resolves. */
+  if(navigator.clipboard && window.ClipboardItem){
+    var writePromise = null;
+    try{
+      writePromise = navigator.clipboard.write([
+        new ClipboardItem({ 'image/png': blobPromise })
+      ]);
+    } catch(e){
+      writePromise = null;
+    }
+    if(writePromise){
+      writePromise.then(function(){
+        toast(t('toastImageCopied'));
+      }).catch(function(){
+        /* Promise-based ClipboardItem write was rejected (some Android
+           browsers still refuse it) -- fall back to resolve-then-write,
+           then finally to a plain file download. */
+        blobPromise.then(function(blob){
+          navigator.clipboard.write([new ClipboardItem({'image/png': blob})]).then(function(){
+            toast(t('toastImageCopied'));
+          }).catch(function(){ downloadImageBlob(blob); });
+        }).catch(function(){ toast(t('toastImageFail')); });
+      });
+      return;
+    }
+  }
+
+  /* No Clipboard image support at all (old browsers / in-app webviews) --
+     just wait for the image and download it instead. */
+  blobPromise.then(function(blob){
+    downloadImageBlob(blob);
+  }).catch(function(){
     toast(t('toastImageFail'));
   });
 }

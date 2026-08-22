@@ -56,8 +56,8 @@ main{padding:0 16px 16px;}
 .hole-nav{display:flex;gap:10px;margin-top:14px;}
 .hole-nav button{flex:1;padding:12px;border-radius:10px;border:none;background:var(--green);color:#fff;font-weight:700;cursor:pointer;}
 #resultSummary{margin-bottom:12px;font-size:13px;color:var(--muted);}
-.table-wrap{overflow-x:auto;margin-bottom:14px;}
-table{border-collapse:collapse;width:100%;font-size:12px;}
+.table-wrap{overflow-x:auto;-webkit-overflow-scrolling:touch;touch-action:pan-x pan-y;overscroll-behavior-x:contain;margin-bottom:14px;}
+table{border-collapse:collapse;width:max-content;min-width:100%;font-size:12px;}
 table th,table td{border:1px solid #e3ece6;padding:6px 5px;text-align:center;white-space:nowrap;}
 table th{background:var(--green-light);color:var(--green-dark);}
 table td.team-row{background:#f1f7f3;font-weight:700;color:var(--green-dark);text-align:left;}
