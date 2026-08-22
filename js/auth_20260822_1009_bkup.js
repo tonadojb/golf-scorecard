@@ -229,10 +229,7 @@ if(naverBtn){
 var logoutBtn = sj("sjLogout");
 if(logoutBtn){
   logoutBtn.addEventListener("click", function(){
-    signOut(auth).then(function(){
-      // "로그인 성공!" 같은 이전 상태 문구가 로그아웃 후에도 남아있지 않도록 지워줍니다.
-      setStatus("");
-    });
+    signOut(auth);
   });
 }
 
