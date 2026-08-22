@@ -109,10 +109,6 @@ if(kakaoBtn){
               return saveUserProfile(o.result.user, { provider: "kakao", displayName: o.displayName || "" });
             });
           }).then(function(){
-            // updateProfile이 끝난 뒤에도 onAuthStateChanged가 다시 안 불려서
-            // 직접 한 번 더 화면을 갱신해줍니다 (auth.currentUser는 이 시점엔
-            // updateProfile 결과가 반영된 최신 상태).
-            renderAuthUI(auth.currentUser);
             setStatus("로그인 성공!");
             closeAuthModal();
           }).catch(function(e){
@@ -192,9 +188,6 @@ function handleNaverLoginSuccess(){
         return saveUserProfile(o.result.user, { provider: "naver", displayName: o.displayName || "" });
       });
     }).then(function(){
-      // updateProfile이 끝난 뒤에도 onAuthStateChanged가 다시 안 불려서
-      // 직접 한 번 더 화면을 갱신해줍니다.
-      renderAuthUI(auth.currentUser);
       setStatus("로그인 성공!");
       closeAuthModal();
       // 주소창에 남은 토큰 해시를 지워서 새로고침해도 다시 로그인 처리가
@@ -233,13 +226,7 @@ if(logoutBtn){
   });
 }
 
-// onAuthStateChanged만으로는 화면에 이름이 안 뜨는 문제가 있었습니다: 카카오/네이버는
-// signInWithCustomToken 직후에는 프로필이 비어있고, 그 다음 줄에서 updateProfile()로
-// 이름/사진을 나중에 채워넣는데, updateProfile()은 onAuthStateChanged를 다시 실행시키지
-// 않습니다. 그래서 로그인 직후 "이름 없음" 상태로 딱 한 번 렌더링된 화면이 그대로 굳어서
-// kakao:숫자 같은 uid가 계속 남아있었던 것입니다. renderAuthUI를 따로 빼내서
-// updateProfile이 끝난 뒤에도 한 번 더 직접 호출해 화면을 갱신합니다.
-function renderAuthUI(user){
+onAuthStateChanged(auth, function(user){
   currentUser = user;
   var loggedOut = sj("sjAuthLoggedOut");
   var loggedIn = sj("sjAuthLoggedIn");
@@ -252,9 +239,7 @@ function renderAuthUI(user){
     if(loggedOut) loggedOut.style.display = "block";
     if(loggedIn) loggedIn.style.display = "none";
   }
-}
-
-onAuthStateChanged(auth, renderAuthUI);
+});
 
 window.__sjAuth = {
   getCurrentUser: function(){ return currentUser; },
