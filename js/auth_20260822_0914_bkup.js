@@ -123,98 +123,50 @@ if(kakaoBtn){
 }
 
 // ---- 네이버 로그인 ----
-// 예전 코드는 팝업(isPopup:true) 방식이었는데, 네이버가 처음 보는 기기/브라우저에서
-// 로그인할 때 보안을 위해 이메일로 "본인 확인"을 요청하는 경우가 있고, 그 인증 링크를
-// (아이폰 메일 앱 등) 별도의 탭/앱에서 열면 원래 로그인 팝업 창이 완료 신호를 못 받아
-// 로그인이 중간에 끊기는 문제가 있었습니다. 그래서 페이지 전체를 네이버 로그인 화면으로
-// 이동시키는 방식(isPopup:false)으로 바꿨습니다 -- 이러면 이메일 인증을 포함한 모든 과정이
-// 하나의 탭 안에서 끝나고, 완료되면 네이버가 다시 이 페이지로 돌려보내 줍니다.
-//
-// 또한 예전 코드는 window.__sjHandleNaverToken 이라는 함수를 만들어두기만 했을 뿐 그
-// 함수를 실제로 호출하는 코드가 어디에도 없었습니다 (SDK가 자동으로 불러주는 함수가
-// 아니었음) -- 그래서 로그인 자체는 네이버 쪽에서 성공해도 우리 페이지가 그 결과를 전혀
-// 받아오지 못하고 아무 반응이 없었던 것입니다. 아래 코드는 로그인 후 이 페이지로 돌아왔을
-// 때 getLoginStatus()로 로그인 여부를 직접 확인하고, 액세스 토큰을 꺼내 처리합니다.
-var naverLoginInstance = null;
-if(window.naver && window.naver.LoginWithNaverId){
-  naverLoginInstance = new window.naver.LoginWithNaverId({
-    clientId: NAVER_CLIENT_ID,
-    callbackUrl: window.location.origin + window.location.pathname,
-    isPopup: false,
-    callbackHandle: true
-  });
-  naverLoginInstance.init();
-}
-
-function extractNaverAccessToken(){
-  // SDK 인스턴스에 실려오는 값을 우선 시도하고, 혹시 못 찾으면 주소창의
-  // "#access_token=..." 해시에서 직접 꺼내는 것으로 한 번 더 확인합니다.
-  if(naverLoginInstance && naverLoginInstance.accessToken && naverLoginInstance.accessToken.accessToken){
-    return naverLoginInstance.accessToken.accessToken;
-  }
-  var hash = window.location.hash || "";
-  if(hash.indexOf("access_token=") !== -1){
-    var params = new URLSearchParams(hash.replace(/^#/, ""));
-    return params.get("access_token");
-  }
-  return null;
-}
-
-function handleNaverLoginSuccess(){
-  var accessToken = extractNaverAccessToken();
-  if(!accessToken){
-    setStatus("네이버 로그인 토큰을 확인하지 못했습니다.", true);
-    return;
-  }
-  setStatus("네이버 로그인 처리 중...");
-  fetch(NAVER_AUTH_URL, {
-    method: "POST",
-    headers: { "Content-Type": "application/json" },
-    body: JSON.stringify({ accessToken: accessToken })
-  }).then(function(res){ return res.json(); })
-    .then(function(data){
-      if(data && data.error){ throw new Error(data.error); }
-      return signInWithCustomToken(auth, data.customToken).then(function(result){
-        return { result: result, displayName: data.displayName, photoURL: data.photoURL };
-      });
-    }).then(function(o){
-      // custom-token sign-ins don't carry a profile, unlike Google's
-      // popup flow -- fill it in from what naverAuth looked up.
-      var profileUpdate = {};
-      if(o.displayName) profileUpdate.displayName = o.displayName;
-      if(o.photoURL) profileUpdate.photoURL = o.photoURL;
-      var p = Object.keys(profileUpdate).length ? updateProfile(o.result.user, profileUpdate) : Promise.resolve();
-      return p.then(function(){
-        return saveUserProfile(o.result.user, { provider: "naver", displayName: o.displayName || "" });
-      });
-    }).then(function(){
-      setStatus("로그인 성공!");
-      closeAuthModal();
-      // 주소창에 남은 토큰 해시를 지워서 새로고침해도 다시 로그인 처리가
-      // 반복되지 않도록 정리합니다.
-      if(window.history && window.history.replaceState){
-        window.history.replaceState(null, "", window.location.pathname + window.location.search);
-      }
-    }).catch(function(e){
-      setStatus("오류: " + (e && e.message ? e.message : e), true);
-    });
-}
-
-// 네이버 로그인 후 이 페이지로 돌아왔을 때 자동으로 로그인 처리를 이어갑니다.
-if(naverLoginInstance){
-  naverLoginInstance.getLoginStatus(function(status){
-    if(status){ handleNaverLoginSuccess(); }
-  });
-}
-
 var naverBtn = sj("sjNaverLogin");
 if(naverBtn){
   naverBtn.addEventListener("click", function(){
-    if(!naverLoginInstance){
+    if(!window.naver || !window.naver.LoginWithNaverId){
       setStatus("네이버 SDK를 불러오지 못했습니다.", true);
       return;
     }
-    naverLoginInstance.authorize();
+    setStatus("네이버 로그인 창을 확인해주세요.");
+    window.__sjHandleNaverToken = function(accessToken){
+      fetch(NAVER_AUTH_URL, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ accessToken: accessToken })
+      }).then(function(res){ return res.json(); })
+        .then(function(data){
+          if(data && data.error){ throw new Error(data.error); }
+          return signInWithCustomToken(auth, data.customToken).then(function(result){
+            return { result: result, displayName: data.displayName, photoURL: data.photoURL };
+          });
+        }).then(function(o){
+          // custom-token sign-ins don't carry a profile, unlike Google's
+          // popup flow -- fill it in from what naverAuth looked up.
+          var profileUpdate = {};
+          if(o.displayName) profileUpdate.displayName = o.displayName;
+          if(o.photoURL) profileUpdate.photoURL = o.photoURL;
+          var p = Object.keys(profileUpdate).length ? updateProfile(o.result.user, profileUpdate) : Promise.resolve();
+          return p.then(function(){
+            return saveUserProfile(o.result.user, { provider: "naver", displayName: o.displayName || "" });
+          });
+        }).then(function(){
+          setStatus("로그인 성공!");
+          closeAuthModal();
+        }).catch(function(e){
+          setStatus("오류: " + (e && e.message ? e.message : e), true);
+        });
+    };
+    var naverLogin = new window.naver.LoginWithNaverId({
+      clientId: NAVER_CLIENT_ID,
+      callbackUrl: window.location.href,
+      isPopup: true,
+      callbackHandle: true
+    });
+    naverLogin.init();
+    if(naverLogin.authorize){ naverLogin.authorize(); }
   });
 }
 
