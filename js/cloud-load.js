@@ -7,11 +7,50 @@
     return (typeof t === "function") ? t(key) : fallback;
   }
 
-  function renderList(rounds){
+  function extractYear(roundDate){
+    if(!roundDate) return null;
+    var m = String(roundDate).match(/^(\d{4})/);
+    return m ? m[1] : null;
+  }
+
+  function populateYearFilter(){
+    var sel = sj("sjLoadYearFilter");
+    if(!sel) return;
+    var years = [];
+    cachedRounds.forEach(function(r){
+      var y = extractYear(r.roundDate);
+      if(y && years.indexOf(y) === -1) years.push(y);
+    });
+    years.sort().reverse();
+    var prev = sel.value;
+    sel.innerHTML = '<option value="">' + tt("loadYearAll", "전체 연도") + '</option>' +
+      years.map(function(y){ return '<option value="'+y+'">'+y+'</option>'; }).join("");
+    if(years.indexOf(prev) !== -1){ sel.value = prev; }
+  }
+
+  /* Returns [{r, idx}] -- idx is the index into cachedRounds so a click on
+     a filtered row can still resolve back to the original round object. */
+  function getFilteredEntries(){
+    var courseQuery = ((sj("sjLoadCourseFilter") && sj("sjLoadCourseFilter").value) || "").trim().toLowerCase();
+    var yearQuery = (sj("sjLoadYearFilter") && sj("sjLoadYearFilter").value) || "";
+    return cachedRounds.map(function(r, idx){ return { r: r, idx: idx }; }).filter(function(entry){
+      var r = entry.r;
+      if(courseQuery){
+        var name = (r.courseName || "").toLowerCase();
+        if(name.indexOf(courseQuery) === -1) return false;
+      }
+      if(yearQuery){
+        if(extractYear(r.roundDate) !== yearQuery) return false;
+      }
+      return true;
+    });
+  }
+
+  function renderList(){
     var listEl = sj("sjLoadList");
     var statusEl = sj("sjLoadStatus");
     if(!listEl) return;
-    if(!rounds || !rounds.length){
+    if(!cachedRounds.length){
       listEl.innerHTML = "";
       if(statusEl){
         statusEl.className = "sj-status";
@@ -19,13 +58,23 @@
       }
       return;
     }
+    var entries = getFilteredEntries();
+    if(!entries.length){
+      listEl.innerHTML = "";
+      if(statusEl){
+        statusEl.className = "sj-status";
+        statusEl.textContent = tt("loadNoMatch", "검색 결과가 없습니다");
+      }
+      return;
+    }
     if(statusEl){ statusEl.textContent = ""; }
-    listEl.innerHTML = rounds.map(function(r, idx){
+    listEl.innerHTML = entries.map(function(entry){
+      var r = entry.r;
       var course = r.courseName ? escapeHtml(r.courseName) : tt("loadNoCourseName", "골프장 미입력");
       if(r.courseSub){ course += " (" + escapeHtml(r.courseSub) + ")"; }
       var date = r.roundDate ? escapeHtml(r.roundDate) : tt("loadNoDate", "날짜 미입력");
       var toPar = signedLabel(r.scoreToPar);
-      return '<div class="sj-load-item" data-idx="'+idx+'" style="border:1px solid #e5e7eb;border-radius:10px;padding:10px 12px;margin-bottom:8px;cursor:pointer;">' +
+      return '<div class="sj-load-item" data-idx="'+entry.idx+'" style="border:1px solid #e5e7eb;border-radius:10px;padding:10px 12px;margin-bottom:8px;cursor:pointer;">' +
         '<div style="font-weight:600;font-size:14px;color:#1f2b24;">' + course + '</div>' +
         '<div style="font-size:12px;color:#666;margin-top:2px;">' + date + '</div>' +
         '<div style="font-size:13px;color:#1b6b3c;margin-top:4px;font-weight:600;">' + r.totalScore + ' (' + toPar + ')</div>' +
@@ -33,67 +82,29 @@
     }).join("");
   }
 
-  function renderDetail(r){
-    var content = sj("sjLoadDetailContent");
-    if(!content) return;
-    var course = r.courseName ? escapeHtml(r.courseName) : tt("loadNoCourseName", "골프장 미입력");
-    if(r.courseSub){ course += " (" + escapeHtml(r.courseSub) + ")"; }
-    var date = r.roundDate ? escapeHtml(r.roundDate) : tt("loadNoDate", "날짜 미입력");
-    if(r.teeOffTime){ date += " " + escapeHtml(r.teeOffTime); }
-    var companionsLabel = tt("loadCompanionsLabel", "동반자");
-    var companions = (r.companions && r.companions.length) ? r.companions.map(escapeHtml).join(", ") : "-";
-    var totalLabel = tt("loadTotalLabel", "합계");
-    var toPar = signedLabel(r.scoreToPar);
-    var holeLabel = tt("loadHoleLabel", "홀");
-    var parLabel = tt("loadParLabel", "파");
-    var scoreLabel = tt("loadScoreLabel", "스코어");
-
-    var pars = r.pars || [];
-    var scores = r.holeScores || [];
-    var n = Math.max(pars.length, scores.length);
-    var rows = "";
-    for(var i=0; i<n; i++){
-      var par = pars[i];
-      var rel = scores[i];
-      var abs = (typeof par === "number" && typeof rel === "number") ? (par + rel) : null;
-      rows += '<tr>' +
-        '<td style="padding:4px 6px;border-bottom:1px solid #f1f1f1;">' + (i+1) + '</td>' +
-        '<td style="padding:4px 6px;border-bottom:1px solid #f1f1f1;">' + (typeof par === "number" ? par : "-") + '</td>' +
-        '<td style="padding:4px 6px;border-bottom:1px solid #f1f1f1;">' +
-          (abs !== null ? abs : "-") + (typeof rel === "number" ? ' (' + signedLabel(rel) + ')' : '') +
-        '</td></tr>';
+  /* Applies a saved round directly onto the live scorecard (team 0) --
+     reuses the same merge logic OCR results go through, since the shape
+     (courseName/courseSub/roundDate/teeOffTime/pars/players[]) matches.
+     Self player's name isn't stored server-side (only companions are), so
+     it's passed as null and hydrateFromOCR leaves whatever name is
+     already there untouched. */
+  function applyRoundToState(r){
+    if(typeof state === "undefined" || !state || !window.__golfScorecardAPI) return;
+    if(r.holeCount === 9 || r.holeCount === 18){
+      state.holeCount = r.holeCount;
+      if(typeof normalize === "function") normalize();
     }
-
-    content.innerHTML =
-      '<div style="font-weight:600;font-size:15px;color:#1f2b24;">' + course + '</div>' +
-      '<div style="font-size:13px;color:#666;margin-top:2px;">' + date + '</div>' +
-      '<div style="font-size:13px;color:#444;margin-top:6px;">' + companionsLabel + ': ' + companions + '</div>' +
-      '<div style="font-size:15px;color:#1b6b3c;font-weight:700;margin-top:8px;">' + totalLabel + ': ' + r.totalScore + ' (' + toPar + ')</div>' +
-      (n ? (
-        '<table style="width:100%;border-collapse:collapse;margin-top:10px;font-size:13px;">' +
-        '<thead><tr>' +
-        '<th style="text-align:left;padding:4px 6px;border-bottom:1px solid #ccc;">' + holeLabel + '</th>' +
-        '<th style="text-align:left;padding:4px 6px;border-bottom:1px solid #ccc;">' + parLabel + '</th>' +
-        '<th style="text-align:left;padding:4px 6px;border-bottom:1px solid #ccc;">' + scoreLabel + '</th>' +
-        '</tr></thead><tbody>' + rows + '</tbody></table>'
-      ) : '');
-  }
-
-  function showList(){
-    var listView = sj("sjLoadListView");
-    var detailView = sj("sjLoadDetailView");
-    if(listView) listView.style.display = "";
-    if(detailView) detailView.style.display = "none";
-  }
-
-  function showDetail(idx){
-    var r = cachedRounds[idx];
-    if(!r) return;
-    renderDetail(r);
-    var listView = sj("sjLoadListView");
-    var detailView = sj("sjLoadDetailView");
-    if(listView) listView.style.display = "none";
-    if(detailView) detailView.style.display = "";
+    var players = [{ name: null, isSelf: true, holeScores: r.holeScores || [] }]
+      .concat((r.companions || []).map(function(name){ return { name: name, isSelf: false, holeScores: [] }; }));
+    var data = {
+      courseName: r.courseName || null,
+      courseSub: r.courseSub || null,
+      roundDate: r.roundDate || null,
+      teeOffTime: r.teeOffTime || null,
+      pars: (r.pars && r.pars.length) ? r.pars : null,
+      players: players
+    };
+    window.__golfScorecardAPI.hydrateFromOCR(data, 0);
   }
 
   function bindListClick(){
@@ -102,20 +113,32 @@
     listEl.addEventListener("click", function(e){
       var item = e.target.closest(".sj-load-item");
       if(!item) return;
-      showDetail(parseInt(item.dataset.idx, 10));
+      var idx = parseInt(item.dataset.idx, 10);
+      var r = cachedRounds[idx];
+      if(!r) return;
+      applyRoundToState(r);
+      var resultTabBtn = sj("tabResultBtn");
+      if(resultTabBtn) resultTabBtn.click();
+      var modal = sj("sjLoadModal");
+      if(modal) modal.classList.remove("open");
+      if(typeof toast === "function"){ toast(tt("loadApplied", "라운드를 불러왔습니다")); }
     });
   }
 
-  function bindBack(){
-    var btn = sj("sjLoadBackBtn");
-    if(!btn) return;
-    btn.addEventListener("click", function(){ showList(); });
+  function bindFilters(){
+    var courseInput = sj("sjLoadCourseFilter");
+    var yearSelect = sj("sjLoadYearFilter");
+    if(courseInput){ courseInput.addEventListener("input", renderList); }
+    if(yearSelect){ yearSelect.addEventListener("change", renderList); }
   }
 
   function onOpen(){
-    showList();
     var statusEl = sj("sjLoadStatus");
     var listEl = sj("sjLoadList");
+    var courseInput = sj("sjLoadCourseFilter");
+    var yearSelect = sj("sjLoadYearFilter");
+    if(courseInput) courseInput.value = "";
+    if(yearSelect) yearSelect.value = "";
     if(listEl) listEl.innerHTML = "";
     if(statusEl){ statusEl.className = "sj-status"; statusEl.textContent = "불러오는 중..."; }
     var currentUser = window.__sjAuth && window.__sjAuth.getCurrentUser();
@@ -132,7 +155,8 @@
       .then(function(data){
         if(data && data.error){ throw new Error(data.error); }
         cachedRounds = (data && data.rounds) || [];
-        renderList(cachedRounds);
+        populateYearFilter();
+        renderList();
       })
       .catch(function(e){
         if(statusEl){
@@ -143,6 +167,6 @@
   }
 
   bindListClick();
-  bindBack();
+  bindFilters();
   window.__sjCloudLoad = { onOpen: onOpen };
 })();

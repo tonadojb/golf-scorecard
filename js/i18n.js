@@ -60,7 +60,11 @@ var I18N = {
     loadScoreLabel:"스코어",
     loadNoCourseName:"골프장 미입력",
     loadNoDate:"날짜 미입력",
-    loadFetchFail:"불러오기 실패"
+    loadFetchFail:"불러오기 실패",
+    loadYearAll:"전체 연도",
+    loadNoMatch:"검색 결과가 없습니다",
+    loadApplied:"라운드를 불러왔습니다",
+    loadCourseFilterPlaceholder:"골프장 이름 검색"
   },
   en:{
     title:"⛳ Golf Scorecard",
@@ -123,7 +127,11 @@ var I18N = {
     loadScoreLabel:"Score",
     loadNoCourseName:"No course name",
     loadNoDate:"No date",
-    loadFetchFail:"Failed to load"
+    loadFetchFail:"Failed to load",
+    loadYearAll:"All years",
+    loadNoMatch:"No matches found",
+    loadApplied:"Round loaded",
+    loadCourseFilterPlaceholder:"Search course name"
   },
   ja:{
     title:"⛳ ゴルフスコアカード",
@@ -186,7 +194,11 @@ var I18N = {
     loadScoreLabel:"スコア",
     loadNoCourseName:"コース名未入力",
     loadNoDate:"日付未入力",
-    loadFetchFail:"読み込みに失敗しました"
+    loadFetchFail:"読み込みに失敗しました",
+    loadYearAll:"すべての年",
+    loadNoMatch:"該当する結果がありません",
+    loadApplied:"ラウンドを読み込みました",
+    loadCourseFilterPlaceholder:"コース名で検索"
   },
   zh:{
     title:"⛳ 高尔夫记分卡",
@@ -249,7 +261,11 @@ var I18N = {
     loadScoreLabel:"成绩",
     loadNoCourseName:"未输入球场名称",
     loadNoDate:"未输入日期",
-    loadFetchFail:"加载失败"
+    loadFetchFail:"加载失败",
+    loadYearAll:"全部年份",
+    loadNoMatch:"没有匹配结果",
+    loadApplied:"已加载回合",
+    loadCourseFilterPlaceholder:"搜索球场名称"
   }
 };
 
@@ -339,8 +355,8 @@ function applyStaticTranslations(){
   if(loadFabEl) loadFabEl.title = t('loadFabTitle');
   var loadModalTitleEl = document.getElementById('sjLoadModalTitle');
   if(loadModalTitleEl) loadModalTitleEl.textContent = t('loadModalTitle');
-  var loadBackBtnEl = document.getElementById('sjLoadBackBtn');
-  if(loadBackBtnEl) loadBackBtnEl.textContent = t('loadBackBtn');
+  var loadCourseFilterEl = document.getElementById('sjLoadCourseFilter');
+  if(loadCourseFilterEl) loadCourseFilterEl.placeholder = t('loadCourseFilterPlaceholder');
   Array.prototype.forEach.call(langDropdown.querySelectorAll('button[data-lang]'), function(b){
     b.classList.toggle('active', b.dataset.lang === state.lang);
   });
