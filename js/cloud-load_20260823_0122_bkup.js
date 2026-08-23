@@ -2,9 +2,7 @@
   function sj(id){ return document.getElementById(id); }
   var LIST_URL = "https://asia-northeast3-skyjang-golfscore.cloudfunctions.net/listRounds";
   var DELETE_URL = "https://asia-northeast3-skyjang-golfscore.cloudfunctions.net/deleteRound";
-  var UPDATE_URL = "https://asia-northeast3-skyjang-golfscore.cloudfunctions.net/updateRound";
   var cachedRounds = [];
-  var editState = null;
 
   function tt(key, fallback){
     return (typeof t === "function") ? t(key) : fallback;
@@ -80,9 +78,7 @@
       var playersLine = (r.players || []).map(function(p){
         return escapeHtml(p.name || "") + " " + p.totalScore + "(" + signedLabel(p.scoreToPar) + ")";
       }).join(" · ");
-      return '<div class="sj-load-item" data-idx="'+entry.idx+'" style="position:relative;border:1px solid #e5e7eb;border-radius:10px;padding:10px 76px 10px 12px;margin-bottom:8px;cursor:pointer;">' +
-        '<button type="button" class="sj-load-edit" data-idx="'+entry.idx+'" title="수정" ' +
-          'style="position:absolute;top:8px;right:40px;width:26px;height:26px;line-height:1;border:none;border-radius:8px;background:#e6f2ea;color:#1b6b3c;font-size:13px;cursor:pointer;">✏</button>' +
+      return '<div class="sj-load-item" data-idx="'+entry.idx+'" style="position:relative;border:1px solid #e5e7eb;border-radius:10px;padding:10px 40px 10px 12px;margin-bottom:8px;cursor:pointer;">' +
         '<button type="button" class="sj-load-delete" data-idx="'+entry.idx+'" title="삭제" ' +
           'style="position:absolute;top:8px;right:8px;width:26px;height:26px;line-height:1;border:none;border-radius:8px;background:#fee2e2;color:#b91c1c;font-size:14px;cursor:pointer;">×</button>' +
         '<div style="font-weight:600;font-size:14px;color:#1f2b24;">' + titleLine + '</div>' +
@@ -142,174 +138,6 @@
 
     if(typeof save === "function") save();
     if(typeof renderAll === "function") renderAll();
-  }
-
-  /* ---------------- 저장된 라운드 수정 (스코어 + My) ---------------- */
-
-  function computeEditTotals(pi){
-    var p = editState.players[pi];
-    var total = 0, toPar = 0;
-    for(var hi = 0; hi < editState.holeCount; hi++){
-      var rel = p.holeScores[hi] || 0;
-      var par = (editState.holes[hi] && editState.holes[hi].par) || 4;
-      total += par + rel;
-      toPar += rel;
-    }
-    return { total: total, toPar: toPar };
-  }
-
-  function renderEditBody(){
-    var container = sj("sjEditRoundBody");
-    if(!container || !editState) return;
-    var courseLine = (editState.courseName || tt("loadNoCourseName", "골프장 미입력")) +
-      (editState.courseSub ? " (" + escapeHtml(editState.courseSub) + ")" : "");
-    var dateLine = editState.roundDate || tt("loadNoDate", "날짜 미입력");
-    var html = '<div class="sj-edit-meta">' + escapeHtml(courseLine) + " · " + escapeHtml(dateLine) + "</div>";
-    html += '<p class="sj-edit-hint">My를 눌러 본인 스코어를 지정하고, 홀별 +/- 버튼으로 스코어를 수정한 뒤 아래 "수정 저장"을 눌러주세요.</p>';
-    editState.players.forEach(function(p, pi){
-      var totals = computeEditTotals(pi);
-      html += '<div class="sj-edit-player">';
-      html += '<div class="sj-edit-player-head">';
-      html += '<label class="sj-edit-my-label"><input type="radio" name="sjEditSelf" class="sj-edit-self-radio" data-player="' + pi + '"' + (p.isSelf ? " checked" : "") + '> <span>My</span></label>';
-      html += '<span class="sj-edit-player-name">' + escapeHtml(p.name || ("Player" + (pi + 1))) + '</span>';
-      html += '<span class="sj-edit-player-total" id="sjEditTotal_' + pi + '">' + totals.total + " (" + signedLabel(totals.toPar) + ")</span>";
-      html += '</div>';
-      html += '<div class="sj-edit-holes-wrap"><div class="sj-edit-holes">';
-      for(var hi = 0; hi < editState.holeCount; hi++){
-        var par = (editState.holes[hi] && editState.holes[hi].par) || 4;
-        var rel = p.holeScores[hi] || 0;
-        html += '<div class="sj-edit-hole-cell">';
-        html += '<div class="sj-edit-hole-label">' + (hi + 1) + "H<br>P" + par + "</div>";
-        html += '<div class="sj-edit-counter">';
-        html += '<button type="button" class="sj-edit-step" data-action="minus" data-player="' + pi + '" data-hole="' + hi + '">−</button>';
-        html += '<span class="sj-edit-val" id="sjEditVal_' + pi + "_" + hi + '">' + signedLabel(rel) + "</span>";
-        html += '<button type="button" class="sj-edit-step" data-action="plus" data-player="' + pi + '" data-hole="' + hi + '">+</button>';
-        html += '</div></div>';
-      }
-      html += '</div></div>';
-      html += '</div>';
-    });
-    container.innerHTML = html;
-  }
-
-  function openEditModal(idx){
-    var r = cachedRounds[idx];
-    if(!r) return;
-    editState = {
-      idx: idx,
-      roundId: r.id,
-      courseName: r.courseName || "",
-      courseSub: r.courseSub || "",
-      teeOffTime: r.teeOffTime || "",
-      roundDate: r.roundDate || "",
-      teamName: r.teamName || "",
-      holeCount: (r.holeCount === 9 || r.holeCount === 18) ? r.holeCount : 18,
-      holes: (r.holes || []).map(function(h){ return { par: h.par, note: h.note || "" }; }),
-      players: (r.players || []).map(function(p){
-        return {
-          name: p.name || "",
-          isSelf: !!p.isSelf,
-          holeScores: (p.holeScores || []).slice(),
-          entered: (p.entered || []).slice()
-        };
-      })
-    };
-    /* 레거시 데이터(모두 isSelf 없음) 보정: 첫 번째 플레이어를 기본 My로 */
-    if(editState.players.length && !editState.players.some(function(p){ return p.isSelf; })){
-      editState.players[0].isSelf = true;
-    }
-    var status = sj("sjEditRoundStatus");
-    if(status){ status.className = "sj-status"; status.textContent = ""; }
-    renderEditBody();
-    var modal = sj("sjEditRoundModal");
-    if(modal) modal.classList.add("open");
-  }
-
-  function bindEditBodyEvents(){
-    var container = sj("sjEditRoundBody");
-    if(!container) return;
-    container.addEventListener("click", function(e){
-      var btn = e.target.closest(".sj-edit-step");
-      if(!btn || !editState) return;
-      var pi = parseInt(btn.dataset.player, 10);
-      var hi = parseInt(btn.dataset.hole, 10);
-      var p = editState.players[pi];
-      if(!p) return;
-      var delta = (btn.dataset.action === "plus") ? 1 : -1;
-      var cur = p.holeScores[hi] || 0;
-      var next = Math.max(-10, Math.min(20, cur + delta));
-      p.holeScores[hi] = next;
-      p.entered[hi] = true;
-      var valEl = sj("sjEditVal_" + pi + "_" + hi);
-      if(valEl){ valEl.textContent = signedLabel(next); }
-      var totals = computeEditTotals(pi);
-      var totalEl = sj("sjEditTotal_" + pi);
-      if(totalEl){ totalEl.textContent = totals.total + " (" + signedLabel(totals.toPar) + ")"; }
-    });
-    container.addEventListener("change", function(e){
-      var el = e.target;
-      if(el.classList.contains("sj-edit-self-radio") && editState){
-        var pi = parseInt(el.dataset.player, 10);
-        editState.players.forEach(function(p, i){ p.isSelf = (i === pi); });
-      }
-    });
-  }
-
-  function bindEditSave(){
-    var btn = sj("sjEditRoundSaveBtn");
-    if(!btn) return;
-    btn.addEventListener("click", function(){
-      if(!editState) return;
-      var status = sj("sjEditRoundStatus");
-      var currentUser = window.__sjAuth && window.__sjAuth.getCurrentUser();
-      if(!currentUser){
-        if(status){ status.className = "sj-status error"; status.textContent = "로그인이 필요합니다."; }
-        return;
-      }
-      if(status){ status.className = "sj-status"; status.textContent = "저장 중..."; }
-      var holes = editState.holes.slice(0, editState.holeCount).map(function(h){
-        return { par: h.par, note: h.note || "" };
-      });
-      var players = editState.players.map(function(p){
-        return {
-          name: p.name,
-          isSelf: !!p.isSelf,
-          holeScores: (p.holeScores || []).slice(0, editState.holeCount),
-          entered: (p.entered || []).slice(0, editState.holeCount)
-        };
-      });
-      currentUser.getIdToken().then(function(idToken){
-        return fetch(UPDATE_URL, {
-          method: "POST",
-          headers: { "Content-Type": "application/json", "Authorization": "Bearer " + idToken },
-          body: JSON.stringify({
-            id: editState.roundId,
-            courseName: editState.courseName || "",
-            courseSub: editState.courseSub || null,
-            teeOffTime: editState.teeOffTime || null,
-            roundDate: editState.roundDate || null,
-            holeCount: editState.holeCount,
-            holes: holes,
-            teamName: editState.teamName || "",
-            players: players
-          })
-        });
-      }).then(function(res){ return res.json(); })
-        .then(function(data){
-          if(data && data.error){ throw new Error(data.error); }
-          if(status){ status.textContent = "수정 완료되었습니다"; }
-          if(typeof toast === "function"){ toast("수정되었습니다"); }
-          var modal = sj("sjEditRoundModal");
-          if(modal) modal.classList.remove("open");
-          editState = null;
-          /* 목록/통계 전체를 서버 기준으로 다시 불러와서, 통계 패널을 다시 열었을 때
-             수정된 스코어가 정확히 반영되도록 한다. */
-          onOpen();
-        })
-        .catch(function(e){
-          if(status){ status.className = "sj-status error"; status.textContent = "수정 실패: " + (e && e.message ? e.message : e); }
-        });
-    });
   }
 
   /* ---------------- 내 스코어 통계 ---------------- */
@@ -476,11 +304,6 @@
         handleDelete(parseInt(delBtn.dataset.idx, 10));
         return;
       }
-      var editBtn = e.target.closest(".sj-load-edit");
-      if(editBtn){
-        openEditModal(parseInt(editBtn.dataset.idx, 10));
-        return;
-      }
       var item = e.target.closest(".sj-load-item");
       if(!item) return;
       var idx = parseInt(item.dataset.idx, 10);
@@ -541,7 +364,5 @@
   bindListClick();
   bindFilters();
   bindStatsBtn();
-  bindEditBodyEvents();
-  bindEditSave();
   window.__sjCloudLoad = { onOpen: onOpen };
 })();
