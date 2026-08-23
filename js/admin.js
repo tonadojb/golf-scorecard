@@ -117,8 +117,10 @@
     }).then(function(data){
       var toggle = sj("sjAdminGlobalBlockToggle");
       var msg = sj("sjAdminBlockMessage");
+      var maxViolationsEl = sj("sjAdminMaxViolations");
       if(toggle) toggle.checked = !!(data && data.globalBlock);
       if(msg) msg.value = (data && data.blockMessage) || "";
+      if(maxViolationsEl) maxViolationsEl.value = (data && data.maxViolations) || 3;
     }).catch(function(e){
       var status = sj("sjAdminGlobalStatus");
       if(status){ status.className = "sj-status error"; status.textContent = "설정 불러오기 실패: " + (e && e.message ? e.message : e); }
@@ -178,15 +180,21 @@
       var status = sj("sjAdminGlobalStatus");
       var toggle = sj("sjAdminGlobalBlockToggle");
       var msgEl = sj("sjAdminBlockMessage");
+      var maxViolationsEl = sj("sjAdminMaxViolations");
       var globalBlock = !!(toggle && toggle.checked);
       var blockMessage = (msgEl && msgEl.value) ? msgEl.value.trim() : "";
+      // 1~20 사이 정수만 허용 (서버에서도 다시 한 번 검증/보정함). 비어있거나
+      // 범위를 벗어나면 기본값 3으로 되돌려서 사용자에게 바로 보여준다.
+      var maxViolationsRaw = maxViolationsEl ? parseInt(maxViolationsEl.value, 10) : 3;
+      var maxViolations = (maxViolationsRaw >= 1 && maxViolationsRaw <= 20) ? maxViolationsRaw : 3;
+      if(maxViolationsEl) maxViolationsEl.value = maxViolations;
       if(globalBlock && !confirm("관리자를 제외한 모든 사용자의 접속을 즉시 차단합니다. 계속할까요?")){
         return;
       }
       btn.disabled = true;
       if(status){ status.className = "sj-status"; status.textContent = "저장 중..."; }
       withIdToken(function(idToken){
-        return authedFetch(SET_GLOBAL_BLOCK_URL, idToken, { globalBlock: globalBlock, blockMessage: blockMessage });
+        return authedFetch(SET_GLOBAL_BLOCK_URL, idToken, { globalBlock: globalBlock, blockMessage: blockMessage, maxViolations: maxViolations });
       }).then(function(){
         if(status){ status.textContent = "저장되었습니다" + (globalBlock ? " (관리자 제외 전원 강제 로그아웃 처리됨)" : ""); }
         if(typeof toast === "function"){ toast("설정이 저장되었습니다"); }

@@ -187,6 +187,7 @@ footer.credit{text-align:center;color:var(--muted);font-size:11px;padding:14px;}
 .sj-admin-toggle-row{display:flex;align-items:center;gap:8px;font-weight:700;color:#b91c1c;font-size:13px;margin:0 0 8px;cursor:pointer;}
 .sj-admin-toggle-row input[type="checkbox"]{width:16px;height:16px;flex:0 0 auto;accent-color:#c0392b;}
 .sj-admin-global-card textarea{width:100%;padding:9px 10px;border:1px solid #ccc;border-radius:8px;font-size:13px;box-sizing:border-box;resize:vertical;font-family:inherit;}
+.sj-admin-global-card input[type="number"]{width:100px;padding:9px 10px;border:1px solid #ccc;border-radius:8px;font-size:13px;box-sizing:border-box;font-family:inherit;}
 .sj-admin-users-head{display:flex;align-items:center;justify-content:space-between;gap:8px;margin-bottom:8px;}
 .sj-admin-users-head span{font-weight:700;font-size:13px;color:var(--primary-dark);}
 .sj-admin-refresh-btn{margin-top:0 !important;width:auto !important;padding:6px 12px !important;}
