@@ -30,7 +30,7 @@ function defaultState(){
     holeCount:18,
     holes:defaultHoles(18),
     teams:[
-      {id:1, name:'Team 1', players:['플레이어1','플레이어2','플레이어3','플레이어4'], scores:[[],[],[],[]], entered:[[],[],[],[]], anonymize:[false,false,false,false]}
+      {id:1, name:'Team 1', players:['플레이어1','플레이어2','플레이어3','플레이어4'], scores:[[],[],[],[]], entered:[[],[],[],[]], anonymize:[false,false,false,false], selfIndex:0}
     ],
     nextTeamId:2,
     currentHole:1,
@@ -62,6 +62,7 @@ function normalize(){
     var hadEntered = !!team.entered;
     if(!team.entered) team.entered = [[],[],[],[]];
     if(!team.anonymize) team.anonymize = [false,false,false,false];
+    if(typeof team.selfIndex !== 'number' || team.selfIndex < 0 || team.selfIndex > 3) team.selfIndex = 0;
     for(var i=0;i<4;i++){
       if(!team.scores[i]) team.scores[i] = [];
       while(team.scores[i].length < state.holeCount) team.scores[i].push(0);

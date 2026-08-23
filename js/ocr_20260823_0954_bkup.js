@@ -105,48 +105,18 @@
     list.innerHTML = teamIds.map(function(teamId){
       var team = state.teams.filter(function(tm){ return tm.id === teamId; })[0];
       if(!team) return "";
-      var selfIdx = (typeof team.selfIndex === "number") ? team.selfIndex : 0;
       var rows = team.players.map(function(name, pi){
         var stat = computePlayerTotal(team, pi);
-        return '<div class="sj-ocr-review-row">' +
-          '<label class="sj-ocr-self-label" title="본인(My)으로 표시">' +
-            '<input type="radio" name="sj-ocr-self-'+teamId+'" class="sj-ocr-self-player" data-team-id="'+teamId+'" data-player-idx="'+pi+'"'+(pi===selfIdx?' checked':'')+'>' +
-            '<span>My</span>' +
-          '</label>' +
-          '<label class="sj-ocr-review-label">' +
-            '<input type="checkbox" class="sj-ocr-review-player" data-team-id="'+teamId+'" data-player-idx="'+pi+'">' +
-            '<span>' + escapeHtml(name) + ' — ' + stat.total + ' (' + signedLabel(stat.toPar) + ')</span>' +
-          '</label>' +
-        '</div>';
+        return '<label style="display:flex;align-items:center;gap:6px;font-size:13px;padding:3px 0;">' +
+          '<input type="checkbox" class="sj-ocr-review-player" data-team-id="'+teamId+'" data-player-idx="'+pi+'">' +
+          escapeHtml(name) + ' — ' + stat.total + ' (' + signedLabel(stat.toPar) + ')' +
+          '</label>';
       }).join("");
       return '<div style="margin-bottom:8px;">' +
         '<div style="font-weight:600;font-size:13px;color:#1f2b24;">' + escapeHtml(team.name) + '</div>' +
         rows +
       '</div>';
     }).join("");
-  }
-
-  /* "My" radio inside the review list -- lets the user correct which
-     player is "본인" when the first-row assumption (used as the default
-     both here and by hydrateFromOCR's self-first ordering) doesn't match
-     reality, e.g. a companion's card got scanned instead. Persisted on
-     team.selfIndex so cloud-save can tag the right player as isSelf for
-     later stats aggregation. */
-  function bindOcrReviewListEvents(){
-    var list = sj("sjOcrReviewList");
-    if(!list) return;
-    list.addEventListener("change", function(e){
-      var el = e.target;
-      if(el.classList.contains("sj-ocr-self-player")){
-        var teamId = parseInt(el.dataset.teamId, 10);
-        var pi = parseInt(el.dataset.playerIdx, 10);
-        var team = state.teams.filter(function(tm){ return tm.id === teamId; })[0];
-        if(team){
-          team.selfIndex = pi;
-          if(typeof save === "function") save();
-        }
-      }
-    });
   }
 
   function bindOcrTeamListEvents(){
@@ -210,8 +180,7 @@
         players: (typeof defaultPlayers === "function") ? defaultPlayers() : ["플레이어1","플레이어2","플레이어3","플레이어4"],
         scores: [[],[],[],[]],
         entered: [[],[],[],[]],
-        anonymize: [false,false,false,false],
-        selfIndex: 0
+        anonymize: [false,false,false,false]
       });
       if(typeof normalize === "function") normalize();
       if(typeof save === "function") save();
@@ -398,26 +367,10 @@
     });
   }
 
-  /* "재검토 Pass" -- lets the user close the modal right after recognition
-     without running a re-review, since the OCR results are already applied
-     to the live scorecard the moment "인식 시작" finishes (see bindAnalyze
-     below); this button is purely a "I'm satisfied, close this" affordance. */
-  function bindSkipReviewBtn(){
-    var btn = sj("sjOcrSkipReviewBtn");
-    if(!btn) return;
-    btn.addEventListener("click", function(){
-      var modal = sj("sjOcrModal");
-      if(modal) modal.classList.remove("open");
-      if(typeof toast === "function"){ toast("저장되었습니다"); }
-    });
-  }
-
   bindOcrTeamListEvents();
-  bindOcrReviewListEvents();
   bindOcrAddTeam();
   bindAnalyze();
   bindReviewBtn();
-  bindSkipReviewBtn();
 
   window.__sjOcr = {
     wasLastInputFromOcr: function(){ return lastOcrUsed; },

@@ -43,9 +43,11 @@
       var holes = (state.holes || []).slice(0, state.holeCount).map(function(h){
         return { par: h.par, note: h.note || "" };
       });
+      var selfIdx = (typeof team.selfIndex === "number") ? team.selfIndex : 0;
       var players = team.players.map(function(name, pi){
         return {
           name: name,
+          isSelf: pi === selfIdx,
           holeScores: (team.scores[pi] || []).slice(0, state.holeCount),
           entered: (team.entered[pi] || []).slice(0, state.holeCount)
         };

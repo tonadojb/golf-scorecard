@@ -133,136 +133,9 @@
       team.scores[pi] = scArr;
       team.entered[pi] = entArr;
     }
-    var selfIdx = playersIn.findIndex(function(p){ return p && p.isSelf; });
-    team.selfIndex = (selfIdx !== -1) ? selfIdx : 0;
 
     if(typeof save === "function") save();
     if(typeof renderAll === "function") renderAll();
-  }
-
-  /* ---------------- 내 스코어 통계 ---------------- */
-
-  /* Which saved player counts as "me" for a round. Prefers the explicit
-     isSelf flag (set via the OCR review 화면's My radio, or defaulted to
-     player 0 at save time) -- but rounds saved before that flag existed
-     have no isSelf on ANY player, so fall back to treating the first
-     player as me, per an explicit product decision: legacy data should
-     never just be silently excluded from the stats. */
-  function getMyPlayer(round){
-    var players = round.players || [];
-    var mine = players.filter(function(p){ return p && p.isSelf; })[0];
-    if(!mine) mine = players[0];
-    return mine || null;
-  }
-
-  var STATS_SEGMENTS = [
-    { key: "under", label: "버디 이상", color: "#0e7490" },
-    { key: "par", label: "파", color: "#1b6b3c" },
-    { key: "bogey", label: "보기", color: "#e8a33d" },
-    { key: "double", label: "더블보기 이상", color: "#c0392b" }
-  ];
-
-  function buildDonut(counts){
-    var total = STATS_SEGMENTS.reduce(function(sum, seg){ return sum + (counts[seg.key] || 0); }, 0);
-    if(!total){
-      return { gradient: "#e5e7eb", segments: STATS_SEGMENTS.map(function(seg){
-        return { label: seg.label, color: seg.color, count: 0, pct: 0 };
-      }) };
-    }
-    var acc = 0;
-    var stops = STATS_SEGMENTS.map(function(seg){
-      var v = counts[seg.key] || 0;
-      var start = (acc / total) * 360;
-      acc += v;
-      var end = (acc / total) * 360;
-      return seg.color + " " + start.toFixed(1) + "deg " + end.toFixed(1) + "deg";
-    });
-    var segments = STATS_SEGMENTS.map(function(seg){
-      var v = counts[seg.key] || 0;
-      return { label: seg.label, color: seg.color, count: v, pct: Math.round((v / total) * 100) };
-    });
-    return { gradient: "conic-gradient(" + stops.join(",") + ")", segments: segments };
-  }
-
-  var currentStatsRange = 10;
-
-  function renderStatsPanel(range){
-    if(range !== undefined) currentStatsRange = range;
-    var panel = sj("sjMyStatsPanel");
-    if(!panel) return;
-
-    var withMe = cachedRounds.map(function(r){ return { r: r, p: getMyPlayer(r) }; })
-      .filter(function(x){ return x.p; });
-
-    if(!withMe.length){
-      panel.innerHTML = '<div class="sj-stats-empty">통계를 낼 저장된 라운드가 없습니다.</div>';
-      return;
-    }
-
-    var pool = (currentStatsRange === "all") ? withMe : withMe.slice(0, currentStatsRange);
-    var scores = pool.map(function(x){ return x.p.totalScore; }).filter(function(v){ return typeof v === "number"; });
-    var toPars = pool.map(function(x){ return x.p.scoreToPar; }).filter(function(v){ return typeof v === "number"; });
-    var avgScore = scores.length ? (scores.reduce(function(a,b){ return a+b; },0) / scores.length) : 0;
-    var bestScore = scores.length ? Math.min.apply(null, scores) : 0;
-    var avgToPar = toPars.length ? (toPars.reduce(function(a,b){ return a+b; },0) / toPars.length) : 0;
-    var recent = withMe[0].p;
-
-    var counts = { under: 0, par: 0, bogey: 0, double: 0 };
-    pool.forEach(function(x){
-      var bd = x.p.scoreBreakdown || {};
-      counts.under += (bd.eagle || 0) + (bd.birdie || 0);
-      counts.par += bd.par || 0;
-      counts.bogey += bd.bogey || 0;
-      counts.double += bd.doubleOrWorse || 0;
-    });
-    var donut = buildDonut(counts);
-
-    var tabs = ["10", "20", "all"].map(function(r){
-      var label = (r === "all") ? "전체" : ("최근 " + r + "회");
-      var active = (String(currentStatsRange) === r) ? " active" : "";
-      return '<button type="button" data-range="' + r + '" class="' + active.trim() + '">' + label + "</button>";
-    }).join("");
-
-    panel.innerHTML =
-      '<div class="sj-stats-tabs">' + tabs + "</div>" +
-      '<div class="sj-stats-tiles">' +
-        '<div class="sj-stat-tile"><div class="sj-stat-label">총 라운드</div><div class="sj-stat-value">' + withMe.length + "</div></div>" +
-        '<div class="sj-stat-tile"><div class="sj-stat-label">최근 스코어</div><div class="sj-stat-value">' + recent.totalScore + "</div></div>" +
-        '<div class="sj-stat-tile"><div class="sj-stat-label">평균 스코어</div><div class="sj-stat-value">' + avgScore.toFixed(1) + "</div></div>" +
-        '<div class="sj-stat-tile"><div class="sj-stat-label">베스트 스코어</div><div class="sj-stat-value">' + bestScore + "</div></div>" +
-        '<div class="sj-stat-tile" style="grid-column:1 / -1;"><div class="sj-stat-label">평균 오버파</div><div class="sj-stat-value">' + signedLabel(Math.round(avgToPar * 10) / 10) + "</div></div>" +
-      "</div>" +
-      '<div class="sj-stats-donut-wrap">' +
-        '<div class="sj-stats-donut" style="background:' + donut.gradient + ';"></div>' +
-        '<div class="sj-stats-legend">' +
-          donut.segments.map(function(seg){
-            return '<div class="sj-stats-legend-row"><span class="sj-stats-legend-dot" style="background:' + seg.color + ';"></span>' +
-              seg.label + " " + seg.pct + "% (" + seg.count + ")</div>";
-          }).join("") +
-        "</div>" +
-      "</div>";
-
-    Array.prototype.forEach.call(panel.querySelectorAll(".sj-stats-tabs button"), function(btn){
-      btn.addEventListener("click", function(){
-        var r = (btn.dataset.range === "all") ? "all" : parseInt(btn.dataset.range, 10);
-        renderStatsPanel(r);
-      });
-    });
-  }
-
-  function bindStatsBtn(){
-    var btn = sj("sjMyStatsBtn");
-    var panel = sj("sjMyStatsPanel");
-    if(!btn || !panel) return;
-    btn.addEventListener("click", function(){
-      var showing = panel.style.display !== "none";
-      if(showing){
-        panel.style.display = "none";
-      } else {
-        renderStatsPanel();
-        panel.style.display = "";
-      }
-    });
   }
 
   function handleDelete(idx){
@@ -330,8 +203,6 @@
     var listEl = sj("sjLoadList");
     var courseInput = sj("sjLoadCourseFilter");
     var yearSelect = sj("sjLoadYearFilter");
-    var statsPanel = sj("sjMyStatsPanel");
-    if(statsPanel){ statsPanel.style.display = "none"; statsPanel.innerHTML = ""; }
     if(courseInput) courseInput.value = "";
     if(yearSelect) yearSelect.value = "";
     if(listEl) listEl.innerHTML = "";
@@ -363,6 +234,5 @@
 
   bindListClick();
   bindFilters();
-  bindStatsBtn();
   window.__sjCloudLoad = { onOpen: onOpen };
 })();
