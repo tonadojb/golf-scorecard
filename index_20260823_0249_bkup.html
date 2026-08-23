@@ -145,12 +145,6 @@
   </a>
 </div>
 <div id="toast" class="toast"></div>
-<div id="sjBlockOverlay" class="sj-block-overlay" style="display:none;">
-<div class="sj-block-box">
-<div class="sj-block-icon">⛔</div>
-<p id="sjBlockMessage">점검중입니다.</p>
-</div>
-</div>
 <div id="shareModalOverlay" class="modal-overlay">
   <div class="modal-box">
 <h3 id="shareModalTitle">공유 방식을 선택하세요</h3>
@@ -165,7 +159,6 @@
 <button class="sj-fab" id="sjOcrFab" title="사진으로 입력">📷</button>
 <button class="sj-fab" id="sjSaveFab" title="클라우드 저장">☁</button>
 <button class="sj-fab" id="sjLoadFab" title="불러오기">📂</button>
-<button class="sj-fab sj-admin-fab" id="sjAdminFab" title="관리자 페이지" style="display:none;">🛠</button>
 </div>
 
 <div class="sj-modal-overlay" id="sjAuthModal"><div class="sj-modal">
@@ -223,24 +216,6 @@
 </div>
 <div id="sjLoadList"></div>
 <div class="sj-status" id="sjLoadStatus"></div>
-</div></div>
-
-<div class="sj-modal-overlay" id="sjAdminModal"><div class="sj-modal sj-admin-modal">
-<button class="sj-close" data-close>×</button>
-<h3>🛠 관리자 페이지</h3>
-<div class="sj-admin-global-card">
-<label class="sj-admin-toggle-row"><input type="checkbox" id="sjAdminGlobalBlockToggle"> <span>관리자 제외 전체 접속금지</span></label>
-<label>접속금지 시 표시할 안내 메시지 (비워두면 "점검중입니다." 표시)</label>
-<textarea id="sjAdminBlockMessage" rows="2" placeholder="점검중입니다."></textarea>
-<button type="button" id="sjAdminSaveGlobalBlockBtn" class="sj-primary">전체 설정 저장</button>
-<div class="sj-status" id="sjAdminGlobalStatus"></div>
-</div>
-<div class="sj-admin-users-head">
-<span>로그인 사용자 목록</span>
-<button type="button" id="sjAdminRefreshBtn" class="sj-secondary sj-admin-refresh-btn">↻ 새로고침</button>
-</div>
-<div id="sjAdminUserList"></div>
-<div class="sj-status" id="sjAdminStatus"></div>
 </div></div>
 
 <div class="sj-modal-overlay" id="sjManualModal"><div class="sj-modal sj-manual-modal">
@@ -326,7 +301,6 @@
 <script src="js/ocr.js" defer></script>
 <script src="js/cloud-save.js" defer></script>
 <script src="js/cloud-load.js" defer></script>
-<script src="js/admin.js" defer></script>
 
 </body>
 </html>

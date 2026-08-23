@@ -71,6 +71,10 @@
         });
       }).then(function(res){ return res.json(); })
         .then(function(data){
+          if(data && data.blocked){
+            if(window.__sjAuth && window.__sjAuth.handleBlocked){ window.__sjAuth.handleBlocked(data.error); }
+            throw new Error(data.error || "접속이 제한되었습니다.");
+          }
           if(data && data.error){ throw new Error(data.error); }
           status.textContent = "저장 완료! (본인 + 동반자 전체 스코어가 저장되었습니다)";
           if(window.__sjOcr && window.__sjOcr.resetLastInputFlag){ window.__sjOcr.resetLastInputFlag(); }

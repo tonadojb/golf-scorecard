@@ -26,11 +26,6 @@ var NAVER_AUTH_URL = "https://asia-northeast3-skyjang-golfscore.cloudfunctions.n
 var KAKAO_JS_KEY = "e73a39b4f944bc251c449f0535d5f39b";
 var NAVER_CLIENT_ID = "jdkW2uYK23DCwxrCeVWu";
 
-// 관리자 페이지(🛠)는 이 이메일로 로그인했을 때만 노출됩니다. 실제 접근 제어는
-// 서버(firebase-backend/functions/access.js의 ADMIN_EMAIL)에서 한 번 더
-// 검증하므로, 이 값은 어디까지나 화면 표시용 UI 편의 체크입니다.
-var ADMIN_EMAIL = "tonadojb@gmail.com";
-
 var app = initializeApp(firebaseConfig);
 var auth = getAuth(app);
 var db = getFirestore(app);
@@ -263,31 +258,15 @@ function renderAuthUI(user){
   currentUser = user;
   var loggedOut = sj("sjAuthLoggedOut");
   var loggedIn = sj("sjAuthLoggedIn");
-  var adminFab = sj("sjAdminFab");
   if(user){
     if(loggedOut) loggedOut.style.display = "none";
     if(loggedIn) loggedIn.style.display = "block";
     var nameEl = sj("sjMyName");
     if(nameEl) nameEl.textContent = user.displayName || user.email || user.uid;
-    if(adminFab) adminFab.style.display = (user.email === ADMIN_EMAIL) ? "" : "none";
   } else {
     if(loggedOut) loggedOut.style.display = "block";
     if(loggedIn) loggedIn.style.display = "none";
-    if(adminFab) adminFab.style.display = "none";
   }
-}
-
-/* Called when the server tells us this account/session is blocked
-   (banned, or a global 접속금지 is in effect): signs the user out and
-   shows a full-screen overlay with the admin-configured message (or the
-   "점검중입니다." default) so they can't keep working with stale local
-   state. */
-function handleBlocked(message){
-  var overlay = sj("sjBlockOverlay");
-  var msgEl = sj("sjBlockMessage");
-  if(msgEl) msgEl.textContent = message || "점검중입니다.";
-  if(overlay) overlay.style.display = "flex";
-  signOut(auth).catch(function(){});
 }
 
 onAuthStateChanged(auth, renderAuthUI);
@@ -295,6 +274,5 @@ onAuthStateChanged(auth, renderAuthUI);
 window.__sjAuth = {
   getCurrentUser: function(){ return currentUser; },
   getAuth: function(){ return auth; },
-  getDb: function(){ return db; },
-  handleBlocked: handleBlocked
+  getDb: function(){ return db; }
 };

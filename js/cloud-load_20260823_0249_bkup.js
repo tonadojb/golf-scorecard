@@ -296,10 +296,6 @@
         });
       }).then(function(res){ return res.json(); })
         .then(function(data){
-          if(data && data.blocked){
-            if(window.__sjAuth && window.__sjAuth.handleBlocked){ window.__sjAuth.handleBlocked(data.error); }
-            throw new Error(data.error || "접속이 제한되었습니다.");
-          }
           if(data && data.error){ throw new Error(data.error); }
           if(status){ status.textContent = "수정 완료되었습니다"; }
           if(typeof toast === "function"){ toast("수정되었습니다"); }
@@ -460,10 +456,6 @@
       });
     }).then(function(res){ return res.json(); })
       .then(function(data){
-        if(data && data.blocked){
-          if(window.__sjAuth && window.__sjAuth.handleBlocked){ window.__sjAuth.handleBlocked(data.error); }
-          throw new Error(data.error || "접속이 제한되었습니다.");
-        }
         if(data && data.error){ throw new Error(data.error); }
         cachedRounds.splice(idx, 1);
         populateYearFilter();
@@ -533,10 +525,6 @@
       });
     }).then(function(res){ return res.json(); })
       .then(function(data){
-        if(data && data.blocked){
-          if(window.__sjAuth && window.__sjAuth.handleBlocked){ window.__sjAuth.handleBlocked(data.error); }
-          throw new Error(data.error || "접속이 제한되었습니다.");
-        }
         if(data && data.error){ throw new Error(data.error); }
         cachedRounds = (data && data.rounds) || [];
         populateYearFilter();

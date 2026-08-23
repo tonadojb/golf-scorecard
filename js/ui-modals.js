@@ -36,4 +36,11 @@
     if(window.__sjCloudLoad){ window.__sjCloudLoad.onOpen(); }
     sjOpen("sjLoadModal");
   });
+  var sjAdminFabEl = sj("sjAdminFab");
+  if(sjAdminFabEl){
+    sjAdminFabEl.addEventListener("click", function(){
+      if(window.__sjAdmin && window.__sjAdmin.onOpen){ window.__sjAdmin.onOpen(); }
+      sjOpen("sjAdminModal");
+    });
+  }
 })();

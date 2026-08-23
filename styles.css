@@ -177,3 +177,36 @@ footer.credit{text-align:center;color:var(--muted);font-size:11px;padding:14px;}
 .sj-edit-counter{display:flex;flex-direction:column;align-items:center;gap:3px;border:1px solid #d7d8ec;border-radius:8px;padding:4px 2px;background:#fff;}
 .sj-edit-step{width:26px;height:22px;border:none;border-radius:6px;background:#eef0fb;color:#4338ca;font-size:13px;font-weight:700;cursor:pointer;line-height:1;}
 .sj-edit-val{font-size:12px;font-weight:700;color:#1f2b24;min-width:22px;}
+
+/* ---------------- Admin page (관리자 전용) ---------------- */
+.sj-admin-modal{max-width:480px;}
+.sj-admin-global-card{background:#f5f6fc;border:1px solid #e5e7eb;border-radius:12px;padding:12px 14px;margin-bottom:14px;}
+.sj-admin-toggle-row{display:flex;align-items:center;gap:8px;font-weight:700;color:#b91c1c;font-size:13px;margin:0 0 8px;cursor:pointer;}
+.sj-admin-toggle-row input[type="checkbox"]{width:16px;height:16px;flex:0 0 auto;accent-color:#c0392b;}
+.sj-admin-global-card textarea{width:100%;padding:9px 10px;border:1px solid #ccc;border-radius:8px;font-size:13px;box-sizing:border-box;resize:vertical;font-family:inherit;}
+.sj-admin-users-head{display:flex;align-items:center;justify-content:space-between;gap:8px;margin-bottom:8px;}
+.sj-admin-users-head span{font-weight:700;font-size:13px;color:var(--primary-dark);}
+.sj-admin-refresh-btn{margin-top:0 !important;width:auto !important;padding:6px 12px !important;}
+.sj-admin-user-row{border:1px solid #e5e7eb;border-radius:10px;padding:10px;margin-bottom:8px;background:#fbfbfe;}
+.sj-admin-user-top{display:flex;align-items:center;gap:6px;flex-wrap:wrap;}
+.sj-admin-dot{width:9px;height:9px;border-radius:50%;flex:0 0 auto;background:#c8cadf;}
+.sj-admin-dot.on{background:#16a34a;box-shadow:0 0 0 2px rgba(22,163,74,0.2);}
+.sj-admin-dot.off{background:#c8cadf;}
+.sj-admin-user-name{font-weight:700;font-size:13px;color:#1f2b24;overflow-wrap:anywhere;}
+.sj-admin-badge{font-size:10px;font-weight:700;padding:2px 7px;border-radius:20px;background:var(--primary-light);color:var(--primary-dark);}
+.sj-admin-badge.admin{background:#e0f2fe;color:#0e7490;}
+.sj-admin-badge.banned{background:#fee2e2;color:#b91c1c;}
+.sj-admin-user-meta{font-size:11.5px;color:#6b7a72;margin-top:4px;}
+.sj-admin-user-actions{display:flex;gap:6px;margin-top:8px;}
+.sj-admin-logout-btn,.sj-admin-ban-btn,.sj-admin-unban-btn{flex:1;border:none;border-radius:8px;padding:7px 6px;font-size:11.5px;font-weight:700;cursor:pointer;}
+.sj-admin-logout-btn{background:#eef0fb;color:#4338ca;}
+.sj-admin-ban-btn{background:#fee2e2;color:#b91c1c;}
+.sj-admin-unban-btn{background:#dcfce7;color:#15803d;}
+.sj-admin-empty{font-size:13px;color:#888;text-align:center;padding:16px 0;}
+
+/* ---------------- Block overlay (접속금지 / 전체점검) ---------------- */
+.sj-block-overlay{position:fixed;inset:0;background:rgba(18,20,32,0.94);display:flex;align-items:center;justify-content:center;z-index:20000;padding:20px;}
+.sj-block-box{background:#fff;border-radius:16px;padding:28px 24px;max-width:340px;width:100%;text-align:center;box-shadow:0 10px 30px rgba(0,0,0,0.35);}
+.sj-block-icon{font-size:36px;margin-bottom:10px;}
+.sj-block-box p{margin:0;font-size:15px;font-weight:600;color:#1f2b24;line-height:1.5;overflow-wrap:anywhere;}
+

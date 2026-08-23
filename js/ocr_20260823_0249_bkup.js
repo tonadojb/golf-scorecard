@@ -269,14 +269,6 @@
               });
             }).then(function(res){ return res.json(); })
               .then(function(data){
-                if(data && data.blocked){
-                  if(window.__sjAuth && window.__sjAuth.handleBlocked){ window.__sjAuth.handleBlocked(data.error); }
-                  throw new Error(data.error || "접속이 제한되었습니다.");
-                }
-                if(data && data.notScorecard){
-                  alert(data.error || "스코어카드로 인식되지 않는 이미지입니다. 스코어카드 사진을 다시 올려주세요.");
-                  throw new Error(data.error || "스코어카드가 아닙니다.");
-                }
                 if(data && data.error){ throw new Error(data.error); }
                 var teamIdx = -1;
                 for(var i=0; i<state.teams.length; i++){ if(state.teams[i].id === job.teamId){ teamIdx = i; break; } }
@@ -365,10 +357,6 @@
               body: JSON.stringify({ imageBase64: base64, focusPlayers: focusNames })
             }).then(function(res){ return res.json(); })
               .then(function(data){
-                if(data && data.blocked){
-                  if(window.__sjAuth && window.__sjAuth.handleBlocked){ window.__sjAuth.handleBlocked(data.error); }
-                  throw new Error(data.error || "접속이 제한되었습니다.");
-                }
                 if(data && data.error){ throw new Error(data.error); }
                 var ordered = reorderPlayers(data.players);
                 indices.forEach(function(pi){
