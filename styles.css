@@ -160,6 +160,7 @@ footer.credit{text-align:center;color:var(--muted);font-size:11px;padding:14px;}
 .sj-manual-steps li{margin-bottom:4px;}
 .sj-manual-steps b{color:#4338ca;}
 .sj-manual-footer{margin-top:2px;text-align:center;font-size:11px;color:#999;}
+.sj-manual-contact{margin-top:4px;text-align:center;font-size:11px;color:#999;}
 .sj-manual-warning{background:#fff7ed;border-color:#fdba74;}
 .sj-manual-warning .sj-manual-title{color:#c2410c;}
 .sj-manual-warning .sj-manual-desc b{color:#c2410c;}
@@ -208,6 +209,7 @@ footer.credit{text-align:center;color:var(--muted);font-size:11px;padding:14px;}
 .sj-admin-unban-btn{background:#dcfce7;color:#15803d;}
 .sj-admin-empty{font-size:13px;color:#888;text-align:center;padding:16px 0;}
 .sj-admin-stats-bar{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:14px;}
+.sj-admin-storage-link{display:block;text-align:center;background:#eef0fb;color:#4338ca;border-radius:8px;padding:8px;margin-bottom:14px;font-size:12px;font-weight:700;text-decoration:none;}
 .sj-admin-stat-tile{background:#fff;border:1px solid #e5e7eb;border-radius:10px;padding:9px;text-align:center;}
 .sj-admin-stat-label{font-size:10.5px;color:#6b7a72;margin-bottom:3px;}
 .sj-admin-stat-value{font-size:16px;font-weight:700;color:#1f2b24;}
