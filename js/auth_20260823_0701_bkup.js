@@ -22,9 +22,6 @@ var KAKAO_AUTH_URL = "https://asia-northeast3-skyjang-golfscore.cloudfunctions.n
 // admin.auth().createCustomToken(uid) 로 발급한 Firebase 커스텀 토큰을
 // { customToken, displayName, photoURL } 형태의 JSON으로 응답합니다.
 var NAVER_AUTH_URL = "https://asia-northeast3-skyjang-golfscore.cloudfunctions.net/naverAuth";
-// 로그인 직후 및 로그인 유지 중 주기적으로 호출해서 관리자 페이지의
-// "접속중"/최근 접속 표시(lastSeenAt 기반)를 갱신하는 용도입니다.
-var PING_PRESENCE_URL = "https://asia-northeast3-skyjang-golfscore.cloudfunctions.net/pingPresence";
 
 var KAKAO_JS_KEY = "e73a39b4f944bc251c449f0535d5f39b";
 var NAVER_CLIENT_ID = "jdkW2uYK23DCwxrCeVWu";
@@ -60,37 +57,6 @@ function saveUserProfile(user, extra){
 function closeAuthModal(){
   var m = sj("sjAuthModal");
   if(m) m.classList.remove("open");
-}
-
-/* 로그인 자체(saveUserProfile)는 클라이언트 Firestore SDK로 직접 쓰기 때문에
-   관리자 페이지가 보는 lastSeenAt을 건드리지 않습니다 -- 그래서 로그인만 하고
-   스캔/저장/불러오기를 하지 않으면 관리자 목록에 전혀 반영되지 않았습니다.
-   pingPresence()가 그 lastSeenAt을 직접 갱신해서 이 간극을 메웁니다. */
-var presenceIntervalId = null;
-
-function pingPresence(){
-  if(!currentUser) return;
-  currentUser.getIdToken().then(function(idToken){
-    return fetch(PING_PRESENCE_URL, {
-      method: "POST",
-      headers: { "Content-Type": "application/json", "Authorization": "Bearer " + idToken }
-    });
-  }).then(function(res){ return res.json(); })
-    .then(function(data){
-      if(data && data.blocked){ handleBlocked(data.error); }
-    })
-    .catch(function(){ /* best-effort presence ping -- 실패해도 무시 */ });
-}
-
-// 5분짜리 "접속중" 판정 창(ONLINE_WINDOW_MS, 서버)보다 여유 있게 4분마다
-// 갱신해서, 다른 활동이 없어도 로그인 유지 중에는 계속 접속중으로 보이게 합니다.
-function startPresenceHeartbeat(){
-  stopPresenceHeartbeat();
-  pingPresence();
-  presenceIntervalId = setInterval(pingPresence, 4 * 60 * 1000);
-}
-function stopPresenceHeartbeat(){
-  if(presenceIntervalId){ clearInterval(presenceIntervalId); presenceIntervalId = null; }
 }
 
 // ---- Google 로그인 ----
@@ -304,12 +270,10 @@ function renderAuthUI(user){
     var nameEl = sj("sjMyName");
     if(nameEl) nameEl.textContent = user.displayName || user.email || user.uid;
     if(adminFab) adminFab.style.display = (user.email === ADMIN_EMAIL) ? "" : "none";
-    startPresenceHeartbeat();
   } else {
     if(loggedOut) loggedOut.style.display = "block";
     if(loggedIn) loggedIn.style.display = "none";
     if(adminFab) adminFab.style.display = "none";
-    stopPresenceHeartbeat();
   }
 }
 

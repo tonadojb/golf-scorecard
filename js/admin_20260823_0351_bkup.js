@@ -137,9 +137,6 @@
           return authedFetch(FORCE_LOGOUT_URL, idToken, { uid: targetUid });
         }).then(function(){
           if(typeof toast === "function"){ toast("강제 로그아웃 처리되었습니다"); }
-          // 로그아웃 직후 "접속중" 표시가 바로 갱신되도록 목록을 새로 불러온다
-          // (버튼 재활성화는 이 새로고침이 끝난 뒤 이어지는 .then에서 처리됨).
-          return loadUsers();
         }).catch(function(err){
           alert("실패: " + (err && err.message ? err.message : err));
         }).then(function(){ logoutBtn.disabled = false; });
