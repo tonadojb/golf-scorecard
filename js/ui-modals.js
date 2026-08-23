@@ -10,6 +10,8 @@
   });
 
   sj("sjAuthFab").addEventListener("click", function(){ sjOpen("sjAuthModal"); });
+  var sjManualBtnEl = sj("sjManualBtn");
+  if(sjManualBtnEl){ sjManualBtnEl.addEventListener("click", function(){ sjOpen("sjManualModal"); }); }
   sj("sjOcrFab").addEventListener("click", function(){
     if(window.__sjOcr && window.__sjOcr.onOpen){ window.__sjOcr.onOpen(); }
     sjOpen("sjOcrModal");
