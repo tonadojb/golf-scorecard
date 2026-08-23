@@ -82,12 +82,12 @@
       }).join(" · ");
       return '<div class="sj-load-item" data-idx="'+entry.idx+'" style="position:relative;border:1px solid #e5e7eb;border-radius:10px;padding:10px 76px 10px 12px;margin-bottom:8px;cursor:pointer;">' +
         '<button type="button" class="sj-load-edit" data-idx="'+entry.idx+'" title="수정" ' +
-          'style="position:absolute;top:8px;right:40px;width:26px;height:26px;line-height:1;border:none;border-radius:8px;background:#eef0fb;color:#4338ca;font-size:13px;cursor:pointer;">✏</button>' +
+          'style="position:absolute;top:8px;right:40px;width:26px;height:26px;line-height:1;border:none;border-radius:8px;background:#e6f2ea;color:#1b6b3c;font-size:13px;cursor:pointer;">✏</button>' +
         '<button type="button" class="sj-load-delete" data-idx="'+entry.idx+'" title="삭제" ' +
           'style="position:absolute;top:8px;right:8px;width:26px;height:26px;line-height:1;border:none;border-radius:8px;background:#fee2e2;color:#b91c1c;font-size:14px;cursor:pointer;">×</button>' +
         '<div style="font-weight:600;font-size:14px;color:#1f2b24;">' + titleLine + '</div>' +
         '<div style="font-size:12px;color:#666;margin-top:2px;">' + date + '</div>' +
-        (playersLine ? '<div style="font-size:12px;color:#4338ca;margin-top:4px;">' + playersLine + '</div>' : '') +
+        (playersLine ? '<div style="font-size:12px;color:#1b6b3c;margin-top:4px;">' + playersLine + '</div>' : '') +
         '</div>';
     }).join("");
   }
@@ -329,8 +329,8 @@
 
   var STATS_SEGMENTS = [
     { key: "under", label: "버디 이상", color: "#0e7490" },
-    { key: "par", label: "파", color: "#4338ca" },
-    { key: "bogey", label: "보기", color: "#f59e0b" },
+    { key: "par", label: "파", color: "#1b6b3c" },
+    { key: "bogey", label: "보기", color: "#e8a33d" },
     { key: "double", label: "더블보기 이상", color: "#c0392b" }
   ];
 
