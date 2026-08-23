@@ -103,6 +103,12 @@ footer.credit{text-align:center;color:var(--muted);font-size:11px;padding:14px;}
 .sj-modal h3{margin:0 0 12px;font-size:17px;color:#1f2b24;}
 .sj-modal label{display:block;font-size:13px;margin:10px 0 4px;color:#444;}
 .sj-modal input,.sj-modal select{width:100%;padding:10px;border:1px solid #ccc;border-radius:8px;font-size:14px;box-sizing:border-box;}
+/* The width:100% above is meant for the modals' text/select/file inputs.
+   Without this override it also stretches checkboxes (e.g. the OCR
+   재검토 player-select list) to fill the whole row, which squashes their
+   label text into a sliver at the far edge -- same fix already applied
+   to .anon-row's checkboxes outside the modals. */
+.sj-modal input[type="checkbox"]{width:16px;height:16px;flex:0 0 auto;accent-color:#1b6b3c;}
 .sj-modal button.sj-primary{margin-top:14px;width:100%;padding:11px;border:none;border-radius:8px;background:#1b6b3c;color:#fff;font-size:15px;cursor:pointer;}
 .sj-modal button.sj-secondary{margin-top:8px;width:100%;padding:9px;border:none;border-radius:8px;background:#eee;color:#333;font-size:14px;cursor:pointer;}
 .sj-modal .sj-close{float:right;background:none;border:none;font-size:18px;cursor:pointer;color:#888;}
