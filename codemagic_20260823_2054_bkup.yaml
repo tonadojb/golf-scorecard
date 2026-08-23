@@ -8,13 +8,9 @@ workflows:
       # 이름과 정확히 같아야 합니다 (Teams > Integrations > App Store Connect).
       app_store_connect: codemagic
     environment:
-      # ⚠ ios_signing 블록을 일부러 뺐습니다. 이 블록이 있으면 Codemagic이 스크립트를
-      # 실행하기도 전에 "이미 존재하는" 서명 파일을 자동으로 찾으려고 시도하는데,
-      # 계정에 아직 배포용 인증서/프로파일이 하나도 없는 상태(첫 iOS 앱)라 이 사전
-      # 탐색 단계에서 즉시 실패하며 빌드 전체가 중단돼버립니다 (그래서 npm install조차
-      # 로그에 안 찍혔던 것). 아래 스크립트의 "fetch-signing-files --create" 단계가
-      # 인증서/프로파일을 새로 만들고 use-profiles가 그걸 적용하므로 이 블록 없이도
-      # 정상 동작합니다.
+      ios_signing:
+        distribution_type: app_store
+        bundle_identifier: com.skyjang.golfscorecard
       vars:
         BUNDLE_ID: "com.skyjang.golfscorecard"
         XCODE_WORKSPACE: "ios-app/ios/App/App.xcworkspace"
