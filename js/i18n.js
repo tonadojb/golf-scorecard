@@ -122,7 +122,21 @@ var I18N = {
     manualStatsDesc:'불러오기 창 위쪽의 <b>📊 내 스코어 통계</b> 버튼을 누르면 최근 10회 · 20회 · 전체 기준으로 평균/베스트 스코어, 평균 오버파, 파 · 보기 · 더블보기 이상 비율을 한눈에 볼 수 있어요.',
     manualLangTitle:"언어 변경",
     manualLangDesc:'오른쪽 위 <b>🌐 Language</b> 버튼으로 한국어 · 영어 · 일본어 · 중국어 중 원하는 언어로 바로 바꿀 수 있어요.',
-    manualFooter:"궁금한 점이 있으면 이 버튼을 언제든 다시 눌러 확인하세요 ⛳"
+    manualFooter:"궁금한 점이 있으면 이 버튼을 언제든 다시 눌러 확인하세요 ⛳",
+    statsUnder:"버디 이상",
+    statsPar:"파",
+    statsBogey:"보기",
+    statsDouble:"더블보기 이상",
+    statsNoData:"통계를 낼 저장된 라운드가 없습니다.",
+    statsAll:"전체",
+    statsRecentN:function(n){ return "최근 "+n+"회"; },
+    statsTotalRounds:"총 라운드",
+    statsRecentScore:"최근 스코어",
+    statsAvgScore:"평균 스코어",
+    statsBestScore:"베스트 스코어",
+    statsAvgOverPar:"평균 오버파",
+    loadLoading:"불러오는 중...",
+    loginRequired:"로그인이 필요합니다."
   },
   en:{
     title:"⛳ Golf Scorecard",
@@ -247,7 +261,21 @@ var I18N = {
     manualStatsDesc:'Tap <b>📊 My Score Stats</b> at the top of the Load window to see your average/best score, average over par, and the ratio of par/bogey/double-bogey-or-worse at a glance, for the last 10, last 20, or all rounds.',
     manualLangTitle:"Change Language",
     manualLangDesc:'Use the <b>🌐 Language</b> button in the top right to switch instantly between Korean, English, Japanese, and Chinese.',
-    manualFooter:"If you have any questions, tap this button again anytime ⛳"
+    manualFooter:"If you have any questions, tap this button again anytime ⛳",
+    statsUnder:"Birdie or better",
+    statsPar:"Par",
+    statsBogey:"Bogey",
+    statsDouble:"Double bogey or worse",
+    statsNoData:"No saved rounds to show stats for.",
+    statsAll:"All",
+    statsRecentN:function(n){ return "Last "+n; },
+    statsTotalRounds:"Total Rounds",
+    statsRecentScore:"Recent Score",
+    statsAvgScore:"Average Score",
+    statsBestScore:"Best Score",
+    statsAvgOverPar:"Average Over Par",
+    loadLoading:"Loading...",
+    loginRequired:"Login required."
   },
   ja:{
     title:"⛳ ゴルフスコアカード",
@@ -372,7 +400,21 @@ var I18N = {
     manualStatsDesc:'読み込みウィンドウ上部の<b>📊 マイスコア統計</b>ボタンを押すと、直近10回・20回・全体を基準に平均/ベストスコア、平均オーバーパー、パー・ボギー・ダブルボギー以上の割合を一目で確認できます。',
     manualLangTitle:"言語変更",
     manualLangDesc:'右上の<b>🌐 Language</b>ボタンで韓国語・英語・日本語・中国語のうち好きな言語にすぐ切り替えられます。',
-    manualFooter:"ご不明な点があれば、このボタンをいつでも再度押してご確認ください ⛳"
+    manualFooter:"ご不明な点があれば、このボタンをいつでも再度押してご確認ください ⛳",
+    statsUnder:"バーディ以上",
+    statsPar:"パー",
+    statsBogey:"ボギー",
+    statsDouble:"ダブルボギー以上",
+    statsNoData:"統計を表示できる保存済みラウンドがありません。",
+    statsAll:"全体",
+    statsRecentN:function(n){ return "直近"+n+"回"; },
+    statsTotalRounds:"総ラウンド数",
+    statsRecentScore:"直近スコア",
+    statsAvgScore:"平均スコア",
+    statsBestScore:"ベストスコア",
+    statsAvgOverPar:"平均オーバーパー",
+    loadLoading:"読み込み中...",
+    loginRequired:"ログインが必要です。"
   },
   zh:{
     title:"⛳ 高尔夫记分卡",
@@ -497,7 +539,21 @@ var I18N = {
     manualStatsDesc:'点击加载窗口上方的<b>📊 我的成绩统计</b>按钮,即可一目了然地查看最近10次·20次·全部的平均/最佳成绩、平均超标杆数,以及标准杆·柏忌·双柏忌以上的比例。',
     manualLangTitle:"更改语言",
     manualLangDesc:'使用右上角的<b>🌐 Language</b>按钮,可在韩语、英语、日语、中文之间随时切换。',
-    manualFooter:"如有疑问,请随时再次点击此按钮查看 ⛳"
+    manualFooter:"如有疑问,请随时再次点击此按钮查看 ⛳",
+    statsUnder:"小鸟球以上",
+    statsPar:"标准杆",
+    statsBogey:"柏忌",
+    statsDouble:"双柏忌以上",
+    statsNoData:"没有可用于统计的已保存回合。",
+    statsAll:"全部",
+    statsRecentN:function(n){ return "最近"+n+"次"; },
+    statsTotalRounds:"总回合数",
+    statsRecentScore:"最近成绩",
+    statsAvgScore:"平均成绩",
+    statsBestScore:"最佳成绩",
+    statsAvgOverPar:"平均超标杆数",
+    loadLoading:"加载中...",
+    loginRequired:"需要登录。"
   }
 };
 

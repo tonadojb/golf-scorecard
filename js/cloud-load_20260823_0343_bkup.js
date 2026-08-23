@@ -7,11 +7,7 @@
   var editState = null;
 
   function tt(key, fallback){
-    if(typeof t === "function"){
-      var args = Array.prototype.slice.call(arguments, 2);
-      return t.apply(null, [key].concat(args));
-    }
-    return fallback;
+    return (typeof t === "function") ? t(key) : fallback;
   }
 
   function extractYear(roundDate){
@@ -267,7 +263,7 @@
       var status = sj("sjEditRoundStatus");
       var currentUser = window.__sjAuth && window.__sjAuth.getCurrentUser();
       if(!currentUser){
-        if(status){ status.className = "sj-status error"; status.textContent = tt("loginRequired", "로그인이 필요합니다."); }
+        if(status){ status.className = "sj-status error"; status.textContent = "로그인이 필요합니다."; }
         return;
       }
       if(status){ status.className = "sj-status"; status.textContent = "저장 중..."; }
@@ -336,17 +332,17 @@
   }
 
   var STATS_SEGMENTS = [
-    { key: "under", labelKey: "statsUnder", label: "버디 이상", color: "#0e7490" },
-    { key: "par", labelKey: "statsPar", label: "파", color: "#4338ca" },
-    { key: "bogey", labelKey: "statsBogey", label: "보기", color: "#f59e0b" },
-    { key: "double", labelKey: "statsDouble", label: "더블보기 이상", color: "#c0392b" }
+    { key: "under", label: "버디 이상", color: "#0e7490" },
+    { key: "par", label: "파", color: "#4338ca" },
+    { key: "bogey", label: "보기", color: "#f59e0b" },
+    { key: "double", label: "더블보기 이상", color: "#c0392b" }
   ];
 
   function buildDonut(counts){
     var total = STATS_SEGMENTS.reduce(function(sum, seg){ return sum + (counts[seg.key] || 0); }, 0);
     if(!total){
       return { gradient: "#e5e7eb", segments: STATS_SEGMENTS.map(function(seg){
-        return { label: tt(seg.labelKey, seg.label), color: seg.color, count: 0, pct: 0 };
+        return { label: seg.label, color: seg.color, count: 0, pct: 0 };
       }) };
     }
     var acc = 0;
@@ -359,7 +355,7 @@
     });
     var segments = STATS_SEGMENTS.map(function(seg){
       var v = counts[seg.key] || 0;
-      return { label: tt(seg.labelKey, seg.label), color: seg.color, count: v, pct: Math.round((v / total) * 100) };
+      return { label: seg.label, color: seg.color, count: v, pct: Math.round((v / total) * 100) };
     });
     return { gradient: "conic-gradient(" + stops.join(",") + ")", segments: segments };
   }
@@ -375,7 +371,7 @@
       .filter(function(x){ return x.p; });
 
     if(!withMe.length){
-      panel.innerHTML = '<div class="sj-stats-empty">' + escapeHtml(tt("statsNoData", "통계를 낼 저장된 라운드가 없습니다.")) + '</div>';
+      panel.innerHTML = '<div class="sj-stats-empty">통계를 낼 저장된 라운드가 없습니다.</div>';
       return;
     }
 
@@ -398,7 +394,7 @@
     var donut = buildDonut(counts);
 
     var tabs = ["10", "20", "all"].map(function(r){
-      var label = (r === "all") ? tt("statsAll", "전체") : tt("statsRecentN", "최근 " + r + "회", r);
+      var label = (r === "all") ? "전체" : ("최근 " + r + "회");
       var active = (String(currentStatsRange) === r) ? " active" : "";
       return '<button type="button" data-range="' + r + '" class="' + active.trim() + '">' + label + "</button>";
     }).join("");
@@ -406,11 +402,11 @@
     panel.innerHTML =
       '<div class="sj-stats-tabs">' + tabs + "</div>" +
       '<div class="sj-stats-tiles">' +
-        '<div class="sj-stat-tile"><div class="sj-stat-label">' + escapeHtml(tt("statsTotalRounds", "총 라운드")) + '</div><div class="sj-stat-value">' + withMe.length + "</div></div>" +
-        '<div class="sj-stat-tile"><div class="sj-stat-label">' + escapeHtml(tt("statsRecentScore", "최근 스코어")) + '</div><div class="sj-stat-value">' + recent.totalScore + "</div></div>" +
-        '<div class="sj-stat-tile"><div class="sj-stat-label">' + escapeHtml(tt("statsAvgScore", "평균 스코어")) + '</div><div class="sj-stat-value">' + avgScore.toFixed(1) + "</div></div>" +
-        '<div class="sj-stat-tile"><div class="sj-stat-label">' + escapeHtml(tt("statsBestScore", "베스트 스코어")) + '</div><div class="sj-stat-value">' + bestScore + "</div></div>" +
-        '<div class="sj-stat-tile" style="grid-column:1 / -1;"><div class="sj-stat-label">' + escapeHtml(tt("statsAvgOverPar", "평균 오버파")) + '</div><div class="sj-stat-value">' + signedLabel(Math.round(avgToPar * 10) / 10) + "</div></div>" +
+        '<div class="sj-stat-tile"><div class="sj-stat-label">총 라운드</div><div class="sj-stat-value">' + withMe.length + "</div></div>" +
+        '<div class="sj-stat-tile"><div class="sj-stat-label">최근 스코어</div><div class="sj-stat-value">' + recent.totalScore + "</div></div>" +
+        '<div class="sj-stat-tile"><div class="sj-stat-label">평균 스코어</div><div class="sj-stat-value">' + avgScore.toFixed(1) + "</div></div>" +
+        '<div class="sj-stat-tile"><div class="sj-stat-label">베스트 스코어</div><div class="sj-stat-value">' + bestScore + "</div></div>" +
+        '<div class="sj-stat-tile" style="grid-column:1 / -1;"><div class="sj-stat-label">평균 오버파</div><div class="sj-stat-value">' + signedLabel(Math.round(avgToPar * 10) / 10) + "</div></div>" +
       "</div>" +
       '<div class="sj-stats-donut-wrap">' +
         '<div class="sj-stats-donut" style="background:' + donut.gradient + ';"></div>' +
@@ -453,7 +449,7 @@
     if(!confirm('"' + label + '" 라운드를 삭제할까요? 되돌릴 수 없습니다.')) return;
     var currentUser = window.__sjAuth && window.__sjAuth.getCurrentUser();
     if(!currentUser){
-      alert(tt("loginRequired", "로그인이 필요합니다."));
+      alert("로그인이 필요합니다.");
       return;
     }
     currentUser.getIdToken().then(function(idToken){
@@ -524,10 +520,10 @@
     if(courseInput) courseInput.value = "";
     if(yearSelect) yearSelect.value = "";
     if(listEl) listEl.innerHTML = "";
-    if(statusEl){ statusEl.className = "sj-status"; statusEl.textContent = tt("loadLoading", "불러오는 중..."); }
+    if(statusEl){ statusEl.className = "sj-status"; statusEl.textContent = "불러오는 중..."; }
     var currentUser = window.__sjAuth && window.__sjAuth.getCurrentUser();
     if(!currentUser){
-      if(statusEl){ statusEl.className = "sj-status error"; statusEl.textContent = tt("loginRequired", "로그인이 필요합니다."); }
+      if(statusEl){ statusEl.className = "sj-status error"; statusEl.textContent = "로그인이 필요합니다."; }
       return;
     }
     currentUser.getIdToken().then(function(idToken){
