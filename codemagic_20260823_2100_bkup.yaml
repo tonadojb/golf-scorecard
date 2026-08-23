@@ -15,14 +15,6 @@ workflows:
       # 로그에 안 찍혔던 것). 아래 스크립트의 "fetch-signing-files --create" 단계가
       # 인증서/프로파일을 새로 만들고 use-profiles가 그걸 적용하므로 이 블록 없이도
       # 정상 동작합니다.
-      #
-      # ⚠ 새 배포용 인증서를 "생성"하려면 그 인증서의 개인키(CERTIFICATE_PRIVATE_KEY)가
-      # 있어야 합니다 (Apple은 CSR만 받고 개인키는 절대 대신 만들어주지 않습니다).
-      # Codemagic 앱 설정 → Environment variables 에서 "ios_signing"이라는 이름의
-      # 그룹을 만들고, 그 안에 CERTIFICATE_PRIVATE_KEY 변수(Secure 체크)를 추가해야
-      # 아래 groups 참조가 정상 동작합니다.
-      groups:
-        - ios_signing
       vars:
         BUNDLE_ID: "com.skyjang.golfscorecard"
         XCODE_WORKSPACE: "ios-app/ios/App/App.xcworkspace"
