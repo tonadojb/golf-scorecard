@@ -54,12 +54,15 @@
           (u.banned ? "접속가능으로 전환" : "접속금지") +
         '</button>' +
       '</div>';
+    var loginCount = u.loginCount || 0;
     var scanCount = u.scanCount || 0;
     var saveCount = u.saveCount || 0;
-    var usageCount = scanCount + saveCount;
     // 클릭하면 펼쳐지는 사용자별 이용 통계 -- .sj-admin-user-row.open일 때만 보임 (CSS).
+    // "이용 횟수"는 실제 로그인 횟수(loginCount)를 보여준다 -- 예전엔
+    // scanCount+saveCount 합계였는데, 로그인만 하고 스캔/저장은 안 한
+    // 사용자가 계속 0으로 보이는 문제가 있어서 실제 로그인 횟수로 바꿨다.
     var detail = '<div class="sj-admin-user-detail">' +
-        '<div class="sj-admin-user-stat"><span>이용 횟수</span><b>' + usageCount + '</b></div>' +
+        '<div class="sj-admin-user-stat"><span>이용 횟수</span><b>' + loginCount + '</b></div>' +
         '<div class="sj-admin-user-stat"><span>스캔 건수</span><b>' + scanCount + '</b></div>' +
         '<div class="sj-admin-user-stat"><span>저장 건수</span><b>' + saveCount + '</b></div>' +
       '</div>';

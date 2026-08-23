@@ -29,6 +29,11 @@ var PING_PRESENCE_URL = "https://asia-northeast3-skyjang-golfscore.cloudfunction
 // (그냥 로컬에서 signOut만 하면 서버는 그 사실을 몰라서, 관리자 페이지에는
 // 마지막 하트비트 이후 5분(ONLINE_WINDOW_MS)이 지나야 오프라인으로 보였습니다).
 var CLEAR_PRESENCE_URL = "https://asia-northeast3-skyjang-golfscore.cloudfunctions.net/clearPresence";
+// 로그인 버튼을 눌러 실제로 로그인에 성공했을 때 한 번 호출해서 관리자
+// 페이지의 "이용 횟수"(로그인 횟수)를 늘리는 용도입니다. pingPresence와
+// 달리 세션 유지 중에는 다시 부르지 않습니다 -- 로그인 자체를 세는 값이지
+// 접속 여부를 세는 값이 아니기 때문입니다.
+var RECORD_LOGIN_URL = "https://asia-northeast3-skyjang-golfscore.cloudfunctions.net/recordLogin";
 
 var KAKAO_JS_KEY = "e73a39b4f944bc251c449f0535d5f39b";
 var NAVER_CLIENT_ID = "jdkW2uYK23DCwxrCeVWu";
@@ -59,6 +64,18 @@ function saveUserProfile(user, extra){
     updatedAt: serverTimestamp()
   }, extra || {});
   return setDoc(doc(db, "users", user.uid), data, { merge: true });
+}
+
+/* 로그인 흐름을 막지 않도록 결과를 기다리지 않고(best-effort) 호출합니다 --
+   실패해도 로그인 자체는 정상 진행되어야 합니다. */
+function recordLoginPing(user){
+  if(!user) return;
+  user.getIdToken().then(function(idToken){
+    return fetch(RECORD_LOGIN_URL, {
+      method: "POST",
+      headers: { "Content-Type": "application/json", "Authorization": "Bearer " + idToken }
+    });
+  }).catch(function(){ /* best-effort -- 실패해도 무시 */ });
 }
 
 function closeAuthModal(){
@@ -104,6 +121,7 @@ if(googleBtn){
     setStatus("Google 로그인 중...");
     var provider = new GoogleAuthProvider();
     signInWithPopup(auth, provider).then(function(result){
+      recordLoginPing(result.user);
       return saveUserProfile(result.user, { displayName: result.user.displayName || "", provider: "google" });
     }).then(function(){
       setStatus("로그인 성공!");
@@ -144,6 +162,7 @@ if(kakaoBtn){
           }).then(function(o){
             // custom-token sign-ins don't carry a profile, unlike Google's
             // popup flow -- fill it in from what kakaoAuth looked up.
+            recordLoginPing(o.result.user);
             var profileUpdate = {};
             if(o.displayName) profileUpdate.displayName = o.displayName;
             if(o.photoURL) profileUpdate.photoURL = o.photoURL;
@@ -227,6 +246,7 @@ function handleNaverLoginSuccess(){
     }).then(function(o){
       // custom-token sign-ins don't carry a profile, unlike Google's
       // popup flow -- fill it in from what naverAuth looked up.
+      recordLoginPing(o.result.user);
       var profileUpdate = {};
       if(o.displayName) profileUpdate.displayName = o.displayName;
       if(o.photoURL) profileUpdate.photoURL = o.photoURL;
