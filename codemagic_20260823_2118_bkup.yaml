@@ -43,10 +43,6 @@ workflows:
           app-store-connect fetch-signing-files "$BUNDLE_ID" \
             --type IOS_APP_STORE \
             --create
-      - name: 키체인에 서명 인증서 등록 (macOS 키체인에 실제로 설치해야 서명 가능)
-        script: |
-          keychain initialize
-          keychain add-certificates
       - name: 코드 서명 프로필 자동 구성
         script: |
           xcode-project use-profiles
