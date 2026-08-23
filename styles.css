@@ -160,6 +160,9 @@ footer.credit{text-align:center;color:var(--muted);font-size:11px;padding:14px;}
 .sj-manual-steps li{margin-bottom:4px;}
 .sj-manual-steps b{color:#4338ca;}
 .sj-manual-footer{margin-top:2px;text-align:center;font-size:11px;color:#999;}
+.sj-manual-warning{background:#fff7ed;border-color:#fdba74;}
+.sj-manual-warning .sj-manual-title{color:#c2410c;}
+.sj-manual-warning .sj-manual-desc b{color:#c2410c;}
 
 /* ---------------- Edit saved round (load modal) ---------------- */
 .sj-edit-modal{max-width:520px;}
