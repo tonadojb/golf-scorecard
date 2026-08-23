@@ -187,7 +187,7 @@ footer.credit{text-align:center;color:var(--muted);font-size:11px;padding:14px;}
 .sj-admin-users-head{display:flex;align-items:center;justify-content:space-between;gap:8px;margin-bottom:8px;}
 .sj-admin-users-head span{font-weight:700;font-size:13px;color:var(--primary-dark);}
 .sj-admin-refresh-btn{margin-top:0 !important;width:auto !important;padding:6px 12px !important;}
-.sj-admin-user-row{border:1px solid #e5e7eb;border-radius:10px;padding:10px;margin-bottom:8px;background:#fbfbfe;}
+.sj-admin-user-row{border:1px solid #e5e7eb;border-radius:10px;padding:10px;margin-bottom:8px;background:#fbfbfe;cursor:pointer;}
 .sj-admin-user-top{display:flex;align-items:center;gap:6px;flex-wrap:wrap;}
 .sj-admin-dot{width:9px;height:9px;border-radius:50%;flex:0 0 auto;background:#c8cadf;}
 .sj-admin-dot.on{background:#16a34a;box-shadow:0 0 0 2px rgba(22,163,74,0.2);}
@@ -203,6 +203,15 @@ footer.credit{text-align:center;color:var(--muted);font-size:11px;padding:14px;}
 .sj-admin-ban-btn{background:#fee2e2;color:#b91c1c;}
 .sj-admin-unban-btn{background:#dcfce7;color:#15803d;}
 .sj-admin-empty{font-size:13px;color:#888;text-align:center;padding:16px 0;}
+.sj-admin-stats-bar{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:14px;}
+.sj-admin-stat-tile{background:#fff;border:1px solid #e5e7eb;border-radius:10px;padding:9px;text-align:center;}
+.sj-admin-stat-label{font-size:10.5px;color:#6b7a72;margin-bottom:3px;}
+.sj-admin-stat-value{font-size:16px;font-weight:700;color:#1f2b24;}
+.sj-admin-user-detail{display:none;gap:6px;margin-top:8px;padding-top:8px;border-top:1px dashed #d7d8ec;}
+.sj-admin-user-row.open .sj-admin-user-detail{display:flex;}
+.sj-admin-user-stat{flex:1;text-align:center;background:#f5f6fc;border-radius:8px;padding:6px 4px;}
+.sj-admin-user-stat span{display:block;font-size:10px;color:#6b7a72;margin-bottom:2px;}
+.sj-admin-user-stat b{font-size:13px;color:#4338ca;}
 
 /* ---------------- Block overlay (접속금지 / 전체점검) ---------------- */
 .sj-block-overlay{position:fixed;inset:0;background:rgba(18,20,32,0.94);display:flex;align-items:center;justify-content:center;z-index:20000;padding:20px;}

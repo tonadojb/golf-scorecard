@@ -54,15 +54,6 @@
           (u.banned ? "접속가능으로 전환" : "접속금지") +
         '</button>' +
       '</div>';
-    var scanCount = u.scanCount || 0;
-    var saveCount = u.saveCount || 0;
-    var usageCount = scanCount + saveCount;
-    // 클릭하면 펼쳐지는 사용자별 이용 통계 -- .sj-admin-user-row.open일 때만 보임 (CSS).
-    var detail = '<div class="sj-admin-user-detail">' +
-        '<div class="sj-admin-user-stat"><span>이용 횟수</span><b>' + usageCount + '</b></div>' +
-        '<div class="sj-admin-user-stat"><span>스캔 건수</span><b>' + scanCount + '</b></div>' +
-        '<div class="sj-admin-user-stat"><span>저장 건수</span><b>' + saveCount + '</b></div>' +
-      '</div>';
     return '<div class="sj-admin-user-row" data-uid="' + escapeHtmlLocal(u.uid) + '">' +
       '<div class="sj-admin-user-top">' + onlineDot +
         '<span class="sj-admin-user-name">' + escapeHtmlLocal(name) + '</span>' + badge + bannedBadge +
@@ -70,21 +61,7 @@
       '<div class="sj-admin-user-meta">' + escapeHtmlLocal(u.email || "-") + ' · ' + escapeHtmlLocal(u.provider || "-") +
         ' · 최근 접속 ' + fmtTime(u.lastSeenAt) + ' · 위반 ' + (u.violationCount || 0) + '회' +
       '</div>' +
-      detail +
-      actions +
-    '</div>';
-  }
-
-  function renderStatsBar(stats){
-    var bar = sj("sjAdminStatsBar");
-    if(!bar) return;
-    if(!stats){ bar.innerHTML = ""; return; }
-    bar.innerHTML =
-      '<div class="sj-admin-stat-tile"><div class="sj-admin-stat-label">총 로그인 사용자</div><div class="sj-admin-stat-value">' + stats.totalUsers + '</div></div>' +
-      '<div class="sj-admin-stat-tile"><div class="sj-admin-stat-label">현재 접속중</div><div class="sj-admin-stat-value">' + stats.onlineUsers + '</div></div>' +
-      '<div class="sj-admin-stat-tile"><div class="sj-admin-stat-label">오프라인</div><div class="sj-admin-stat-value">' + stats.offlineUsers + '</div></div>' +
-      '<div class="sj-admin-stat-tile"><div class="sj-admin-stat-label">총 스캔 건수</div><div class="sj-admin-stat-value">' + stats.totalScans + '</div></div>' +
-      '<div class="sj-admin-stat-tile"><div class="sj-admin-stat-label">총 저장 건수</div><div class="sj-admin-stat-value">' + stats.totalSaves + '</div></div>';
+      actions;
   }
 
   function renderUserList(users){
@@ -103,7 +80,6 @@
     return withIdToken(function(idToken){
       return authedFetch(LIST_URL, idToken);
     }).then(function(data){
-      renderStatsBar(data && data.stats);
       renderUserList((data && data.users) || []);
       if(status){ status.textContent = ""; }
     }).catch(function(e){
@@ -162,9 +138,6 @@
         });
         return;
       }
-      // 사용자 행을 클릭하면(버튼이 아닌 곳) 이용횟수/스캔건수/저장건수 상세를 펼쳐서 보여준다.
-      var row = e.target.closest(".sj-admin-user-row");
-      if(row){ row.classList.toggle("open"); }
     });
   }
 
