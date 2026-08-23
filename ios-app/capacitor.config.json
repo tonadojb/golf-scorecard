@@ -1,0 +1,21 @@
+{
+  "appId": "com.skyjang.golfscorecard",
+  "appName": "골프 스코어카드",
+  "webDir": "www",
+  "ios": {
+    "contentInset": "automatic"
+  },
+  "server": {
+    "androidScheme": "https",
+    "allowNavigation": [
+      "*.firebaseapp.com",
+      "*.googleapis.com",
+      "accounts.google.com",
+      "*.google.com",
+      "nid.naver.com",
+      "*.naver.com",
+      "kauth.kakao.com",
+      "*.kakao.com"
+    ]
+  }
+}

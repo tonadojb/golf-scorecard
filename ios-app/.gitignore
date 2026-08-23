@@ -1,0 +1,10 @@
+node_modules/
+www/
+ios/App/Pods/
+ios/App/Podfile.lock
+ios/App/build/
+ios/App/App/public/
+*.xcuserstate
+xcuserdata/
+DerivedData/
+.DS_Store

@@ -1,0 +1,24 @@
+{
+  "name": "golf-scorecard-ios",
+  "version": "1.0.0",
+  "private": true,
+  "description": "골프 스코어카드 웹앱을 감싸는 Capacitor iOS 프로젝트 (App Store 제출용)",
+  "scripts": {
+    "sync-web": "node scripts/sync-web.js",
+    "sync": "npm run sync-web && npx cap sync ios"
+  },
+  "dependencies": {
+    "@capacitor/app": "^6.0.0",
+    "@capacitor/browser": "^6.0.0",
+    "@capacitor/camera": "^6.0.0",
+    "@capacitor/core": "^6.0.0",
+    "@capacitor/share": "^6.0.0",
+    "@capacitor/splash-screen": "^6.0.0",
+    "@capacitor/status-bar": "^6.0.0"
+  },
+  "devDependencies": {
+    "@capacitor/assets": "^3.0.5",
+    "@capacitor/cli": "^6.0.0",
+    "@capacitor/ios": "^6.0.0"
+  }
+}

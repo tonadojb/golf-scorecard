@@ -1,5 +1,5 @@
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
-import { getAuth, GoogleAuthProvider, signInWithPopup, signInWithRedirect, getRedirectResult, signInWithCustomToken, signOut, onAuthStateChanged, updateProfile } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
+import { getAuth, GoogleAuthProvider, signInWithPopup, signInWithCustomToken, signOut, onAuthStateChanged, updateProfile } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
 import { getFirestore, doc, setDoc, serverTimestamp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
 
 var firebaseConfig = {
@@ -47,13 +47,6 @@ var app = initializeApp(firebaseConfig);
 var auth = getAuth(app);
 var db = getFirestore(app);
 var currentUser = null;
-
-/* iOS(Capacitor) 앱 안에서 실행 중인지 판별합니다. Capacitor 런타임이 앱 안에서
-   자동으로 window.Capacitor를 주입해주므로, 웹사이트(GitHub Pages)에서는 항상
-   false -- 아래 네이티브 전용 분기들은 웹 동작에 전혀 영향을 주지 않습니다. */
-function isNativeApp(){
-  return !!(window.Capacitor && typeof window.Capacitor.isNativePlatform === "function" && window.Capacitor.isNativePlatform());
-}
 
 function sj(id){ return document.getElementById(id); }
 
@@ -127,15 +120,6 @@ if(googleBtn){
   googleBtn.addEventListener("click", function(){
     setStatus("Google 로그인 중...");
     var provider = new GoogleAuthProvider();
-    if(isNativeApp()){
-      // 웹뷰 안에서는 signInWithPopup이 동작하지 않습니다 (Google이 임베디드
-      // 웹뷰에서의 로그인을 차단합니다). 전체 화면 리다이렉트로 전환하고,
-      // 결과는 아래 handleGoogleRedirectResult()가 앱 로드 시 처리합니다.
-      signInWithRedirect(auth, provider).catch(function(e){
-        setStatus("오류: " + (e && e.message ? e.message : e), true);
-      });
-      return;
-    }
     signInWithPopup(auth, provider).then(function(result){
       recordLoginPing(result.user);
       return saveUserProfile(result.user, { displayName: result.user.displayName || "", provider: "google" });
@@ -145,26 +129,6 @@ if(googleBtn){
     }).catch(function(e){
       setStatus("오류: " + (e && e.message ? e.message : e), true);
     });
-  });
-}
-
-/* signInWithRedirect()로 떠났다가 앱으로 돌아왔을 때 로그인을 마무리합니다.
-   네이티브(iOS) 환경에서만 의미가 있고, 로그인을 안 한 상태로 그냥 앱을 열었을
-   때는 result가 null이라 아무 일도 하지 않습니다.
-   ⚠ 아직 실기기/Xcode로 검증되지 않은 코드입니다 -- ios-app/README_IOS_BUILD.md
-   의 "로그인 테스트" 항목을 꼭 참고해주세요. */
-if(isNativeApp()){
-  getRedirectResult(auth).then(function(result){
-    if(!result || !result.user) return;
-    recordLoginPing(result.user);
-    return saveUserProfile(result.user, { displayName: result.user.displayName || "", provider: "google" });
-  }).then(function(){
-    if(auth.currentUser){
-      setStatus("로그인 성공!");
-      closeAuthModal();
-    }
-  }).catch(function(e){
-    setStatus("오류: " + (e && e.message ? e.message : e), true);
   });
 }
 

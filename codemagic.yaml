@@ -1,0 +1,51 @@
+workflows:
+  ios-golf-scorecard:
+    name: 골프 스코어카드 iOS 빌드
+    max_build_duration: 60
+    instance_type: mac_mini_m2
+    integrations:
+      # Codemagic 앱 설정 화면에서 "App Store Connect" 통합을 연결할 때 붙이는
+      # 이름과 정확히 같아야 합니다 (Teams > Integrations > App Store Connect).
+      app_store_connect: codemagic
+    environment:
+      ios_signing:
+        distribution_type: app_store
+        bundle_identifier: com.skyjang.golfscorecard
+      vars:
+        XCODE_WORKSPACE: "ios-app/ios/App/App.xcworkspace"
+        XCODE_SCHEME: "App"
+      node: 20
+    scripts:
+      - name: npm install (ios-app)
+        script: |
+          cd ios-app && npm install
+      - name: 웹 파일을 www/ 로 복사 + Capacitor 동기화
+        script: |
+          cd ios-app && npm run sync
+      - name: CocoaPods 설치
+        script: |
+          cd ios-app/ios/App && pod install
+      - name: 코드 서명 프로필 자동 구성
+        script: |
+          xcode-project use-profiles
+      - name: 빌드 번호 자동 증가
+        script: |
+          cd ios-app/ios/App
+          BUNDLE_ID=$(xcode-project detect-bundle-id --project App.xcodeproj --target App 2>/dev/null || echo "com.skyjang.golfscorecard")
+          LATEST_BUILD_NUMBER=$(app-store-connect get-latest-app-store-build-number "$BUNDLE_ID" || echo 0)
+          agvtool new-version -all $(($LATEST_BUILD_NUMBER + 1))
+      - name: ipa 빌드
+        script: |
+          xcode-project build-ipa \
+            --workspace "$XCODE_WORKSPACE" \
+            --scheme "$XCODE_SCHEME"
+    artifacts:
+      - build/ios/ipa/*.ipa
+      - /tmp/xcodebuild_logs/*.log
+    publishing:
+      # 빌드가 끝나면 TestFlight로 자동 업로드합니다. 아직 검토 준비가 안 됐다면
+      # submit_to_testflight를 false로 바꿔서 업로드만 안 하고 ipa만 받아볼 수도 있습니다.
+      app_store_connect:
+        auth: integration
+        submit_to_testflight: true
+        submit_to_app_store: false
