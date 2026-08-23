@@ -25,6 +25,10 @@ var NAVER_AUTH_URL = "https://asia-northeast3-skyjang-golfscore.cloudfunctions.n
 // 로그인 직후 및 로그인 유지 중 주기적으로 호출해서 관리자 페이지의
 // "접속중"/최근 접속 표시(lastSeenAt 기반)를 갱신하는 용도입니다.
 var PING_PRESENCE_URL = "https://asia-northeast3-skyjang-golfscore.cloudfunctions.net/pingPresence";
+// 사용자가 직접 "로그아웃" 버튼을 눌렀을 때 lastSeenAt을 즉시 지우는 용도입니다
+// (그냥 로컬에서 signOut만 하면 서버는 그 사실을 몰라서, 관리자 페이지에는
+// 마지막 하트비트 이후 5분(ONLINE_WINDOW_MS)이 지나야 오프라인으로 보였습니다).
+var CLEAR_PRESENCE_URL = "https://asia-northeast3-skyjang-golfscore.cloudfunctions.net/clearPresence";
 
 var KAKAO_JS_KEY = "e73a39b4f944bc251c449f0535d5f39b";
 var NAVER_CLIENT_ID = "jdkW2uYK23DCwxrCeVWu";
@@ -274,7 +278,21 @@ if(naverBtn){
 var logoutBtn = sj("sjLogout");
 if(logoutBtn){
   logoutBtn.addEventListener("click", function(){
-    signOut(auth).then(function(){
+    // signOut()이 끝나면 currentUser가 사라져서 토큰을 못 얻으니, 먼저
+    // 토큰을 가져와 서버의 lastSeenAt을 지운 뒤에(실패해도 무시하고) signOut
+    // 합니다 -- 이래야 관리자 페이지에 로그아웃이 즉시 반영됩니다.
+    var userBeforeLogout = currentUser;
+    var clearPresence = userBeforeLogout
+      ? userBeforeLogout.getIdToken().then(function(idToken){
+          return fetch(CLEAR_PRESENCE_URL, {
+            method: "POST",
+            headers: { "Content-Type": "application/json", "Authorization": "Bearer " + idToken }
+          });
+        }).catch(function(){ /* best-effort -- 실패해도 로그아웃은 진행 */ })
+      : Promise.resolve();
+    clearPresence.then(function(){
+      return signOut(auth);
+    }).then(function(){
       // "로그인 성공!" 같은 이전 상태 문구가 로그아웃 후에도 남아있지 않도록 지워줍니다.
       setStatus("");
       // 네이버 SDK 쪽 로그인 세션도 같이 끊어줍니다 (Firebase 로그아웃만 하면 네이버
