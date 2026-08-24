@@ -1,6 +1,6 @@
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
 import { getAuth, GoogleAuthProvider, signInWithPopup, signInWithCredential, signInWithCustomToken, signOut, onAuthStateChanged, updateProfile } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
-import { getFirestore, doc, getDoc, setDoc, serverTimestamp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
+import { getFirestore, doc, setDoc, serverTimestamp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
 
 var firebaseConfig = {
   apiKey: "AIzaSyAMbBZIdxDYom7fWpsTrmhgdhNau6xtRHU",
@@ -359,45 +359,8 @@ if(logoutBtn){
       if(naverLoginInstance && typeof naverLoginInstance.logout === "function"){
         naverLoginInstance.logout();
       }
-      // 다음에 (같은 계정이든 다른 계정이든) 다시 로그인했을 때 기본 언어
-      // 적용이 확실히 다시 시도되도록 초기화합니다.
-      appliedLangForUid = null;
     });
   });
-}
-
-// ---- 기본 언어(계정별) ----
-// 로그인 상태에서 언어를 바꾸면(js/i18n.js의 langDropdown 클릭 핸들러가
-// window.__sjAuth.savePreferredLanguage를 호출합니다) 그 값을 이 계정의
-// Firestore 프로필(users/{uid}.preferredLanguage)에 저장해두고, 이후
-// 어느 기기/브라우저에서 이 계정으로 로그인하더라도 아래 applyPreferredLanguage가
-// 로그인 직후 자동으로 그 언어를 적용합니다. 로그인하지 않은 상태에서 언어를
-// 바꾸는 경우는 기존처럼 이 기기의 localStorage에만 저장됩니다(js/state.js의
-// save()).
-var appliedLangForUid = null;
-
-function savePreferredLanguage(lang){
-  if(!currentUser || !lang) return;
-  setDoc(doc(db, "users", currentUser.uid), { preferredLanguage: lang, updatedAt: serverTimestamp() }, { merge: true })
-    .catch(function(){ /* best-effort -- 실패해도 화면의 언어 변경 자체는 이미 적용된 상태 */ });
-}
-
-function applyPreferredLanguage(user){
-  if(!user || appliedLangForUid === user.uid) return;
-  appliedLangForUid = user.uid;
-  getDoc(doc(db, "users", user.uid)).then(function(snap){
-    var data = snap.exists() ? snap.data() : null;
-    var lang = data && data.preferredLanguage;
-    // I18N은 js/i18n.js가 전역으로 만들어두는 { ko:{...}, en:{...}, ... } 사전입니다.
-    // 거기 없는 값이면(예전에 지원하다 뺀 언어 등) 무시하고 현재 화면 언어를 유지합니다.
-    if(lang && window.I18N && window.I18N[lang] && lang !== state.lang){
-      state.lang = lang;
-      save();
-      relocalizeDefaultPlayerNames();
-      applyStaticTranslations();
-      renderAll();
-    }
-  }).catch(function(){ /* best-effort -- 실패해도 현재 화면 언어 그대로 둠 */ });
 }
 
 // onAuthStateChanged만으로는 화면에 이름이 안 뜨는 문제가 있었습니다: 카카오/네이버는
@@ -418,7 +381,6 @@ function renderAuthUI(user){
     if(nameEl) nameEl.textContent = user.displayName || user.email || user.uid;
     if(adminFab) adminFab.style.display = (user.email === ADMIN_EMAIL) ? "" : "none";
     startPresenceHeartbeat();
-    applyPreferredLanguage(user);
   } else {
     if(loggedOut) loggedOut.style.display = "block";
     if(loggedIn) loggedIn.style.display = "none";
@@ -445,7 +407,6 @@ onAuthStateChanged(auth, renderAuthUI);
 window.__sjAuth = {
   getCurrentUser: function(){ return currentUser; },
   getAuth: function(){ return auth; },
-  savePreferredLanguage: savePreferredLanguage,
   getDb: function(){ return db; },
   handleBlocked: handleBlocked
 };

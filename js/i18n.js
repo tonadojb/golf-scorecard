@@ -601,6 +601,13 @@ langDropdown.addEventListener('click', function(e){
   langDropdown.classList.remove('show');
   applyStaticTranslations();
   renderAll();
+  // 로그인 상태라면 이 언어를 계정의 "기본 언어"로도 저장해서, 다음에 다른
+  // 기기/브라우저에서 이 계정으로 로그인했을 때도 자동으로 적용되게 합니다
+  // (js/auth.js의 applyPreferredLanguage). 로그인 안 한 상태면 아무 일도
+  // 일어나지 않고, 방금 위에서 저장한 이 브라우저의 localStorage만 적용됩니다.
+  if(window.__sjAuth && typeof window.__sjAuth.savePreferredLanguage === 'function'){
+    window.__sjAuth.savePreferredLanguage(state.lang);
+  }
 });
 
 /* True if this name is still one of the auto-generated default names (in any supported language),
