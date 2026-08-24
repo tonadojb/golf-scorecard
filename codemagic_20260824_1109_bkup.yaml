@@ -36,10 +36,6 @@ workflows:
         - ios_signing
       vars:
         BUNDLE_ID: "com.skyjang.golfscorecard"
-        # App Store Connect의 "앱 정보" 화면에 있는 숫자로만 된 Apple ID입니다
-        # (Bundle ID와는 다른 값). 빌드 번호를 자동으로 올릴 때(아래 "빌드 번호
-        # 자동 증가" 단계) get-latest-build-number 명령이 이 값을 필요로 합니다.
-        APPLE_APP_ID: "6804484884"
         XCODE_WORKSPACE: "ios-app/ios/App/App.xcworkspace"
         XCODE_SCHEME: "App"
       node: 20
@@ -68,12 +64,7 @@ workflows:
       - name: 빌드 번호 자동 증가
         script: |
           cd ios-app/ios/App
-          # get-latest-app-store-build-number는 "정식 앱스토어에 출시된" 빌드만
-          # 찾기 때문에, TestFlight로만 배포 중인 지금은 항상 0을 반환해서 매번
-          # 빌드 번호가 1로 겹쳐 업로드가 거부됐습니다(빌드 #12 실패 원인).
-          # get-latest-build-number는 TestFlight에 이미 올라간 빌드까지 포함해서
-          # 가장 높은 번호를 찾아주므로 이 문제가 없습니다.
-          LATEST_BUILD_NUMBER=$(app-store-connect get-latest-build-number "$APPLE_APP_ID" || echo 0)
+          LATEST_BUILD_NUMBER=$(app-store-connect get-latest-app-store-build-number "$BUNDLE_ID" || echo 0)
           agvtool new-version -all $(($LATEST_BUILD_NUMBER + 1))
       - name: ipa 빌드
         script: |
