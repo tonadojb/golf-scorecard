@@ -3,17 +3,6 @@ workflows:
     name: 골프 스코어카드 iOS 빌드
     max_build_duration: 60
     instance_type: mac_mini_m2
-    triggering:
-      # main 브랜치에 push할 때마다 Codemagic이 자동으로 새 빌드를 시작하도록
-      # 설정합니다. 이 블록이 없으면(지금까지 계속 이 상태였습니다) 자동 빌드가
-      # 전혀 트리거되지 않고, 매번 Codemagic 대시보드에서 "Start new build"를
-      # 직접 눌러야만 빌드가 시작됩니다.
-      events:
-        - push
-      branch_patterns:
-        - pattern: main
-          include: true
-          source: true
     integrations:
       # Codemagic 앱 설정 화면에서 "App Store Connect" 통합을 연결할 때 붙이는
       # 이름과 정확히 같아야 합니다 (Teams > Integrations > App Store Connect).
