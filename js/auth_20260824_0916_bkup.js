@@ -1,5 +1,5 @@
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
-import { getAuth, GoogleAuthProvider, signInWithPopup, signInWithCredential, signInWithCustomToken, signOut, onAuthStateChanged, updateProfile } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
+import { getAuth, GoogleAuthProvider, signInWithPopup, signInWithRedirect, getRedirectResult, signInWithCustomToken, signOut, onAuthStateChanged, updateProfile } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
 import { getFirestore, doc, setDoc, serverTimestamp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
 
 var firebaseConfig = {
@@ -122,51 +122,49 @@ function stopPresenceHeartbeat(){
 }
 
 // ---- Google 로그인 ----
-// signInWithRedirect도 실제로는 동작하지 않았습니다 (앱 안에서는 "Google
-// 로그인 중..."에서 멈춘 채로 반응이 없었음) -- 구글이 임베디드 웹뷰에서의
-// 로그인 자체를 정책적으로 차단하기 때문에, 팝업이든 리다이렉트든 웹뷰 안에서
-// 하는 방식은 애초에 통하지 않습니다. 그래서 앱 안에서는
-// @capacitor-firebase/authentication 플러그인으로 iOS 네이티브 구글 로그인
-// 화면(웹뷰가 아닌 진짜 시스템 로그인 창)을 띄우고, 거기서 받은 idToken을
-// Firebase 웹 SDK의 signInWithCredential에 그대로 넘겨서 로그인합니다
-// (capacitor.config.json의 skipNativeAuth:true 설정 덕분에 네이티브 Firebase
-// Auth 레이어는 건드리지 않고, 지금 쓰고 있는 웹 SDK의 auth 객체 하나로만
-// 로그인 상태가 관리됩니다). 웹사이트(GitHub Pages)에는 이 네이티브 플러그인이
-// 없으므로 기존 signInWithPopup 방식을 그대로 씁니다.
-function finishGoogleLogin(userPromise){
-  userPromise.then(function(result){
-    recordLoginPing(result.user);
-    return saveUserProfile(result.user, { displayName: result.user.displayName || "", provider: "google" });
-  }).then(function(){
-    setStatus("로그인 성공!");
-    closeAuthModal();
-  }).catch(function(e){
-    setStatus("오류: " + (e && e.message ? e.message : e), true);
-  });
-}
-
 var googleBtn = sj("sjGoogleLogin");
 if(googleBtn){
   googleBtn.addEventListener("click", function(){
     setStatus("Google 로그인 중...");
+    var provider = new GoogleAuthProvider();
     if(isNativeApp()){
-      var FirebaseAuthentication = window.Capacitor.Plugins && window.Capacitor.Plugins.FirebaseAuthentication;
-      if(!FirebaseAuthentication){
-        setStatus("오류: 네이티브 구글 로그인 플러그인을 찾을 수 없습니다.", true);
-        return;
-      }
-      finishGoogleLogin(
-        FirebaseAuthentication.signInWithGoogle().then(function(nativeResult){
-          var idToken = nativeResult && nativeResult.credential && nativeResult.credential.idToken;
-          if(!idToken){ throw new Error("구글 로그인 토큰을 가져오지 못했습니다."); }
-          var credential = GoogleAuthProvider.credential(idToken);
-          return signInWithCredential(auth, credential);
-        })
-      );
+      // 웹뷰 안에서는 signInWithPopup이 동작하지 않습니다 (Google이 임베디드
+      // 웹뷰에서의 로그인을 차단합니다). 전체 화면 리다이렉트로 전환하고,
+      // 결과는 아래 handleGoogleRedirectResult()가 앱 로드 시 처리합니다.
+      signInWithRedirect(auth, provider).catch(function(e){
+        setStatus("오류: " + (e && e.message ? e.message : e), true);
+      });
       return;
     }
-    var provider = new GoogleAuthProvider();
-    finishGoogleLogin(signInWithPopup(auth, provider));
+    signInWithPopup(auth, provider).then(function(result){
+      recordLoginPing(result.user);
+      return saveUserProfile(result.user, { displayName: result.user.displayName || "", provider: "google" });
+    }).then(function(){
+      setStatus("로그인 성공!");
+      closeAuthModal();
+    }).catch(function(e){
+      setStatus("오류: " + (e && e.message ? e.message : e), true);
+    });
+  });
+}
+
+/* signInWithRedirect()로 떠났다가 앱으로 돌아왔을 때 로그인을 마무리합니다.
+   네이티브(iOS) 환경에서만 의미가 있고, 로그인을 안 한 상태로 그냥 앱을 열었을
+   때는 result가 null이라 아무 일도 하지 않습니다.
+   ⚠ 아직 실기기/Xcode로 검증되지 않은 코드입니다 -- ios-app/README_IOS_BUILD.md
+   의 "로그인 테스트" 항목을 꼭 참고해주세요. */
+if(isNativeApp()){
+  getRedirectResult(auth).then(function(result){
+    if(!result || !result.user) return;
+    recordLoginPing(result.user);
+    return saveUserProfile(result.user, { displayName: result.user.displayName || "", provider: "google" });
+  }).then(function(){
+    if(auth.currentUser){
+      setStatus("로그인 성공!");
+      closeAuthModal();
+    }
+  }).catch(function(e){
+    setStatus("오류: " + (e && e.message ? e.message : e), true);
   });
 }
 

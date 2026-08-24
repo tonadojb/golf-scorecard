@@ -1,0 +1,34 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+	<key>CLIENT_ID</key>
+	<string>162951012751-07p9m28h5s0gfqvlc1hvqqumbtjul28d.apps.googleusercontent.com</string>
+	<key>REVERSED_CLIENT_ID</key>
+	<string>com.googleusercontent.apps.162951012751-07p9m28h5s0gfqvlc1hvqqumbtjul28d</string>
+	<key>API_KEY</key>
+	<string>AIzaSyCHeumOXMsIfxx69vw0yaz-CLCLLk6EBfo</string>
+	<key>GCM_SENDER_ID</key>
+	<string>162951012751</string>
+	<key>PLIST_VERSION</key>
+	<string>1</string>
+	<key>BUNDLE_ID</key>
+	<string>com.skyjang.golfscorecard</string>
+	<key>PROJECT_ID</key>
+	<string>skyjang-golfscore</string>
+	<key>STORAGE_BUCKET</key>
+	<string>skyjang-golfscore.firebasestorage.app</string>
+	<key>IS_ADS_ENABLED</key>
+	<false></false>
+	<key>IS_ANALYTICS_ENABLED</key>
+	<false></false>
+	<key>IS_APPINVITE_ENABLED</key>
+	<true></true>
+	<key>IS_GCM_ENABLED</key>
+	<true></true>
+	<key>IS_SIGNIN_ENABLED</key>
+	<true></true>
+	<key>GOOGLE_APP_ID</key>
+	<string>1:162951012751:ios:751dcb55f95c22a1a02bfa</string>
+</dict>
+</plist>

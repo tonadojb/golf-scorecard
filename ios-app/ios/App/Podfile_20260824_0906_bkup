@@ -22,22 +22,8 @@ end
 target 'App' do
   capacitor_pods
   # Add your Pods here
-  # 구글 로그인만 사용하므로 Firebase Authentication 플러그인의 Google 서브스펙만
-  # 추가합니다 (cap sync가 기본 CapacitorFirebaseAuthentication pod까지는
-  # 자동으로 추가해주지만, provider별 서브스펙은 수동으로 추가해야 합니다).
-  pod 'CapacitorFirebaseAuthentication/Google', :path => '../../node_modules/@capacitor-firebase/authentication'
 end
 
 post_install do |installer|
   assertDeploymentTarget(installer)
-  # Xcode 14+에서는 CocoaPods가 만든 리소스 번들(.bundle) 타겟까지 서명하려고
-  # 시도하다가 빌드가 실패하는 문제가 있습니다 (Firebase 계열 pod들에 특히 자주
-  # 발생). 앱 본체가 아니라 "리소스 번들" 타겟에 한해서만 서명을 끕니다.
-  installer.pods_project.targets.each do |target|
-    if target.respond_to?(:product_type) and target.product_type == "com.apple.product-type.bundle"
-      target.build_configurations.each do |config|
-        config.build_settings['CODE_SIGNING_ALLOWED'] = 'NO'
-      end
-    end
-  end
 end

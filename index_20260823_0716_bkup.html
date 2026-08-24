@@ -1,0 +1,338 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>⛳ 골프 스코어카드</title>
+<link rel="stylesheet" href="styles.css">
+
+</head>
+<body>
+<div class="app">
+<header class="app-header">
+<div class="app-header-top">
+<h1 id="appTitle">⛳ 골프 스코어카드</h1>
+<div class="header-actions">
+<button id="sjManualBtn" class="lang-btn" type="button" title="사용설명서"><span class="manual-btn-icon">📖</span><span class="manual-btn-text"> 사용설명서</span></button>
+<div class="lang-switcher">
+<button id="langBtn" class="lang-btn">🌐 Language</button>
+<div id="langDropdown" class="lang-dropdown">
+<button data-lang="ko">한국어 (Korean)</button>
+<button data-lang="en">English</button>
+<button data-lang="ja">日本語 (Japanese)</button>
+<button data-lang="zh">中文 (Chinese)</button>
+</div>
+</div>
+</div>
+</div>
+<div class="course-info">
+<input id="courseName" placeholder="골프장 이름을 입력하세요">
+<input id="playDate" type="date">
+</div>
+<div class="course-info">
+<input id="courseSub" placeholder="코스(전반/후반) 예: 토마토,애플">
+<input id="teeOffTime" type="time">
+</div>
+</header>
+<nav class="tabbar">
+<button class="tabbtn active" data-tab="setup" id="tabSetupBtn">👥 팀 설정</button>
+<button class="tabbtn" data-tab="play" id="tabPlayBtn">🏌️ 스코어 입력</button>
+<button class="tabbtn" data-tab="result" id="tabResultBtn">📋 결과</button>
+</nav>
+<main>
+<section id="panel-setup" class="panel active">
+<div class="card">
+<label id="holeCountLabel">홀 수 선택</label>
+<div class="seg" id="holeCountSeg">
+<button data-holecount="9" id="hole9Btn">9홀</button>
+<button data-holecount="18" class="active" id="hole18Btn">18홀</button>
+</div>
+</div>
+<div id="teamsContainer"></div>
+<button id="addTeamBtn" class="btn-primary">+ 팀 추가 (최대 20팀)</button>
+<button id="resetBtn" class="btn-danger">전체 초기화</button>
+</section>
+<section id="panel-play" class="panel">
+<div class="hole-strip" id="holeStrip"></div>
+<div class="card hole-info">
+<div class="hole-info-top">
+<h2 id="holeTitle">1번 홀</h2>
+<div class="par-select" id="parSelect"></div>
+</div>
+<textarea id="holeNote" placeholder="이 홀의 특징을 적어보세요 (도그렉, 벙커, OB, 그린 경사 등)"></textarea>
+</div>
+<div id="scoreInputList"></div>
+<div class="hole-nav">
+<button id="prevHoleBtn">◀ 이전 홀</button>
+<button id="nextHoleBtn">다음 홀 ▶</button>
+</div>
+</section>
+<section id="panel-result" class="panel">
+<div class="seg" id="sortToggle" style="margin-bottom:12px;">
+<button data-sort="team" class="active" id="sortTeamBtn">팀별 보기</button>
+<button data-sort="rank" id="sortRankBtn">🏆 순위별 보기</button>
+</div>
+<div id="resultCaptureArea">
+<div id="resultSummary"></div>
+<div class="table-wrap">
+<table id="resultTable"></table>
+</div>
+</div>
+<div id="anonymizeSection" class="card">
+<label id="anonymizeLabel">🙈 SNS 공유 시 이름 가리기</label>
+<div id="anonymizeList"></div>
+</div>
+<button id="copyBtn" class="btn-primary">📋 결과 복사하기 (SNS 공유)</button>
+</section>
+</main>
+<footer class="credit" id="footerText">Field Golf Scorecard · 데이터는 이 기기에만 저장됩니다</footer>
+  <a class="made-by" href="https://skyjang.com/" target="_blank" rel="noopener noreferrer">
+    <span class="made-by-label">Made by</span>
+    <svg class="made-by-icon" viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg">
+      <defs>
+        <linearGradient id="madeByGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+          <stop offset="0%" stop-color="#312e81"/>
+          <stop offset="50%" stop-color="#4338ca"/>
+          <stop offset="100%" stop-color="#0e7490"/>
+        </linearGradient>
+        <radialGradient id="madeByGlow" cx="50%" cy="50%" r="50%">
+          <stop offset="0%" stop-color="#ffffff" stop-opacity="0.9"/>
+          <stop offset="100%" stop-color="#ffffff" stop-opacity="0"/>
+        </radialGradient>
+      </defs>
+      <circle cx="50" cy="50" r="46" fill="url(#madeByGrad)" opacity="0.95"/>
+      <circle cx="50" cy="50" r="46" fill="none" stroke="rgba(255,255,255,0.5)" stroke-width="2"/>
+      <circle cx="18" cy="20" r="0.8" fill="#ffffff" opacity="0.5"/>
+      <circle cx="80" cy="60" r="0.9" fill="#ffffff" opacity="0.5"/>
+      <circle cx="14" cy="70" r="0.7" fill="#ffffff" opacity="0.4"/>
+      <circle cx="60" cy="86" r="0.7" fill="#ffffff" opacity="0.4"/>
+      <g stroke="#e0f2fe" stroke-width="1.6" fill="none" stroke-linecap="round" opacity="0.9">
+        <line x1="74" y1="28" x2="56" y2="32"/>
+        <line x1="56" y1="32" x2="36" y2="36"/>
+        <line x1="36" y1="36" x2="20" y2="28"/>
+        <line x1="56" y1="32" x2="58" y2="48"/>
+        <line x1="58" y1="48" x2="54" y2="72"/>
+        <line x1="36" y1="36" x2="32" y2="50"/>
+        <line x1="32" y1="50" x2="26" y2="72"/>
+        <line x1="56" y1="32" x2="50" y2="28"/>
+        <line x1="50" y1="28" x2="32" y2="10"/>
+      </g>
+      <g fill="#ffffff">
+        <circle cx="20" cy="28" r="1.8"/>
+        <circle cx="58" cy="48" r="1.8"/>
+        <circle cx="54" cy="72" r="1.8"/>
+        <circle cx="32" cy="50" r="1.8"/>
+        <circle cx="26" cy="72" r="1.8"/>
+        <circle cx="50" cy="28" r="1.6"/>
+      </g>
+      <circle cx="74" cy="28" r="6" fill="url(#madeByGlow)"/>
+      <circle cx="74" cy="28" r="2.6" fill="#ffffff"/>
+      <circle cx="56" cy="32" r="6" fill="url(#madeByGlow)"/>
+      <circle cx="56" cy="32" r="2.6" fill="#ffffff"/>
+      <circle cx="36" cy="36" r="6" fill="url(#madeByGlow)"/>
+      <circle cx="36" cy="36" r="2.6" fill="#ffffff"/>
+      <g transform="translate(32,10)">
+        <circle r="7" fill="url(#madeByGlow)"/>
+        <path d="M0 -6 L1.4 -1.4 L6 0 L1.4 1.4 L0 6 L-1.4 1.4 L-6 0 L-1.4 -1.4 Z" fill="#fef9c3"/>
+      </g>
+    </svg>
+    <span class="made-by-text-wrap">
+      <span class="made-by-text">SkyJANG Labs</span>
+      <span class="made-by-sparkle s1">✦</span>
+      <span class="made-by-sparkle s2">✦</span>
+      <span class="made-by-sparkle s3">✦</span>
+    </span>
+  </a>
+</div>
+<div id="toast" class="toast"></div>
+<div id="sjBlockOverlay" class="sj-block-overlay" style="display:none;">
+<div class="sj-block-box">
+<div class="sj-block-icon">⛔</div>
+<p id="sjBlockMessage">점검중입니다.</p>
+</div>
+</div>
+<div id="shareModalOverlay" class="modal-overlay">
+  <div class="modal-box">
+<h3 id="shareModalTitle">공유 방식을 선택하세요</h3>
+<button id="shareAsTextBtn" class="btn-primary">📝 텍스트로 복사</button>
+<button id="shareAsImageBtn" class="btn-primary">🖼️ 이미지로 복사</button>
+<button id="shareCancelBtn" class="btn-danger">취소</button>
+</div>
+</div>
+
+<div class="sj-fab-wrap">
+<button class="sj-fab" id="sjAuthFab" title="계정">👤</button>
+<button class="sj-fab" id="sjOcrFab" title="사진으로 입력">📷</button>
+<button class="sj-fab" id="sjSaveFab" title="클라우드 저장">☁</button>
+<button class="sj-fab" id="sjLoadFab" title="불러오기">📂</button>
+<button class="sj-fab sj-admin-fab" id="sjAdminFab" title="관리자 페이지" style="display:none;">🛠</button>
+</div>
+
+<div class="sj-modal-overlay" id="sjAuthModal"><div class="sj-modal">
+<button class="sj-close" data-close>×</button>
+<h3 data-i18n="authModalTitle">로그인</h3>
+<div id="sjAuthLoggedOut">
+<button class="sj-social-btn google" id="sjGoogleLogin" data-i18n="googleLoginBtn">Google로 로그인</button>
+<button class="sj-social-btn kakao" id="sjKakaoLogin" data-i18n="kakaoLoginBtn">카카오로 로그인</button>
+<button class="sj-social-btn naver" id="sjNaverLogin" data-i18n="naverLoginBtn">네이버로 로그인</button>
+</div>
+<div id="sjAuthLoggedIn" style="display:none;">
+<p><span data-i18n="loggedInAs">로그인됨:</span> <strong id="sjMyName"></strong></p>
+<button class="sj-secondary" id="sjLogout" data-i18n="logoutBtn">로그아웃</button>
+</div>
+<div class="sj-status" id="sjAuthStatus"></div>
+</div></div>
+
+<div class="sj-modal-overlay" id="sjOcrModal"><div class="sj-modal">
+<button class="sj-close" data-close>×</button>
+<h3 data-i18n="ocrModalTitle">스코어카드 사진으로 입력</h3>
+<p style="font-size:13px;color:#666;" data-i18n="ocrIntroP1">팀마다 스코어카드 사진을 하나씩 선택한 뒤 "인식 시작"을 누르면 팀별로 자동 인식되어 각각 반영됩니다. 팀은 아래에서 바로 추가·삭제할 수 있습니다.</p>
+<p style="font-size:13px;color:#e11d48;font-weight:bold;" data-i18n="ocrIntroP2">⚠ 스캔 이후 스코어가 정확하지 않을 경우 해당 플레이어 체크 후 재검토 눌러주세요.</p>
+<div id="sjOcrTeamList"></div>
+<button type="button" id="sjOcrAddTeamBtn" class="sj-secondary" style="margin-top:0;">+ 팀 추가</button>
+<button class="sj-primary" id="sjAnalyzeBtn" data-i18n="ocrAnalyzeBtn">인식 시작</button>
+<div class="sj-status" id="sjOcrStatus"></div>
+<div id="sjOcrReviewSection" style="display:none;margin-top:14px;border-top:1px solid #eee;padding-top:10px;">
+<p style="font-size:12px;color:#666;margin:0 0 6px;" data-i18n="ocrReviewIntro">스코어가 이상한 선수를 선택하고 재검토를 누르면 같은 사진을 다시 정밀 분석해서 선택한 선수만 수정합니다.</p>
+<div id="sjOcrReviewList"></div>
+<button type="button" id="sjOcrReviewBtn" class="sj-secondary" style="margin-top:6px;" data-i18n="ocrReviewBtn">선택 재검토</button>
+<button type="button" id="sjOcrSkipReviewBtn" class="sj-secondary sj-skip-review-btn" style="margin-top:6px;" data-i18n="ocrSkipReviewBtn">재검토 Pass (저장)</button>
+<div class="sj-status" id="sjOcrReviewStatus"></div>
+</div>
+</div></div>
+
+<div class="sj-modal-overlay" id="sjSaveModal"><div class="sj-modal">
+<button class="sj-close" data-close>×</button>
+<h3 data-i18n="saveModalTitle">클라우드에 라운드 저장</h3>
+<p style="font-size:12px;color:#666;margin:0 0 8px;" data-i18n="saveIntroP">선택한 팀의 전체 스코어(본인 + 동반자 포함)가 그대로 저장됩니다.</p>
+<label data-i18n="saveTeamSelectLabel">저장할 팀 선택</label>
+<select id="sjSaveTeamSelect"></select>
+<button class="sj-primary" id="sjConfirmSave" data-i18n="saveConfirmBtn">저장하기</button>
+<div class="sj-status" id="sjSaveStatus"></div>
+</div></div>
+
+<div class="sj-modal-overlay" id="sjLoadModal"><div class="sj-modal">
+<button class="sj-close" data-close>×</button>
+<h3 id="sjLoadModalTitle">저장된 라운드 불러오기</h3>
+<p style="font-size:12px;color:#666;margin:0 0 8px;" data-i18n="loadIntroP">목록에서 라운드를 선택하면 현재 스코어카드에 바로 불러와집니다.</p>
+<button type="button" id="sjMyStatsBtn" class="sj-secondary" style="margin-top:0;margin-bottom:16px;" data-i18n="loadStatsBtn">📊 내 스코어 통계</button>
+<div id="sjMyStatsPanel" class="sj-stats-panel" style="display:none;margin-bottom:16px;"></div>
+<div style="display:flex;gap:6px;margin-bottom:10px;">
+<input type="text" id="sjLoadCourseFilter" placeholder="골프장 이름 검색" style="flex:2;width:auto;">
+<select id="sjLoadYearFilter" style="flex:1;width:auto;"><option value="">전체 연도</option></select>
+</div>
+<div id="sjLoadList"></div>
+<div class="sj-status" id="sjLoadStatus"></div>
+</div></div>
+
+<div class="sj-modal-overlay" id="sjAdminModal"><div class="sj-modal sj-admin-modal">
+<button class="sj-close" data-close>×</button>
+<h3 data-i18n="adminModalTitle">🛠 관리자 페이지</h3>
+<div class="sj-admin-global-card">
+<label class="sj-admin-toggle-row"><input type="checkbox" id="sjAdminGlobalBlockToggle"> <span data-i18n="adminGlobalToggleLabel">관리자 제외 전체 접속금지</span></label>
+<label data-i18n="adminBlockMsgLabel">접속금지 시 표시할 안내 메시지 (비워두면 "점검중입니다." 표시)</label>
+<textarea id="sjAdminBlockMessage" rows="2" placeholder="점검중입니다." data-i18n-placeholder="adminBlockMsgPlaceholder"></textarea>
+<button type="button" id="sjAdminSaveGlobalBlockBtn" class="sj-primary" data-i18n="adminSaveGlobalBtn">전체 설정 저장</button>
+<div class="sj-status" id="sjAdminGlobalStatus"></div>
+</div>
+<div id="sjAdminStatsBar" class="sj-admin-stats-bar"></div>
+<div class="sj-admin-users-head">
+<span data-i18n="adminUsersHeadLabel">로그인 사용자 목록</span>
+<button type="button" id="sjAdminRefreshBtn" class="sj-secondary sj-admin-refresh-btn" data-i18n="adminRefreshBtn">↻ 새로고침</button>
+</div>
+<div id="sjAdminUserList"></div>
+<div class="sj-status" id="sjAdminStatus"></div>
+</div></div>
+
+<div class="sj-modal-overlay" id="sjManualModal"><div class="sj-modal sj-manual-modal">
+<button class="sj-close" data-close>×</button>
+<h3 data-i18n="manualModalTitle">📖 사용설명서</h3>
+<div class="sj-manual">
+
+<div class="sj-manual-section">
+<div class="sj-manual-head"><span class="sj-manual-icon">👤</span><span class="sj-manual-title" data-i18n="manualLoginTitle">로그인</span></div>
+<p class="sj-manual-desc" data-i18n-html="manualLoginDesc">오른쪽 아래 <b>👤 계정</b> 버튼으로 구글·카카오·네이버 계정에 로그인하면 라운드를 클라우드에 저장하고 다시 불러올 수 있어요.</p>
+</div>
+
+<div class="sj-manual-section">
+<div class="sj-manual-head"><span class="sj-manual-icon">👥</span><span class="sj-manual-title" data-i18n="manualTeamTitle">팀 설정</span></div>
+<p class="sj-manual-desc" data-i18n-html="manualTeamDesc"><b>팀 설정</b> 탭에서 홀 수(9홀/18홀)를 고르고 팀을 추가해 참가자 이름을 입력하세요. 팀은 최대 20개까지 만들 수 있어요.</p>
+</div>
+
+<div class="sj-manual-section">
+<div class="sj-manual-head"><span class="sj-manual-icon">🏌️</span><span class="sj-manual-title" data-i18n="manualScoreTitle">스코어 입력</span></div>
+<p class="sj-manual-desc" data-i18n-html="manualScoreDesc"><b>스코어 입력</b> 탭에서 홀마다 파(Par)를 선택하고, +/- 버튼으로 각 선수의 스코어를 홀별로 기록하세요.</p>
+</div>
+
+<div class="sj-manual-section">
+<div class="sj-manual-head"><span class="sj-manual-icon">📷</span><span class="sj-manual-title" data-i18n="manualOcrTitle">사진으로 스코어 인식</span></div>
+<p class="sj-manual-desc" data-i18n-html="manualOcrDesc">오른쪽 아래 <b>📷</b> 버튼으로 스코어카드 사진을 팀별로 한 장씩 올리고 "인식 시작"을 누르면 자동으로 스코어가 입력돼요.</p>
+<ul class="sj-manual-steps">
+<li data-i18n-html="manualOcrStep1"><b>My 선택</b>: 본인 스코어를 표시해요. 보통 첫 줄이 자동으로 선택되지만, 본인 사진이 아니라면 다른 사람을 눌러 바꿀 수 있어요.</li>
+<li data-i18n-html="manualOcrStep2"><b>선택 재검토</b>: 스코어가 잘못 인식된 선수만 체크하고 눌러서 같은 사진을 다시 정밀 분석해요.</li>
+<li data-i18n-html="manualOcrStep3"><b>재검토 Pass (저장)</b>: 수정할 부분이 없다면 이 버튼으로 바로 창을 닫을 수 있어요.</li>
+<li data-i18n-html="manualOcrStep4"><b>나중에 다시 수정하려면</b>: 저장한 뒤에도 📂 불러오기 목록의 <b>✏ 수정</b> 버튼으로 스코어와 My 지정을 언제든 바꿀 수 있어요.</li>
+</ul>
+</div>
+
+<div class="sj-manual-section sj-manual-warning">
+<div class="sj-manual-head"><span class="sj-manual-icon">⚠️</span><span class="sj-manual-title" data-i18n="manualWarningTitle">업로드 시 주의사항</span></div>
+<p class="sj-manual-desc" data-i18n-html="manualWarningDesc">스코어카드가 아닌 사진(인물, 풍경 등 관계없는 사진)을 올리면 <b>경고 팝업</b>이 뜨고, 경고가 <b>2회</b> 누적된 뒤 <b>3번째</b>로 다시 올리면 자동으로 <b>접속이 차단</b>돼요. 반드시 실제 스코어카드 사진만 올려주세요.</p>
+</div>
+
+<div class="sj-manual-section">
+<div class="sj-manual-head"><span class="sj-manual-icon">📋</span><span class="sj-manual-title" data-i18n="manualResultTitle">결과 확인 &amp; 공유</span></div>
+<p class="sj-manual-desc" data-i18n-html="manualResultDesc"><b>결과</b> 탭에서 팀별 · 순위별로 전체 스코어를 확인할 수 있고, 표를 옆으로 밀면 18홀까지 모두 볼 수 있어요. <b>결과 복사하기</b>를 누르면 이미지로 만들어져 카카오톡이나 SNS에 바로 붙여넣을 수 있어요.</p>
+</div>
+
+<div class="sj-manual-section">
+<div class="sj-manual-head"><span class="sj-manual-icon">☁</span><span class="sj-manual-title" data-i18n="manualCloudSaveTitle">클라우드 저장</span></div>
+<p class="sj-manual-desc" data-i18n-html="manualCloudSaveDesc">오른쪽 아래 <b>☁</b> 버튼으로 로그인 후 저장할 팀을 선택하면, 그 팀 전체(본인 + 동반자)의 홀별 스코어가 그대로 클라우드에 보관돼요.</p>
+</div>
+
+<div class="sj-manual-section">
+<div class="sj-manual-head"><span class="sj-manual-icon">📂</span><span class="sj-manual-title" data-i18n="manualLoadTitle">불러오기 &amp; 삭제</span></div>
+<p class="sj-manual-desc" data-i18n-html="manualLoadDesc">오른쪽 아래 <b>📂</b> 버튼으로 저장된 라운드 목록을 보고, 골프장 이름이나 연도로 검색할 수 있어요. 목록을 누르면 바로 불러와지고, <b>✏ 수정</b> 버튼으로 스코어와 My 지정을 나중에도 바꿀 수 있어요 (내 스코어 통계에 바로 반영됩니다). 오른쪽 위 ✕ 버튼으로 삭제할 수 있어요.</p>
+</div>
+
+<div class="sj-manual-section">
+<div class="sj-manual-head"><span class="sj-manual-icon">📊</span><span class="sj-manual-title" data-i18n="manualStatsTitle">내 스코어 통계</span></div>
+<p class="sj-manual-desc" data-i18n-html="manualStatsDesc">불러오기 창 위쪽의 <b>📊 내 스코어 통계</b> 버튼을 누르면 최근 10회 · 20회 · 전체 기준으로 평균/베스트 스코어, 평균 오버파, 파 · 보기 · 더블보기 이상 비율을 한눈에 볼 수 있어요.</p>
+</div>
+
+<div class="sj-manual-section">
+<div class="sj-manual-head"><span class="sj-manual-icon">🌐</span><span class="sj-manual-title" data-i18n="manualLangTitle">언어 변경</span></div>
+<p class="sj-manual-desc" data-i18n-html="manualLangDesc">오른쪽 위 <b>🌐 Language</b> 버튼으로 한국어 · 영어 · 일본어 · 중국어 중 원하는 언어로 바로 바꿀 수 있어요.</p>
+</div>
+
+<p class="sj-manual-footer" data-i18n="manualFooter">궁금한 점이 있으면 이 버튼을 언제든 다시 눌러 확인하세요 ⛳</p>
+</div>
+</div></div>
+
+<div class="sj-modal-overlay" id="sjEditRoundModal"><div class="sj-modal sj-edit-modal">
+<button class="sj-close" data-close>×</button>
+<h3>✏ 라운드 수정</h3>
+<div id="sjEditRoundBody"></div>
+<button type="button" id="sjEditRoundSaveBtn" class="sj-primary">수정 저장</button>
+<div class="sj-status" id="sjEditRoundStatus"></div>
+</div></div>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+<script src="js/i18n.js" defer></script>
+<script src="js/state.js" defer></script>
+<script src="js/render-setup.js" defer></script>
+<script src="js/render-play.js" defer></script>
+<script src="js/render-result.js" defer></script>
+<script src="js/share.js" defer></script>
+<script src="js/app.js" defer></script>
+<script src="js/ui-modals.js" defer></script>
+<script src="https://developers.kakao.com/sdk/js/kakao.js" defer></script>
+<script src="https://static.nid.naver.com/js/naveridlogin_js_sdk_2.0.2.js" defer></script>
+<script type="module" src="js/auth.js"></script>
+<script src="js/ocr.js" defer></script>
+<script src="js/cloud-save.js" defer></script>
+<script src="js/cloud-load.js" defer></script>
+<script src="js/admin.js" defer></script>
+
+</body>
+</html>

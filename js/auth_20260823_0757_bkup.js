@@ -1,5 +1,5 @@
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
-import { getAuth, GoogleAuthProvider, signInWithPopup, signInWithCredential, signInWithCustomToken, signOut, onAuthStateChanged, updateProfile } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
+import { getAuth, GoogleAuthProvider, signInWithPopup, signInWithCustomToken, signOut, onAuthStateChanged, updateProfile } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
 import { getFirestore, doc, setDoc, serverTimestamp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
 
 var firebaseConfig = {
@@ -29,11 +29,6 @@ var PING_PRESENCE_URL = "https://asia-northeast3-skyjang-golfscore.cloudfunction
 // (그냥 로컬에서 signOut만 하면 서버는 그 사실을 몰라서, 관리자 페이지에는
 // 마지막 하트비트 이후 5분(ONLINE_WINDOW_MS)이 지나야 오프라인으로 보였습니다).
 var CLEAR_PRESENCE_URL = "https://asia-northeast3-skyjang-golfscore.cloudfunctions.net/clearPresence";
-// 로그인 버튼을 눌러 실제로 로그인에 성공했을 때 한 번 호출해서 관리자
-// 페이지의 "이용 횟수"(로그인 횟수)를 늘리는 용도입니다. pingPresence와
-// 달리 세션 유지 중에는 다시 부르지 않습니다 -- 로그인 자체를 세는 값이지
-// 접속 여부를 세는 값이 아니기 때문입니다.
-var RECORD_LOGIN_URL = "https://asia-northeast3-skyjang-golfscore.cloudfunctions.net/recordLogin";
 
 var KAKAO_JS_KEY = "e73a39b4f944bc251c449f0535d5f39b";
 var NAVER_CLIENT_ID = "jdkW2uYK23DCwxrCeVWu";
@@ -47,13 +42,6 @@ var app = initializeApp(firebaseConfig);
 var auth = getAuth(app);
 var db = getFirestore(app);
 var currentUser = null;
-
-/* iOS(Capacitor) 앱 안에서 실행 중인지 판별합니다. Capacitor 런타임이 앱 안에서
-   자동으로 window.Capacitor를 주입해주므로, 웹사이트(GitHub Pages)에서는 항상
-   false -- 아래 네이티브 전용 분기들은 웹 동작에 전혀 영향을 주지 않습니다. */
-function isNativeApp(){
-  return !!(window.Capacitor && typeof window.Capacitor.isNativePlatform === "function" && window.Capacitor.isNativePlatform());
-}
 
 function sj(id){ return document.getElementById(id); }
 
@@ -71,18 +59,6 @@ function saveUserProfile(user, extra){
     updatedAt: serverTimestamp()
   }, extra || {});
   return setDoc(doc(db, "users", user.uid), data, { merge: true });
-}
-
-/* 로그인 흐름을 막지 않도록 결과를 기다리지 않고(best-effort) 호출합니다 --
-   실패해도 로그인 자체는 정상 진행되어야 합니다. */
-function recordLoginPing(user){
-  if(!user) return;
-  user.getIdToken().then(function(idToken){
-    return fetch(RECORD_LOGIN_URL, {
-      method: "POST",
-      headers: { "Content-Type": "application/json", "Authorization": "Bearer " + idToken }
-    });
-  }).catch(function(){ /* best-effort -- 실패해도 무시 */ });
 }
 
 function closeAuthModal(){
@@ -122,51 +98,19 @@ function stopPresenceHeartbeat(){
 }
 
 // ---- Google 로그인 ----
-// signInWithRedirect도 실제로는 동작하지 않았습니다 (앱 안에서는 "Google
-// 로그인 중..."에서 멈춘 채로 반응이 없었음) -- 구글이 임베디드 웹뷰에서의
-// 로그인 자체를 정책적으로 차단하기 때문에, 팝업이든 리다이렉트든 웹뷰 안에서
-// 하는 방식은 애초에 통하지 않습니다. 그래서 앱 안에서는
-// @capacitor-firebase/authentication 플러그인으로 iOS 네이티브 구글 로그인
-// 화면(웹뷰가 아닌 진짜 시스템 로그인 창)을 띄우고, 거기서 받은 idToken을
-// Firebase 웹 SDK의 signInWithCredential에 그대로 넘겨서 로그인합니다
-// (capacitor.config.json의 skipNativeAuth:true 설정 덕분에 네이티브 Firebase
-// Auth 레이어는 건드리지 않고, 지금 쓰고 있는 웹 SDK의 auth 객체 하나로만
-// 로그인 상태가 관리됩니다). 웹사이트(GitHub Pages)에는 이 네이티브 플러그인이
-// 없으므로 기존 signInWithPopup 방식을 그대로 씁니다.
-function finishGoogleLogin(userPromise){
-  userPromise.then(function(result){
-    recordLoginPing(result.user);
-    return saveUserProfile(result.user, { displayName: result.user.displayName || "", provider: "google" });
-  }).then(function(){
-    setStatus("로그인 성공!");
-    closeAuthModal();
-  }).catch(function(e){
-    setStatus("오류: " + (e && e.message ? e.message : e), true);
-  });
-}
-
 var googleBtn = sj("sjGoogleLogin");
 if(googleBtn){
   googleBtn.addEventListener("click", function(){
     setStatus("Google 로그인 중...");
-    if(isNativeApp()){
-      var FirebaseAuthentication = window.Capacitor.Plugins && window.Capacitor.Plugins.FirebaseAuthentication;
-      if(!FirebaseAuthentication){
-        setStatus("오류: 네이티브 구글 로그인 플러그인을 찾을 수 없습니다.", true);
-        return;
-      }
-      finishGoogleLogin(
-        FirebaseAuthentication.signInWithGoogle().then(function(nativeResult){
-          var idToken = nativeResult && nativeResult.credential && nativeResult.credential.idToken;
-          if(!idToken){ throw new Error("구글 로그인 토큰을 가져오지 못했습니다."); }
-          var credential = GoogleAuthProvider.credential(idToken);
-          return signInWithCredential(auth, credential);
-        })
-      );
-      return;
-    }
     var provider = new GoogleAuthProvider();
-    finishGoogleLogin(signInWithPopup(auth, provider));
+    signInWithPopup(auth, provider).then(function(result){
+      return saveUserProfile(result.user, { displayName: result.user.displayName || "", provider: "google" });
+    }).then(function(){
+      setStatus("로그인 성공!");
+      closeAuthModal();
+    }).catch(function(e){
+      setStatus("오류: " + (e && e.message ? e.message : e), true);
+    });
   });
 }
 
@@ -200,7 +144,6 @@ if(kakaoBtn){
           }).then(function(o){
             // custom-token sign-ins don't carry a profile, unlike Google's
             // popup flow -- fill it in from what kakaoAuth looked up.
-            recordLoginPing(o.result.user);
             var profileUpdate = {};
             if(o.displayName) profileUpdate.displayName = o.displayName;
             if(o.photoURL) profileUpdate.photoURL = o.photoURL;
@@ -284,7 +227,6 @@ function handleNaverLoginSuccess(){
     }).then(function(o){
       // custom-token sign-ins don't carry a profile, unlike Google's
       // popup flow -- fill it in from what naverAuth looked up.
-      recordLoginPing(o.result.user);
       var profileUpdate = {};
       if(o.displayName) profileUpdate.displayName = o.displayName;
       if(o.photoURL) profileUpdate.photoURL = o.photoURL;

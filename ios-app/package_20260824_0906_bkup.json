@@ -8,7 +8,6 @@
     "sync": "npm run sync-web && npx cap sync ios"
   },
   "dependencies": {
-    "@capacitor-firebase/authentication": "^6.3.1",
     "@capacitor/app": "^6.0.0",
     "@capacitor/browser": "^6.0.0",
     "@capacitor/camera": "^6.0.0",

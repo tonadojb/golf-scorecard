@@ -17,11 +17,5 @@
       "kauth.kakao.com",
       "*.kakao.com"
     ]
-  },
-  "plugins": {
-    "FirebaseAuthentication": {
-      "skipNativeAuth": true,
-      "providers": ["google.com"]
-    }
   }
 }
