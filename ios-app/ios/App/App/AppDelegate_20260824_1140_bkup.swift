@@ -1,6 +1,5 @@
 import UIKit
 import Capacitor
-import FirebaseCore
 
 @UIApplicationMain
 class AppDelegate: UIResponder, UIApplicationDelegate {
@@ -9,11 +8,6 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
 
     func application(_ application: UIApplication, didFinishLaunchingWithOptions launchOptions: [UIApplication.LaunchOptionsKey: Any]?) -> Bool {
         // Override point for customization after application launch.
-        // @capacitor-firebase/authentication 플러그인은 이 초기화를 대신 해주지
-        // 않아서, 여기서 직접 안 해주면 구글 로그인 창이 뜨긴 떠도(GoogleSignIn
-        // SDK 자체는 Firebase 없이도 동작하므로) 그 결과를 Firebase에 연결하는
-        // 부분에서 응답이 영영 안 와서 "로그인 중..."에 멈춰있게 됩니다.
-        FirebaseApp.configure()
         return true
     }
 
