@@ -4,7 +4,14 @@
 <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <title>⛳ 골프 스코어카드</title>
-<link rel="stylesheet" href="styles.css">
+<!-- styles.css에도 js/*.js와 동일하게 ?v=... 캐시 무효화 버전을 붙였습니다.
+     그동안 이 태그만 버전 문자열이 없어서, 네이티브 앱(WKWebView)이 이전
+     버전의 styles.css를 계속 캐시에서 재사용하는 바람에 정산 화면 입력창
+     글자 크기를 16px 이상으로 고친 수정이 기기에 실제로 반영되지 않고
+     있었을 가능성이 있습니다(정산하기 이후 화면이 확대된 채 안 풀리는
+     문제). js 파일들처럼 styles.css를 고칠 때마다 이 버전 값도 반드시
+     함께 올려주세요. -->
+<link rel="stylesheet" href="styles.css?v=20260826a">
 
 </head>
 <body>
@@ -355,7 +362,7 @@
 <script src="js/render-result.js?v=20260823f" defer></script>
 <script src="js/settlement.js?v=20260825j" defer></script>
 <script src="js/share.js?v=20260823f" defer></script>
-<script src="js/app.js?v=20260823f" defer></script>
+<script src="js/app.js?v=20260823g" defer></script>
 <script src="js/ui-modals.js?v=20260823f" defer></script>
 <script src="https://developers.kakao.com/sdk/js/kakao.js" defer></script>
 <script src="https://static.nid.naver.com/js/naveridlogin_js_sdk_2.0.2.js" defer></script>

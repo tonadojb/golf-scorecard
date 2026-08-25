@@ -245,6 +245,11 @@ function recalcAndRenderSettlement(){
   if(!settlementCurrentTeam) return;
   var data = computeSettlement(settlementCurrentTeam, settlementCurrentGlobalStake);
   renderSettlementResult(settlementCurrentTeam, data);
+  /* "정산하기"를 누르면 그 직전에 타당 금액 입력창(settlementStakeInput)에서
+     포커스가 빠져나가는데, 이 시점에 iOS가 확대된 화면을 안 풀어주는 경우가
+     보고되어 여기서도 명시적으로 한 번 더 정리합니다 (js/app.js의 전역
+     안전망과 별개로, 실제 증상이 보고된 지점을 직접 겨냥한 이중 안전장치). */
+  if(typeof sjResetIOSZoom === 'function') sjResetIOSZoom();
 }
 
 if(settlementCalcBtn){

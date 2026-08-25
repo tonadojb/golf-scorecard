@@ -9,6 +9,34 @@ document.querySelectorAll('.tabbtn').forEach(function(btn){
   });
 });
 
+/* ---------------- iOS 확대 화면 고정 방지 (안전망) ----------------
+   iOS의 WKWebView(네이티브 앱)는 입력창(input/select/textarea)에 포커스가
+   갈 때 그 요소의 글자 크기가 16px보다 작으면 화면을 자동으로 확대하고,
+   포커스를 벗어나도 확대가 저절로 풀리지 않는 경우가 있습니다. 모든 입력창
+   글자 크기를 16px 이상으로 맞춰 놓았지만(styles.css), 캐시 등 다른 이유로
+   같은 증상이 다시 나타날 수 있으므로 앱 전체에 적용되는 안전망을 하나 더
+   둡니다: 어떤 입력창이든 포커스를 벗어나면(blur) 뷰포트를 아주 잠깐
+   maximum-scale=1.0으로 바꿨다가 원래 설정으로 되돌려서, 확대되어 있던
+   화면을 1.0배로 강제로 정리합니다. 확대/축소(핀치 줌) 자체를 막는 것이
+   아니라 "확대된 채 고정되는" 상태만 풀어주는 것이라 접근성에는 영향이
+   없습니다. */
+function sjResetIOSZoom(){
+  var vp = document.querySelector('meta[name="viewport"]');
+  if(!vp) return;
+  var original = vp.getAttribute('content');
+  if(!original) return;
+  vp.setAttribute('content', original + ', maximum-scale=1.0');
+  setTimeout(function(){
+    vp.setAttribute('content', original);
+  }, 350);
+}
+document.addEventListener('blur', function(e){
+  var tag = e.target && e.target.tagName;
+  if(tag === 'INPUT' || tag === 'SELECT' || tag === 'TEXTAREA'){
+    sjResetIOSZoom();
+  }
+}, true);
+
 function renderAll(){
   applyStaticTranslations();
   renderHeader();
