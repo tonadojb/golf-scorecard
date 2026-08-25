@@ -61,6 +61,16 @@
 				<string>com.googleusercontent.apps.162951012751-07p9m28h5s0gfqvlc1hvqqumbtjul28d</string>
 			</array>
 		</dict>
+		<!-- 카카오/네이버 로그인은 앱 안(WKWebView)이 아니라 시스템 브라우저(Safari)에서
+		     진행합니다 (capacitor://localhost 안에서는 카카오/네이버가 도메인을 인식하지
+		     못해서 로그인을 거부하기 때문). 로그인이 끝나면 이 URL Scheme으로 다시 이
+		     앱으로 돌아옵니다. js/auth.js의 NATIVE_AUTH_SCHEME 값과 정확히 같아야 합니다. -->
+		<dict>
+			<key>CFBundleURLSchemes</key>
+			<array>
+				<string>com.skyjang.golfscorecard</string>
+			</array>
+		</dict>
 	</array>
 </dict>
 </plist>

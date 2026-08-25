@@ -38,6 +38,18 @@ var RECORD_LOGIN_URL = "https://asia-northeast3-skyjang-golfscore.cloudfunctions
 var KAKAO_JS_KEY = "e73a39b4f944bc251c449f0535d5f39b";
 var NAVER_CLIENT_ID = "jdkW2uYK23DCwxrCeVWu";
 
+// 카카오/네이버 JS SDK는 "이 페이지가 실행 중인 주소(도메인)"가 각 개발자센터에
+// 등록해둔 도메인과 일치해야만 로그인을 허용합니다. 그런데 네이티브(Capacitor iOS)
+// 앱 안의 WKWebView는 항상 "capacitor://localhost" 라는 특수 주소에서 실행되고,
+// iOS에서는 이 주소를 http/https로 바꿀 방법이 없습니다(WKWebView가 http/https는
+// 이미 자체적으로 처리하는 스킴이라 Capacitor가 가로챌 수 없음). 그래서 카카오/네이버
+// 로그인만큼은 앱 내부가 아니라 실제 이 웹사이트(GitHub Pages, 이미 양쪽 개발자센터에
+// 등록되어 있는 정상적인 https 주소)를 시스템 브라우저로 열어서 진행하고, 로그인이
+// 끝나면 아래 커스텀 URL Scheme으로 다시 앱으로 돌아옵니다
+// (ios-app/ios/App/App/Info.plist의 CFBundleURLSchemes에 동일한 값이 등록되어 있어야 합니다).
+var NATIVE_AUTH_WEB_URL = "https://tonadojb.github.io/golf-scorecard/";
+var NATIVE_AUTH_SCHEME = "com.skyjang.golfscorecard";
+
 // 관리자 페이지(🛠)는 이 이메일로 로그인했을 때만 노출됩니다. 실제 접근 제어는
 // 서버(firebase-backend/functions/access.js의 ADMIN_EMAIL)에서 한 번 더
 // 검증하므로, 이 값은 어디까지나 화면 표시용 UI 편의 체크입니다.
@@ -205,62 +217,145 @@ if(googleBtn){
   });
 }
 
+// 카카오/네이버 로그인 성공 후 공통으로 하는 일: 받아온 액세스 토큰을 서버
+// (kakaoAuth/naverAuth)에 보내 검증받고 Firebase 커스텀 토큰으로 교환한 뒤 로그인을
+// 완료합니다. 예전에는 카카오/네이버 각각에 거의 같은 코드가 따로 있었는데, 이번에
+// "네이티브 앱에서는 시스템 브라우저를 거쳐 돌아온 토큰으로도 로그인을 완료해야 하는"
+// 세 번째 경로(아래 appUrlOpen 리스너)가 추가되면서 하나로 합쳤습니다.
+function finishProviderLogin(provider, accessToken, authUrl){
+  fetch(authUrl, {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ accessToken: accessToken })
+  }).then(function(res){ return res.json(); })
+    .then(function(data){
+      if(data && data.error){ throw new Error(data.error); }
+      return signInWithCustomToken(auth, data.customToken).then(function(result){
+        return { result: result, displayName: data.displayName, photoURL: data.photoURL };
+      });
+    }).then(function(o){
+      // custom-token sign-ins don't carry a profile, unlike Google's
+      // popup flow -- fill it in from what kakaoAuth/naverAuth looked up.
+      recordLoginPing(o.result.user);
+      var profileUpdate = {};
+      if(o.displayName) profileUpdate.displayName = o.displayName;
+      if(o.photoURL) profileUpdate.photoURL = o.photoURL;
+      var p = Object.keys(profileUpdate).length ? updateProfile(o.result.user, profileUpdate) : Promise.resolve();
+      return p.then(function(){
+        return saveUserProfile(o.result.user, { provider: provider, displayName: o.displayName || "" });
+      });
+    }).then(function(){
+      // updateProfile이 끝난 뒤에도 onAuthStateChanged가 다시 안 불려서
+      // 직접 한 번 더 화면을 갱신해줍니다 (auth.currentUser는 이 시점엔
+      // updateProfile 결과가 반영된 최신 상태).
+      renderAuthUI(auth.currentUser);
+      setStatus("로그인 성공!");
+      closeAuthModal();
+    }).catch(function(e){
+      setStatus("오류: " + (e && e.message ? e.message : e), true);
+    });
+}
+
+// 네이티브 앱 안에서 카카오/네이버 버튼을 눌렀을 때, 이 페이지(WKWebView) 안에서
+// SDK를 바로 호출하는 대신 실제 이 웹사이트를 시스템 브라우저(Safari)로 엽니다.
+// 시스템 브라우저는 진짜 https 주소로 실행되므로 카카오/네이버가 정상적으로
+// 로그인을 허용하고, 로그인이 끝나면 아래 appUrlOpen 리스너가 다시 앱으로
+// 결과를 받아옵니다.
+function openNativeProviderLogin(provider){
+  var Browser = window.Capacitor.Plugins && window.Capacitor.Plugins.Browser;
+  if(!Browser){
+    setStatus("오류: 인앱 브라우저 플러그인을 찾을 수 없습니다.", true);
+    return;
+  }
+  setStatus((provider === "kakao" ? "카카오" : "네이버") + " 로그인 중...");
+  Browser.open({ url: NATIVE_AUTH_WEB_URL + "?nativeLogin=" + provider }).catch(function(e){
+    setStatus("오류: " + (e && e.message ? e.message : e), true);
+  });
+}
+
+// 위 openNativeProviderLogin()이 연 시스템 브라우저 탭이 로그인을 마친 뒤 이
+// 커스텀 스킴으로 다시 앱을 열면(Info.plist의 CFBundleURLSchemes 등록 덕분에
+// iOS가 앱을 다시 띄워줍니다), 여기서 그 결과(provider + accessToken)를 받아
+// finishProviderLogin으로 로그인을 마무리합니다.
+if(isNativeApp()){
+  var __sjAppPlugin = window.Capacitor.Plugins && window.Capacitor.Plugins.App;
+  if(__sjAppPlugin && typeof __sjAppPlugin.addListener === "function"){
+    __sjAppPlugin.addListener("appUrlOpen", function(data){
+      var url = (data && data.url) || "";
+      if(url.indexOf(NATIVE_AUTH_SCHEME + "://authcallback") !== 0) return;
+      var Browser = window.Capacitor.Plugins && window.Capacitor.Plugins.Browser;
+      if(Browser && typeof Browser.close === "function"){
+        Browser.close().catch(function(){ /* 이미 닫혀있으면 무시 */ });
+      }
+      var qIndex = url.indexOf("?");
+      var params = new URLSearchParams(qIndex >= 0 ? url.slice(qIndex + 1) : "");
+      var provider = params.get("provider");
+      var accessToken = params.get("access_token");
+      if(!provider || !accessToken){
+        setStatus("로그인 결과를 확인하지 못했습니다.", true);
+        return;
+      }
+      setStatus((provider === "kakao" ? "카카오" : "네이버") + " 로그인 처리 중...");
+      finishProviderLogin(provider, accessToken, provider === "kakao" ? KAKAO_AUTH_URL : NAVER_AUTH_URL);
+    });
+  }
+}
+
+// 이 페이지가 (일반 방문이 아니라) 위 openNativeProviderLogin()에 의해 시스템
+// 브라우저로 열린 것인지 확인합니다 -- 이 경우 로그인 완료 후 화면에 결과를
+// 보여주는 대신 커스텀 스킴으로 앱에 토큰을 넘기고 돌아갑니다.
+var __sjNativeLoginTarget = new URLSearchParams(window.location.search).get("nativeLogin");
+
+function redirectTokenToApp(provider, accessToken){
+  setStatus("로그인 완료! 앱으로 돌아가는 중...");
+  window.location.href = NATIVE_AUTH_SCHEME + "://authcallback?provider=" + encodeURIComponent(provider) + "&access_token=" + encodeURIComponent(accessToken);
+}
+
 // ---- 카카오 로그인 ----
 function ensureKakaoInit(){
   if(window.Kakao && !window.Kakao.isInitialized()){
     window.Kakao.init(KAKAO_JS_KEY);
   }
 }
+
+// onToken이 있으면(=네이티브 앱이 연 시스템 브라우저 탭인 경우) 이 브라우저 탭에서
+// 바로 로그인을 마무리하지 않고, 받은 액세스 토큰을 그대로 onToken에 넘겨서
+// 앱으로 돌려보내는 데에만 씁니다.
+function startKakaoLoginFlow(onToken){
+  if(!window.Kakao){
+    setStatus("카카오 SDK를 불러오지 못했습니다.", true);
+    return;
+  }
+  ensureKakaoInit();
+  setStatus("카카오 로그인 중...");
+  window.Kakao.Auth.login({
+    success: function(authObj){
+      if(onToken){ onToken(authObj.access_token); return; }
+      finishProviderLogin("kakao", authObj.access_token, KAKAO_AUTH_URL);
+    },
+    fail: function(err){
+      setStatus("카카오 로그인 실패: " + JSON.stringify(err), true);
+    }
+  });
+}
+
 var kakaoBtn = sj("sjKakaoLogin");
 if(kakaoBtn){
   kakaoBtn.addEventListener("click", function(){
-    if(!window.Kakao){
-      setStatus("카카오 SDK를 불러오지 못했습니다.", true);
+    if(isNativeApp()){
+      openNativeProviderLogin("kakao");
       return;
     }
-    ensureKakaoInit();
-    setStatus("카카오 로그인 중...");
-    window.Kakao.Auth.login({
-      success: function(authObj){
-        fetch(KAKAO_AUTH_URL, {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ accessToken: authObj.access_token })
-        }).then(function(res){ return res.json(); })
-          .then(function(data){
-            if(data && data.error){ throw new Error(data.error); }
-            return signInWithCustomToken(auth, data.customToken).then(function(result){
-              return { result: result, displayName: data.displayName, photoURL: data.photoURL };
-            });
-          }).then(function(o){
-            // custom-token sign-ins don't carry a profile, unlike Google's
-            // popup flow -- fill it in from what kakaoAuth looked up.
-            recordLoginPing(o.result.user);
-            var profileUpdate = {};
-            if(o.displayName) profileUpdate.displayName = o.displayName;
-            if(o.photoURL) profileUpdate.photoURL = o.photoURL;
-            var p = Object.keys(profileUpdate).length ? updateProfile(o.result.user, profileUpdate) : Promise.resolve();
-            return p.then(function(){
-              return saveUserProfile(o.result.user, { provider: "kakao", displayName: o.displayName || "" });
-            });
-          }).then(function(){
-            // updateProfile이 끝난 뒤에도 onAuthStateChanged가 다시 안 불려서
-            // 직접 한 번 더 화면을 갱신해줍니다 (auth.currentUser는 이 시점엔
-            // updateProfile 결과가 반영된 최신 상태).
-            renderAuthUI(auth.currentUser);
-            setStatus("로그인 성공!");
-            closeAuthModal();
-          }).catch(function(e){
-            setStatus("오류: " + (e && e.message ? e.message : e), true);
-          });
-      },
-      fail: function(err){
-        // (임시 진단용) 실제로 이 페이지가 어떤 주소(origin)에서 실행 중인지
-        // 함께 보여줍니다 -- 카카오 개발자센터에 등록한 도메인과 정확히
-        // 같은 값인지 확인하기 위한 것으로, 문제 해결 후 제거해도 됩니다.
-        setStatus("카카오 로그인 실패: " + JSON.stringify(err) + " / origin: " + window.location.origin, true);
-      }
-    });
+    startKakaoLoginFlow();
+  });
+}
+
+// 네이티브 앱이 열어준 시스템 브라우저 탭이면, 사용자가 버튼을 다시 누르지 않아도
+// 바로 카카오 로그인을 시작합니다 (kakao.js는 이 스크립트보다 먼저 로드되는
+// defer 스크립트라 이 시점엔 이미 window.Kakao를 쓸 수 있습니다).
+if(__sjNativeLoginTarget === "kakao" && window.Kakao){
+  startKakaoLoginFlow(function(accessToken){
+    redirectTokenToApp("kakao", accessToken);
   });
 }
 
@@ -277,16 +372,16 @@ if(kakaoBtn){
 // 아니었음) -- 그래서 로그인 자체는 네이버 쪽에서 성공해도 우리 페이지가 그 결과를 전혀
 // 받아오지 못하고 아무 반응이 없었던 것입니다. 아래 코드는 로그인 후 이 페이지로 돌아왔을
 // 때 getLoginStatus()로 로그인 여부를 직접 확인하고, 액세스 토큰을 꺼내 처리합니다.
-// 네이버 콜백 URL은 네이버 개발자센터에 등록해둔 값과 정확히 일치해야 합니다.
-// 네이티브 앱 안에서는 아래 capacitor.config.json의 iosScheme:"https" 설정 덕분에
-// 항상 "https://localhost/" 로 고정되므로(페이지 경로가 무엇이든), 매번 같은
-// 값이 나오도록 origin + "/" 로 고정해서 씁니다. 웹사이트(GitHub Pages)에서는
-// 기존처럼 실제 주소(origin + pathname)를 그대로 씁니다.
+//
+// 네이버 콜백 URL은 네이버 개발자센터에 등록해둔 값과 정확히 일치해야 합니다. 이제
+// 네이티브 앱 안에서도 이 코드는 (openNativeProviderLogin이 연) 실제 이 웹사이트
+// 탭 안에서만 실행되므로, isNativeApp()은 여기서 항상 false -- 특별 취급 없이
+// 언제나 실제 주소(origin + pathname)를 그대로 씁니다.
 var naverLoginInstance = null;
 if(window.naver && window.naver.LoginWithNaverId){
   naverLoginInstance = new window.naver.LoginWithNaverId({
     clientId: NAVER_CLIENT_ID,
-    callbackUrl: isNativeApp() ? (window.location.origin + "/") : (window.location.origin + window.location.pathname),
+    callbackUrl: window.location.origin + window.location.pathname,
     isPopup: false,
     callbackHandle: true
   });
@@ -313,42 +408,18 @@ function handleNaverLoginSuccess(){
     setStatus("네이버 로그인 토큰을 확인하지 못했습니다.", true);
     return;
   }
+  // 주소창에 남은 토큰 해시를 지워서 새로고침해도 다시 로그인 처리가
+  // 반복되지 않도록 정리합니다 (accessToken은 이미 위에서 변수로 꺼내뒀으므로
+  // 지금 지워도 안전합니다).
+  if(window.history && window.history.replaceState){
+    window.history.replaceState(null, "", window.location.pathname + window.location.search);
+  }
+  if(__sjNativeLoginTarget === "naver"){
+    redirectTokenToApp("naver", accessToken);
+    return;
+  }
   setStatus("네이버 로그인 처리 중...");
-  fetch(NAVER_AUTH_URL, {
-    method: "POST",
-    headers: { "Content-Type": "application/json" },
-    body: JSON.stringify({ accessToken: accessToken })
-  }).then(function(res){ return res.json(); })
-    .then(function(data){
-      if(data && data.error){ throw new Error(data.error); }
-      return signInWithCustomToken(auth, data.customToken).then(function(result){
-        return { result: result, displayName: data.displayName, photoURL: data.photoURL };
-      });
-    }).then(function(o){
-      // custom-token sign-ins don't carry a profile, unlike Google's
-      // popup flow -- fill it in from what naverAuth looked up.
-      recordLoginPing(o.result.user);
-      var profileUpdate = {};
-      if(o.displayName) profileUpdate.displayName = o.displayName;
-      if(o.photoURL) profileUpdate.photoURL = o.photoURL;
-      var p = Object.keys(profileUpdate).length ? updateProfile(o.result.user, profileUpdate) : Promise.resolve();
-      return p.then(function(){
-        return saveUserProfile(o.result.user, { provider: "naver", displayName: o.displayName || "" });
-      });
-    }).then(function(){
-      // updateProfile이 끝난 뒤에도 onAuthStateChanged가 다시 안 불려서
-      // 직접 한 번 더 화면을 갱신해줍니다.
-      renderAuthUI(auth.currentUser);
-      setStatus("로그인 성공!");
-      closeAuthModal();
-      // 주소창에 남은 토큰 해시를 지워서 새로고침해도 다시 로그인 처리가
-      // 반복되지 않도록 정리합니다.
-      if(window.history && window.history.replaceState){
-        window.history.replaceState(null, "", window.location.pathname + window.location.search);
-      }
-    }).catch(function(e){
-      setStatus("오류: " + (e && e.message ? e.message : e), true);
-    });
+  finishProviderLogin("naver", accessToken, NAVER_AUTH_URL);
 }
 
 // 네이버 로그인 후 이 페이지로 돌아왔을 때(=주소 뒤에 "#access_token=..."이 실제로
@@ -367,17 +438,22 @@ if(window.location.hash && window.location.hash.indexOf("access_token=") !== -1)
 var naverBtn = sj("sjNaverLogin");
 if(naverBtn){
   naverBtn.addEventListener("click", function(){
+    if(isNativeApp()){
+      openNativeProviderLogin("naver");
+      return;
+    }
     if(!naverLoginInstance){
       setStatus("네이버 SDK를 불러오지 못했습니다.", true);
       return;
     }
-    // (임시 진단용) 네이버 페이지로 넘어가기 직전, 실제로 사용될 콜백
-    // 주소를 화면에 보여줍니다 -- 네이버 개발자센터에 등록한 Callback URL과
-    // 정확히 같은 값인지 확인하기 위한 것으로, 문제 해결 후 제거해도 됩니다.
-    var naverDebugCallback = isNativeApp() ? (window.location.origin + "/") : (window.location.origin + window.location.pathname);
-    alert("디버그 정보\norigin: " + window.location.origin + "\ncallbackUrl: " + naverDebugCallback);
     naverLoginInstance.authorize();
   });
+}
+
+// 네이티브 앱이 열어준 시스템 브라우저 탭이면, 사용자가 버튼을 다시 누르지 않아도
+// 바로 네이버 로그인을 시작합니다.
+if(__sjNativeLoginTarget === "naver" && naverLoginInstance){
+  naverLoginInstance.authorize();
 }
 
 // ---- 로그아웃 ----

@@ -7,7 +7,6 @@
   },
   "server": {
     "androidScheme": "https",
-    "iosScheme": "https",
     "allowNavigation": [
       "*.firebaseapp.com",
       "*.googleapis.com",
