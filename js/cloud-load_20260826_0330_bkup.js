@@ -146,12 +146,6 @@
 
     if(typeof save === "function") save();
     if(typeof renderAll === "function") renderAll();
-    /* 정산 탭에 남아있던 이전 계산 결과는 이번에 불러온 라운드와 무관하므로
-       초기화 -- 그대로 두면 마치 저장된 정산 내역이 자동으로 불러와진
-       것처럼 보여 혼란을 줄 수 있습니다. */
-    if(window.__sjSettlement && window.__sjSettlement.resetOnRoundChange){
-      window.__sjSettlement.resetOnRoundChange();
-    }
   }
 
   /* ---------------- 저장된 라운드 수정 (스코어 + My) ---------------- */

@@ -85,13 +85,12 @@
 <div id="settlementSection" class="card">
 <label id="settlementLabel">💰 내기 골프 정산</label>
 <p class="settlement-desc" id="settlementDesc">스코어 입력이 끝난 뒤 타당 금액을 입력하고 "정산하기"를 누르면, 버디 이상 · 파4·5 트리플보기 이상 · 파3 더블보기 이상이 나온 홀은 2배로 계산해서 홀별로 주고받을 금액을 보여드려요. (저장되지 않고 화면에만 표시됩니다)</p>
-<p class="settlement-desc" id="settlementNameTip" data-i18n="settlementNameTip">💡 이름이 "김**"처럼 겹쳐 보인다면, "팀 설정" 탭에서 정확한 이름을 입력한 뒤 "정산하기"를 다시 눌러주세요. 새 이름 기준으로 다시 계산돼요.</p>
 <div id="settlementTeamSelectWrap" style="display:none;">
 <label id="settlementTeamSelectLabel" class="settlement-inline-label">정산할 팀</label>
 <select id="settlementTeamSelect"></select>
 </div>
 <div class="settlement-input-row">
-<input type="number" id="settlementStakeInput" min="0" step="1000" placeholder="타당 금액 (예: 1000)">
+<input type="number" id="settlementStakeInput" min="0" step="100" placeholder="타당 금액 (예: 1000)">
 <button id="settlementCalcBtn" class="btn-primary" type="button">정산하기</button>
 </div>
 <div id="settlementResult"></div>
@@ -201,11 +200,11 @@
 <div class="sj-modal-overlay" id="sjOcrModal"><div class="sj-modal">
 <button class="sj-close" data-close>×</button>
 <h3 data-i18n="ocrModalTitle">스코어카드 사진으로 입력</h3>
-<p style="font-size:13px;color:#666;" data-i18n="ocrIntroP1">팀마다 스코어카드 사진을 하나씩 선택한 뒤 "분석 시작"을 누르면 팀별로 자동 인식되어 각각 반영됩니다. 팀은 아래에서 바로 추가·삭제할 수 있습니다.</p>
+<p style="font-size:13px;color:#666;" data-i18n="ocrIntroP1">팀마다 스코어카드 사진을 하나씩 선택한 뒤 "인식 시작"을 누르면 팀별로 자동 인식되어 각각 반영됩니다. 팀은 아래에서 바로 추가·삭제할 수 있습니다.</p>
 <p style="font-size:13px;color:#e11d48;font-weight:bold;" data-i18n="ocrIntroP2">⚠ 스캔 이후 스코어가 정확하지 않을 경우 해당 플레이어 체크 후 재검토 눌러주세요.</p>
 <div id="sjOcrTeamList"></div>
 <button type="button" id="sjOcrAddTeamBtn" class="sj-secondary" style="margin-top:0;">+ 팀 추가</button>
-<button class="sj-primary" id="sjAnalyzeBtn" data-i18n="ocrAnalyzeBtn">분석 시작</button>
+<button class="sj-primary" id="sjAnalyzeBtn" data-i18n="ocrAnalyzeBtn">인식 시작</button>
 <div class="sj-status" id="sjOcrStatus"></div>
 <div id="sjOcrReviewSection" style="display:none;margin-top:14px;border-top:1px solid #eee;padding-top:10px;">
 <p style="font-size:12px;color:#666;margin:0 0 6px;" data-i18n="ocrReviewIntro">스코어가 이상한 선수를 선택하고 재검토를 누르면 같은 사진을 다시 정밀 분석해서 선택한 선수만 수정합니다.</p>
@@ -284,7 +283,7 @@
 
 <div class="sj-manual-section">
 <div class="sj-manual-head"><span class="sj-manual-icon">📷</span><span class="sj-manual-title" data-i18n="manualOcrTitle">사진으로 스코어 인식</span></div>
-<p class="sj-manual-desc" data-i18n-html="manualOcrDesc">오른쪽 아래 <b>📷</b> 버튼으로 스코어카드 사진을 팀별로 한 장씩 올리고 "분석 시작"을 누르면 자동으로 스코어가 입력돼요.</p>
+<p class="sj-manual-desc" data-i18n-html="manualOcrDesc">오른쪽 아래 <b>📷</b> 버튼으로 스코어카드 사진을 팀별로 한 장씩 올리고 "인식 시작"을 누르면 자동으로 스코어가 입력돼요.</p>
 <ul class="sj-manual-steps">
 <li data-i18n-html="manualOcrStep1"><b>My 선택</b>: 본인 스코어를 표시해요. 보통 첫 줄이 자동으로 선택되지만, 본인 사진이 아니라면 다른 사람을 눌러 바꿀 수 있어요.</li>
 <li data-i18n-html="manualOcrStep2"><b>선택 재검토</b>: 스코어가 잘못 인식된 선수만 체크하고 눌러서 같은 사진을 다시 정밀 분석해요.</li>
@@ -304,16 +303,8 @@
 </div>
 
 <div class="sj-manual-section">
-<div class="sj-manual-head"><span class="sj-manual-icon">💰</span><span class="sj-manual-title" data-i18n="manualSettlementTitle">내기 골프 정산</span></div>
-<p class="sj-manual-desc" data-i18n-html="manualSettlementDesc"><b>결과</b> 탭에서 타당 금액을 입력하고 <b>정산하기</b>를 누르면 홀별로 주고받을 금액을 계산해줘요. 버디 이상 · 파4·5 트리플보기 이상 · 파3 더블보기 이상이 나온 홀은 자동으로 2배가 되고, 홀마다 배수·금액을 직접 눌러 수정할 수도 있어요. (클라우드에 저장되지 않고 화면에서만 계산돼요)</p>
-<ul class="sj-manual-steps">
-<li data-i18n-html="manualSettlementTip"><b>이름이 겹쳐 보일 때</b>: "김**"처럼 같은 성으로 겹쳐 보이면 <b>팀 설정</b> 탭에서 정확한 이름을 입력한 뒤 <b>정산하기</b>를 다시 눌러주세요. 새 이름 기준으로 다시 계산돼요.</li>
-</ul>
-</div>
-
-<div class="sj-manual-section">
 <div class="sj-manual-head"><span class="sj-manual-icon">☁</span><span class="sj-manual-title" data-i18n="manualCloudSaveTitle">클라우드 저장</span></div>
-<p class="sj-manual-desc" data-i18n-html="manualCloudSaveDesc">오른쪽 아래 <b>☁</b> 버튼으로 로그인 후 저장할 팀을 선택하면, 그 팀 전체(본인 + 동반자)의 홀별 스코어가 그대로 클라우드에 보관돼요. 날짜 · 시간 · 참가자가 모두 같은 라운드를 다시 저장하면(예: 같은 사진을 재분석한 경우) 새로 추가되지 않고 기존 기록을 덮어써서, 통계에 중복으로 반영되지 않아요.</p>
+<p class="sj-manual-desc" data-i18n-html="manualCloudSaveDesc">오른쪽 아래 <b>☁</b> 버튼으로 로그인 후 저장할 팀을 선택하면, 그 팀 전체(본인 + 동반자)의 홀별 스코어가 그대로 클라우드에 보관돼요.</p>
 </div>
 
 <div class="sj-manual-section">
@@ -348,12 +339,12 @@
 <!-- 아래 js/*.js 의 ?v=... 은 캐시 무효화용 버전 문자열입니다. GitHub Pages/브라우저가
      이 파일들을 한동안 캐시하기 때문에, js 파일을 수정해서 push할 때마다 이 버전 값을
      바꿔줘야 사용자 브라우저가 새 코드를 즉시 받아갑니다 (예: 현재값 뒤에 a->b->c 처럼 알파벳만 하나씩 올려주면 됩니다). -->
-<script src="js/i18n.js?v=20260825h" defer></script>
+<script src="js/i18n.js?v=20260825g" defer></script>
 <script src="js/state.js?v=20260823f" defer></script>
 <script src="js/render-setup.js?v=20260823f" defer></script>
 <script src="js/render-play.js?v=20260823f" defer></script>
 <script src="js/render-result.js?v=20260823f" defer></script>
-<script src="js/settlement.js?v=20260825j" defer></script>
+<script src="js/settlement.js?v=20260825i" defer></script>
 <script src="js/share.js?v=20260823f" defer></script>
 <script src="js/app.js?v=20260823f" defer></script>
 <script src="js/ui-modals.js?v=20260823f" defer></script>
@@ -362,7 +353,7 @@
 <script type="module" src="js/auth.js?v=20260825h"></script>
 <script src="js/ocr.js?v=20260823f" defer></script>
 <script src="js/cloud-save.js?v=20260823f" defer></script>
-<script src="js/cloud-load.js?v=20260823g" defer></script>
+<script src="js/cloud-load.js?v=20260823f" defer></script>
 <script src="js/admin.js?v=20260823f" defer></script>
 
 </body>

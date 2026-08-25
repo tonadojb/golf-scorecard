@@ -35,20 +35,18 @@ function settlementGetOverride(h){
   return settlementHoleOverrides[h];
 }
 
-/* 부호(+/-)가 있는 합계 표시용 (예: "+15,000" / "-5,000" / "0") -- 단위(원)는
-   표시하지 않고 숫자만 보여줍니다. */
+/* 부호(+/-)가 있는 합계 표시용 (예: "+15,000원" / "-5,000원" / "0원") */
 function settlementFormatSigned(n){
   var v = Math.round(n);
   var abs = Math.abs(v).toLocaleString();
-  if(v > 0) return '+' + abs;
-  if(v < 0) return '-' + abs;
-  return '0';
+  if(v > 0) return '+' + abs + t('settlementUnit');
+  if(v < 0) return '-' + abs + t('settlementUnit');
+  return '0' + t('settlementUnit');
 }
 
-/* 부호 없는 금액 표시용 (예: "15,000") — 이미 누가 누구에게 주는지 문맥이 있는 경우.
-   단위(원)는 표시하지 않고 숫자만 보여줍니다. */
+/* 부호 없는 금액 표시용 (예: "15,000원") — 이미 누가 누구에게 주는지 문맥이 있는 경우 */
 function settlementFormatPlain(n){
-  return Math.abs(Math.round(n)).toLocaleString();
+  return Math.abs(Math.round(n)).toLocaleString() + t('settlementUnit');
 }
 
 function populateSettlementTeamSelect(){
@@ -200,7 +198,7 @@ function renderSettlementHoleCard(team, hr){
       '<div class="settlement-mult-seg">' + btnsHtml + '</div>' +
       '<input type="number" class="settlement-mult-custom" data-hole="' + hr.holeIdx + '" min="1" step="1" value="' + hr.effectiveMultiplier + '" title="' + escapeHtml(t('settlementCustomMultTitle')) + '">' +
       '<div class="settlement-hole-stake-wrap">' +
-        '<input type="number" class="settlement-hole-stake-input" data-hole="' + hr.holeIdx + '" min="0" step="1000" value="' + hr.effectiveStake + '">' +
+        '<input type="number" class="settlement-hole-stake-input" data-hole="' + hr.holeIdx + '" min="0" step="100" value="' + hr.effectiveStake + '">' +
         '<span class="settlement-hole-stake-label">' + escapeHtml(t('settlementUnit')) + '</span>' +
       '</div>' +
     '</div>' +
@@ -362,7 +360,7 @@ function buildSettlementCaptureHtml(team, data, globalStake){
   return '' +
     '<div style="font-weight:700;font-size:16px;color:#312e81;margin-bottom:2px;">💰 ' + escapeHtml(team.name) + '</div>' +
     '<div style="font-size:12px;color:#6b6f8a;margin-bottom:6px;">' + escapeHtml(state.courseName || t('courseNameEmpty')) + ' · ' + escapeHtml(state.playDate || '') + '</div>' +
-    '<div style="font-size:11px;color:#9295ac;margin-bottom:12px;">' + escapeHtml(t('settlementBaseStakeLabel')) + ' ' + Math.round(globalStake).toLocaleString() + '</div>' +
+    '<div style="font-size:11px;color:#9295ac;margin-bottom:12px;">' + escapeHtml(t('settlementBaseStakeLabel')) + ' ' + Math.round(globalStake).toLocaleString() + escapeHtml(t('settlementUnit')) + '</div>' +
     '<div style="font-weight:700;font-size:13px;color:#312e81;margin-bottom:4px;">' + escapeHtml(t('settlementTotalsTitle')) + '</div>' +
     '<table style="width:100%;border-collapse:collapse;margin-bottom:14px;">' + totalsRows + '</table>' +
     '<div style="font-weight:700;font-size:13px;color:#312e81;margin-bottom:4px;">' + escapeHtml(t('settlementFinalTitle')) + '</div>' +
@@ -463,19 +461,3 @@ if(settlementShareImageBtn){
     copySettlementResultAsImage();
   });
 }
-
-/* "불러오기"로 다른 라운드를 불러왔을 때, 직전에 계산해둔 정산 결과가 화면에
-   그대로 남아있으면 마치 저장/자동 계산된 것처럼 보여 혼란을 줄 수 있습니다.
-   실제로는 저장되지 않으며(위 주석 참고), 그냥 마지막 계산 결과가 지워지지
-   않고 남아있던 것뿐이라 -- 다른 라운드를 불러오면 이 화면을 초기화해서
-   "정산하기"를 다시 눌러야 새 라운드 기준으로 계산되도록 합니다. */
-function resetSettlementOnRoundChange(){
-  settlementHoleOverrides = {};
-  settlementCurrentTeam = null;
-  settlementCurrentGlobalStake = null;
-  if(settlementResultEl) settlementResultEl.innerHTML = '';
-  if(settlementShareImageBtn) settlementShareImageBtn.style.display = 'none';
-  if(settlementStakeInput) settlementStakeInput.value = '';
-  if(typeof populateSettlementTeamSelect === 'function') populateSettlementTeamSelect();
-}
-window.__sjSettlement = { resetOnRoundChange: resetSettlementOnRoundChange };
