@@ -274,11 +274,16 @@ if(kakaoBtn){
 // 아니었음) -- 그래서 로그인 자체는 네이버 쪽에서 성공해도 우리 페이지가 그 결과를 전혀
 // 받아오지 못하고 아무 반응이 없었던 것입니다. 아래 코드는 로그인 후 이 페이지로 돌아왔을
 // 때 getLoginStatus()로 로그인 여부를 직접 확인하고, 액세스 토큰을 꺼내 처리합니다.
+// 네이버 콜백 URL은 네이버 개발자센터에 등록해둔 값과 정확히 일치해야 합니다.
+// 네이티브 앱 안에서는 아래 capacitor.config.json의 iosScheme:"https" 설정 덕분에
+// 항상 "https://localhost/" 로 고정되므로(페이지 경로가 무엇이든), 매번 같은
+// 값이 나오도록 origin + "/" 로 고정해서 씁니다. 웹사이트(GitHub Pages)에서는
+// 기존처럼 실제 주소(origin + pathname)를 그대로 씁니다.
 var naverLoginInstance = null;
 if(window.naver && window.naver.LoginWithNaverId){
   naverLoginInstance = new window.naver.LoginWithNaverId({
     clientId: NAVER_CLIENT_ID,
-    callbackUrl: window.location.origin + window.location.pathname,
+    callbackUrl: isNativeApp() ? (window.location.origin + "/") : (window.location.origin + window.location.pathname),
     isPopup: false,
     callbackHandle: true
   });
