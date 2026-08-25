@@ -255,7 +255,10 @@ if(kakaoBtn){
           });
       },
       fail: function(err){
-        setStatus("카카오 로그인 실패: " + JSON.stringify(err), true);
+        // (임시 진단용) 실제로 이 페이지가 어떤 주소(origin)에서 실행 중인지
+        // 함께 보여줍니다 -- 카카오 개발자센터에 등록한 도메인과 정확히
+        // 같은 값인지 확인하기 위한 것으로, 문제 해결 후 제거해도 됩니다.
+        setStatus("카카오 로그인 실패: " + JSON.stringify(err) + " / origin: " + window.location.origin, true);
       }
     });
   });
@@ -368,6 +371,11 @@ if(naverBtn){
       setStatus("네이버 SDK를 불러오지 못했습니다.", true);
       return;
     }
+    // (임시 진단용) 네이버 페이지로 넘어가기 직전, 실제로 사용될 콜백
+    // 주소를 화면에 보여줍니다 -- 네이버 개발자센터에 등록한 Callback URL과
+    // 정확히 같은 값인지 확인하기 위한 것으로, 문제 해결 후 제거해도 됩니다.
+    var naverDebugCallback = isNativeApp() ? (window.location.origin + "/") : (window.location.origin + window.location.pathname);
+    alert("디버그 정보\norigin: " + window.location.origin + "\ncallbackUrl: " + naverDebugCallback);
     naverLoginInstance.authorize();
   });
 }
