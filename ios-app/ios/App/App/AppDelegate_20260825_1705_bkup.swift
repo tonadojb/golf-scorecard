@@ -1,7 +1,6 @@
 import UIKit
 import Capacitor
 import FirebaseCore
-import GoogleSignIn
 
 @UIApplicationMain
 class AppDelegate: UIResponder, UIApplicationDelegate {
@@ -43,17 +42,6 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
     func application(_ app: UIApplication, open url: URL, options: [UIApplication.OpenURLOptionsKey: Any] = [:]) -> Bool {
         // Called when the app was launched with a url. Feel free to add additional processing here,
         // but if you want the App API to support tracking app url opens, make sure to keep this call
-        //
-        // ⚠ 구글 로그인 창이 뜬 뒤 "로그인 중..."에서 멈추는 문제의 진짜 원인이 여기
-        // 있었습니다. @capacitor-firebase/authentication 플러그인은 GIDSignIn.signIn()만
-        // 호출할 뿐, 로그인 과정 중간에 시스템이 이 앱으로 되돌아올 때 전달하는 콜백
-        // URL을 GoogleSignIn SDK에 넘겨주는 코드가 빠져 있습니다 (Google/Firebase
-        // 공식 문서에도 앱이 직접 GIDSignIn.sharedInstance.handle(url)을 호출해야
-        // 한다고 명시되어 있습니다). 이 연결이 없으면 로그인 결과가 영영 앱에
-        // 전달되지 않아 "로그인 중..." 화면에서 멈춰있게 됩니다.
-        if GIDSignIn.sharedInstance.handle(url) {
-            return true
-        }
         return ApplicationDelegateProxy.shared.application(app, open: url, options: options)
     }
 

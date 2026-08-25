@@ -82,19 +82,6 @@
 <label id="anonymizeLabel">🙈 SNS 공유 시 이름 가리기</label>
 <div id="anonymizeList"></div>
 </div>
-<div id="settlementSection" class="card">
-<label id="settlementLabel">💰 내기 골프 정산</label>
-<p class="settlement-desc" id="settlementDesc">스코어 입력이 끝난 뒤 타당 금액을 입력하고 "정산하기"를 누르면, 버디 이상 · 파4·5 트리플보기 이상 · 파3 더블보기 이상이 나온 홀은 2배로 계산해서 홀별로 주고받을 금액을 보여드려요. (저장되지 않고 화면에만 표시됩니다)</p>
-<div id="settlementTeamSelectWrap" style="display:none;">
-<label id="settlementTeamSelectLabel" class="settlement-inline-label">정산할 팀</label>
-<select id="settlementTeamSelect"></select>
-</div>
-<div class="settlement-input-row">
-<input type="number" id="settlementStakeInput" min="0" step="100" placeholder="타당 금액 (예: 1000)">
-<button id="settlementCalcBtn" class="btn-primary" type="button">정산하기</button>
-</div>
-<div id="settlementResult"></div>
-</div>
 <button id="copyBtn" class="btn-primary">📋 결과 복사하기 (SNS 공유)</button>
 </section>
 </main>
@@ -338,12 +325,11 @@
 <!-- 아래 js/*.js 의 ?v=... 은 캐시 무효화용 버전 문자열입니다. GitHub Pages/브라우저가
      이 파일들을 한동안 캐시하기 때문에, js 파일을 수정해서 push할 때마다 이 버전 값을
      바꿔줘야 사용자 브라우저가 새 코드를 즉시 받아갑니다 (예: 현재값 뒤에 a->b->c 처럼 알파벳만 하나씩 올려주면 됩니다). -->
-<script src="js/i18n.js?v=20260825g" defer></script>
+<script src="js/i18n.js?v=20260823f" defer></script>
 <script src="js/state.js?v=20260823f" defer></script>
 <script src="js/render-setup.js?v=20260823f" defer></script>
 <script src="js/render-play.js?v=20260823f" defer></script>
 <script src="js/render-result.js?v=20260823f" defer></script>
-<script src="js/settlement.js?v=20260825g" defer></script>
 <script src="js/share.js?v=20260823f" defer></script>
 <script src="js/app.js?v=20260823f" defer></script>
 <script src="js/ui-modals.js?v=20260823f" defer></script>
