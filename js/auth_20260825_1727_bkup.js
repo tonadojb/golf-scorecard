@@ -1,5 +1,5 @@
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
-import { getAuth, initializeAuth, indexedDBLocalPersistence, GoogleAuthProvider, signInWithPopup, signInWithCredential, signInWithCustomToken, signOut, onAuthStateChanged, updateProfile } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
+import { getAuth, GoogleAuthProvider, signInWithPopup, signInWithCredential, signInWithCustomToken, signOut, onAuthStateChanged, updateProfile } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
 import { getFirestore, doc, getDoc, setDoc, serverTimestamp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
 
 var firebaseConfig = {
@@ -44,16 +44,7 @@ var NAVER_CLIENT_ID = "jdkW2uYK23DCwxrCeVWu";
 var ADMIN_EMAIL = "tonadojb@gmail.com";
 
 var app = initializeApp(firebaseConfig);
-// 네이티브(Capacitor iOS) 앱 안에서는 Firebase Auth의 기본 지속성(persistence)
-// 방식이 WKWebView 안에서 signInWithCredential() 같은 호출을 응답 없이 무한
-// 대기하게 만드는 경우가 있습니다 (구글 로그인 화면이 뜨고 닫힌 뒤 "로그인
-// 중..."에서 멈추던 문제의 실제 원인으로 보입니다). @capacitor-firebase/
-// authentication 공식 문서에서도 네이티브 플랫폼에서는 이렇게 indexedDBLocalPersistence를
-// 명시적으로 지정하라고 안내하고 있어서, 아래에서 웹(GitHub Pages)과 네이티브 앱을
-// 구분해서 다르게 초기화합니다. window.Capacitor는 네이티브 앱 안에서만 주입되므로
-// 웹사이트에서는 항상 기존과 동일하게 getAuth(app)를 그대로 씁니다.
-var __sjIsNativeApp = !!(window.Capacitor && typeof window.Capacitor.isNativePlatform === "function" && window.Capacitor.isNativePlatform());
-var auth = __sjIsNativeApp ? initializeAuth(app, { persistence: indexedDBLocalPersistence }) : getAuth(app);
+var auth = getAuth(app);
 var db = getFirestore(app);
 var currentUser = null;
 
@@ -142,32 +133,6 @@ function stopPresenceHeartbeat(){
 // Auth 레이어는 건드리지 않고, 지금 쓰고 있는 웹 SDK의 auth 객체 하나로만
 // 로그인 상태가 관리됩니다). 웹사이트(GitHub Pages)에는 이 네이티브 플러그인이
 // 없으므로 기존 signInWithPopup 방식을 그대로 씁니다.
-// 네이티브 로그인 호출이 응답 없이 무한 대기하는 상황(이번에 겪었던 "로그인
-// 중..."에서 멈추는 문제)을 대비한 안전장치입니다. 정해진 시간 안에 응답이
-// 없으면 그냥 무한정 멈춰있는 대신 구체적인 오류 메시지를 보여줘서, 다음에
-// 비슷한 문제가 생기더라도 어느 단계에서 멈췄는지 바로 알 수 있게 합니다.
-function withTimeout(promise, ms, label){
-  return new Promise(function(resolve, reject){
-    var settled = false;
-    var timer = setTimeout(function(){
-      if(settled) return;
-      settled = true;
-      reject(new Error((label || "작업") + "이(가) " + Math.round(ms/1000) + "초 안에 응답하지 않았습니다 (시간 초과)."));
-    }, ms);
-    promise.then(function(v){
-      if(settled) return;
-      settled = true;
-      clearTimeout(timer);
-      resolve(v);
-    }, function(e){
-      if(settled) return;
-      settled = true;
-      clearTimeout(timer);
-      reject(e);
-    });
-  });
-}
-
 function finishGoogleLogin(userPromise){
   userPromise.then(function(result){
     recordLoginPing(result.user);
@@ -191,11 +156,11 @@ if(googleBtn){
         return;
       }
       finishGoogleLogin(
-        withTimeout(FirebaseAuthentication.signInWithGoogle(), 25000, "네이티브 구글 로그인").then(function(nativeResult){
+        FirebaseAuthentication.signInWithGoogle().then(function(nativeResult){
           var idToken = nativeResult && nativeResult.credential && nativeResult.credential.idToken;
           if(!idToken){ throw new Error("구글 로그인 토큰을 가져오지 못했습니다."); }
           var credential = GoogleAuthProvider.credential(idToken);
-          return withTimeout(signInWithCredential(auth, credential), 15000, "Firebase 로그인 연결");
+          return signInWithCredential(auth, credential);
         })
       );
       return;
