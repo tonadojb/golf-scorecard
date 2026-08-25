@@ -1,0 +1,784 @@
+var I18N = {
+  ko:{
+    title:"⛳ 골프 스코어카드",
+    courseNamePlaceholder:"골프장 이름을 입력하세요",
+    courseSubPlaceholder:"코스(전반/후반) 예: 토마토,애플",
+    langBtn:"🌐 Language",
+    tabSetup:"👥 팀 설정",
+    tabPlay:"🏌️ 스코어 입력",
+    tabResult:"📋 결과",
+    holeCountLabel:"홀 수 선택",
+    hole9:"9홀",
+    hole18:"18홀",
+    addTeam:"+ 팀 추가 (최대 20팀)",
+    resetAll:"전체 초기화",
+    teamNamePlaceholder:"팀 이름",
+    playerPlaceholder:function(n){ return "플레이어"+n; },
+    removeTeam:"✕ 삭제",
+    holeNotePlaceholder:"이 홀의 특징을 적어보세요 (도그렉, 벙커, OB, 그린 경사 등)",
+    prevHole:"◀ 이전 홀",
+    nextHole:"다음 홀 ▶",
+    holeLabel:function(n){ return n+"번 홀"; },
+    courseNameEmpty:"코스명 미입력",
+    holesSuffix:"홀",
+    tableCategory:"구분",
+    tableTotal:"합계",
+    outLabel:"전반",
+    inLabel:"후반",
+    copyResult:"📋 결과 복사하기 (SNS 공유)",
+    shareModalTitle:"공유 방식을 선택하세요",
+    shareAsText:"📝 텍스트로 복사",
+    shareAsImage:"🖼️ 이미지로 복사",
+    shareCancel:"취소",
+    toastImageCopied:"이미지가 복사되었습니다! SNS에 붙여넣기 하세요",
+    toastImageSaved:"이미지가 저장되었습니다. 갤러리에서 공유해보세요",
+    toastImageFail:"이미지 생성에 실패했습니다",
+    anonymizeLabel:"🙈 SNS 공유 시 이름 가리기",
+    settlementLabel:"💰 내기 골프 정산",
+    settlementDesc:'스코어 입력이 끝난 뒤 타당 금액을 입력하고 "정산하기"를 누르면, 버디 이상 · 파4·5 트리플보기 이상 · 파3 더블보기 이상이 나온 홀은 2배로 계산해서 홀별로 주고받을 금액을 보여드려요. (저장되지 않고 화면에만 표시됩니다)',
+    settlementTeamSelectLabel:"정산할 팀",
+    settlementStakePlaceholder:"타당 금액 (예: 1000)",
+    settlementCalcBtn:"정산하기",
+    settlementUnit:"원",
+    settlementNeedTwoPlayers:"정산하려면 스코어가 입력된 참가자가 2명 이상 필요해요",
+    settlementStakeRequired:"타당 금액을 입력해주세요",
+    settlementAllEven:"주고받을 금액이 없어요 (모두 동점)",
+    settlementHoleEven:"동점",
+    settlementDoubleBadge:"더블",
+    settlementTotalsTitle:"플레이어별 최종 합계",
+    settlementFinalTitle:"최종 정산 내역",
+    settlementHolesTitle:"홀별 상세 내역",
+    settlementHoleCol:"홀",
+    settlementDoubleCol:"더블",
+    settlementAmountCol:"정산 금액",
+    sortTeamView:"팀별 보기",
+    sortRankView:"🏆 순위별 보기",
+    rankColumnHeader:"순위",
+    footer:"Field Golf Scorecard · 회원가입 후 저장하면 클라우드 DB에 저장되고 언제든지 불러올 수 있습니다.",
+    toastMaxTeams:"팀은 최대 20개까지 만들 수 있어요",
+    toastReset:"초기화되었습니다",
+    toastCopied:"결과가 복사되었습니다! SNS에 붙여넣기 하세요",
+    toastCopyFail:"복사에 실패했습니다",
+    confirmRemoveTeam:function(name){ return '"'+name+'" 팀을 삭제할까요?'; },
+    confirmReset:"모든 팀, 스코어, 홀 정보를 초기화할까요? 이 작업은 되돌릴 수 없습니다.",
+    copyDatePrefix:"📅",
+    copyTotalLabel:"합계",
+    copyFooter:"- Field Golf Scorecard -",
+    ocrTeamLabel:"어느 팀 사진인가요?",
+    ocrAddTeamBtn:"+ 팀 추가",
+    loadFabTitle:"불러오기",
+    loadModalTitle:"저장된 라운드 불러오기",
+    loadEmpty:"저장된 라운드가 없습니다",
+    loadBackBtn:"◀ 목록으로",
+    loadCompanionsLabel:"동반자",
+    loadTotalLabel:"합계",
+    loadHoleLabel:"홀",
+    loadParLabel:"파",
+    loadScoreLabel:"스코어",
+    loadNoCourseName:"골프장 미입력",
+    loadNoDate:"날짜 미입력",
+    loadFetchFail:"불러오기 실패",
+    loadYearAll:"전체 연도",
+    loadNoMatch:"검색 결과가 없습니다",
+    loadApplied:"라운드를 불러왔습니다",
+    loadCourseFilterPlaceholder:"골프장 이름 검색",
+    manualBtnTitle:"사용설명서",
+    manualBtnText:" 사용설명서",
+    authFabTitle:"계정",
+    ocrFabTitle:"사진으로 입력",
+    saveFabTitle:"클라우드 저장",
+    adminFabTitle:"관리자 페이지",
+    authModalTitle:"로그인",
+    googleLoginBtn:"Google로 로그인",
+    kakaoLoginBtn:"카카오로 로그인",
+    naverLoginBtn:"네이버로 로그인",
+    loggedInAs:"로그인됨:",
+    logoutBtn:"로그아웃",
+    ocrModalTitle:"스코어카드 사진으로 입력",
+    ocrIntroP1:'팀마다 스코어카드 사진을 하나씩 선택한 뒤 "인식 시작"을 누르면 팀별로 자동 인식되어 각각 반영됩니다. 팀은 아래에서 바로 추가·삭제할 수 있습니다.',
+    ocrIntroP2:"⚠ 스캔 이후 스코어가 정확하지 않을 경우 해당 플레이어 체크 후 재검토 눌러주세요.",
+    ocrAnalyzeBtn:"인식 시작",
+    ocrReviewIntro:"스코어가 이상한 선수를 선택하고 재검토를 누르면 같은 사진을 다시 정밀 분석해서 선택한 선수만 수정합니다.",
+    ocrReviewBtn:"선택 재검토",
+    ocrSkipReviewBtn:"재검토 Pass (저장)",
+    saveModalTitle:"클라우드에 라운드 저장",
+    saveIntroP:"선택한 팀의 전체 스코어(본인 + 동반자 포함)가 그대로 저장됩니다.",
+    saveTeamSelectLabel:"저장할 팀 선택",
+    saveConfirmBtn:"저장하기",
+    loadIntroP:"목록에서 라운드를 선택하면 현재 스코어카드에 바로 불러와집니다.",
+    loadStatsBtn:"📊 내 스코어 통계",
+    adminModalTitle:"🛠 관리자 페이지",
+    adminGlobalToggleLabel:"관리자 제외 전체 접속금지",
+    adminBlockMsgLabel:'접속금지 시 표시할 안내 메시지 (비워두면 "점검중입니다." 표시)',
+    adminBlockMsgPlaceholder:"점검중입니다.",
+    adminMaxViolationsLabel:"스코어카드 아닌 사진 업로드 시 자동 접속금지되는 경고 누적 횟수 (1~20)",
+    adminSaveGlobalBtn:"전체 설정 저장",
+    adminUsersHeadLabel:"로그인 사용자 목록",
+    adminRefreshBtn:"↻ 새로고침",
+    adminStorageUsageLink:"📦 Storage 사용량 확인 (Firebase 콘솔) ↗",
+    manualModalTitle:"📖 사용설명서",
+    manualLoginTitle:"로그인",
+    manualLoginDesc:'오른쪽 아래 <b>👤 계정</b> 버튼으로 구글·카카오·네이버 계정에 로그인하면 라운드를 클라우드에 저장하고 다시 불러올 수 있어요.',
+    manualTeamTitle:"팀 설정",
+    manualTeamDesc:'<b>팀 설정</b> 탭에서 홀 수(9홀/18홀)를 고르고 팀을 추가해 참가자 이름을 입력하세요. 팀은 최대 20개까지 만들 수 있어요.',
+    manualScoreTitle:"스코어 입력",
+    manualScoreDesc:'<b>스코어 입력</b> 탭에서 홀마다 파(Par)를 선택하고, +/- 버튼으로 각 선수의 스코어를 홀별로 기록하세요.',
+    manualOcrTitle:"사진으로 스코어 인식",
+    manualOcrDesc:'오른쪽 아래 <b>📷</b> 버튼으로 스코어카드 사진을 팀별로 한 장씩 올리고 "인식 시작"을 누르면 자동으로 스코어가 입력돼요.',
+    manualOcrStep1:'<b>My 선택</b>: 본인 스코어를 표시해요. 보통 첫 줄이 자동으로 선택되지만, 본인 사진이 아니라면 다른 사람을 눌러 바꿀 수 있어요.',
+    manualOcrStep2:'<b>선택 재검토</b>: 스코어가 잘못 인식된 선수만 체크하고 눌러서 같은 사진을 다시 정밀 분석해요.',
+    manualOcrStep3:'<b>재검토 Pass (저장)</b>: 수정할 부분이 없다면 이 버튼으로 바로 창을 닫을 수 있어요.',
+    manualOcrStep4:'<b>나중에 다시 수정하려면</b>: 저장한 뒤에도 📂 불러오기 목록의 <b>✏ 수정</b> 버튼으로 스코어와 My 지정을 언제든 바꿀 수 있어요.',
+    manualWarningTitle:"업로드 시 주의사항",
+    manualWarningDesc:'스코어카드가 아닌 사진(인물, 풍경 등 관계없는 사진)을 올리면 <b>경고 팝업</b>이 뜨고, 경고가 <b>2회</b> 누적된 뒤 <b>3번째</b>로 다시 올리면 자동으로 <b>접속이 차단</b>돼요. 반드시 실제 스코어카드 사진만 올려주세요.',
+    manualResultTitle:"결과 확인 & 공유",
+    manualResultDesc:'<b>결과</b> 탭에서 팀별 · 순위별로 전체 스코어를 확인할 수 있고, 표를 옆으로 밀면 18홀까지 모두 볼 수 있어요. <b>결과 복사하기</b>를 누르면 이미지로 만들어져 카카오톡이나 SNS에 바로 붙여넣을 수 있어요.',
+    manualCloudSaveTitle:"클라우드 저장",
+    manualCloudSaveDesc:'오른쪽 아래 <b>☁</b> 버튼으로 로그인 후 저장할 팀을 선택하면, 그 팀 전체(본인 + 동반자)의 홀별 스코어가 그대로 클라우드에 보관돼요.',
+    manualLoadTitle:"불러오기 & 삭제",
+    manualLoadDesc:'오른쪽 아래 <b>📂</b> 버튼으로 저장된 라운드 목록을 보고, 골프장 이름이나 연도로 검색할 수 있어요. 목록을 누르면 바로 불러와지고, <b>✏ 수정</b> 버튼으로 스코어와 My 지정을 나중에도 바꿀 수 있어요 (내 스코어 통계에 바로 반영됩니다). 오른쪽 위 ✕ 버튼으로 삭제할 수 있어요.',
+    manualStatsTitle:"내 스코어 통계",
+    manualStatsDesc:'불러오기 창 위쪽의 <b>📊 내 스코어 통계</b> 버튼을 누르면 최근 10회 · 20회 · 전체 기준으로 평균/베스트 스코어, 평균 오버파, 파 · 보기 · 더블보기 이상 비율을 한눈에 볼 수 있어요.',
+    manualLangTitle:"언어 변경",
+    manualLangDesc:'오른쪽 위 <b>🌐 Language</b> 버튼으로 한국어 · 영어 · 일본어 · 중국어 중 원하는 언어로 바로 바꿀 수 있어요.',
+    manualFooter:"궁금한 점이 있으면 이 버튼을 언제든 다시 눌러 확인하세요 ⛳",
+    manualContactDesc:"문의사항은 manager@skyjang.com 으로 남겨주세요.",
+    statsUnder:"버디 이상",
+    statsPar:"파",
+    statsBogey:"보기",
+    statsDouble:"더블보기 이상",
+    statsNoData:"통계를 낼 저장된 라운드가 없습니다.",
+    statsAll:"전체",
+    statsRecentN:function(n){ return "최근 "+n+"회"; },
+    statsTotalRounds:"총 라운드",
+    statsRecentScore:"최근 스코어",
+    statsAvgScore:"평균 스코어",
+    statsBestScore:"베스트 스코어",
+    statsAvgOverPar:"평균 오버파",
+    loadLoading:"불러오는 중...",
+    loginRequired:"로그인이 필요합니다."
+  },
+  en:{
+    title:"⛳ Golf Scorecard",
+    courseNamePlaceholder:"Enter course name",
+    courseSubPlaceholder:"Nine names, e.g. Tomato, Apple",
+    langBtn:"🌐 Language",
+    tabSetup:"👥 Teams",
+    tabPlay:"🏌️ Enter Score",
+    tabResult:"📋 Results",
+    holeCountLabel:"Number of Holes",
+    hole9:"9 Holes",
+    hole18:"18 Holes",
+    addTeam:"+ Add Team (max 20)",
+    resetAll:"Reset All",
+    teamNamePlaceholder:"Team name",
+    playerPlaceholder:function(n){ return "Player "+n; },
+    removeTeam:"✕ Remove",
+    holeNotePlaceholder:"Notes about this hole (dogleg, bunker, OB, green slope, etc.)",
+    prevHole:"◀ Prev Hole",
+    nextHole:"Next Hole ▶",
+    holeLabel:function(n){ return "Hole "+n; },
+    courseNameEmpty:"No course name",
+    holesSuffix:"holes",
+    tableCategory:"Player",
+    tableTotal:"Total",
+    outLabel:"OUT",
+    inLabel:"IN",
+    copyResult:"📋 Copy Results (Share)",
+    shareModalTitle:"Choose how to share",
+    shareAsText:"📝 Copy as Text",
+    shareAsImage:"🖼️ Copy as Image",
+    shareCancel:"Cancel",
+    toastImageCopied:"Image copied! Paste it on social media",
+    toastImageSaved:"Image saved. Share it from your gallery",
+    toastImageFail:"Failed to create image",
+    anonymizeLabel:"🙈 Hide names when sharing",
+    settlementLabel:"💰 Betting Settlement",
+    settlementDesc:'After entering scores, type the amount per stroke and tap "Calculate" — holes with a birdie or better, a triple bogey or worse on par 4/5, or a double bogey or worse on par 3 are doubled, and the amount each pair owes per hole is shown. (Not saved, shown on screen only)',
+    settlementTeamSelectLabel:"Team to settle",
+    settlementStakePlaceholder:"Amount per stroke (e.g. 1000)",
+    settlementCalcBtn:"Calculate",
+    settlementUnit:" KRW",
+    settlementNeedTwoPlayers:"At least 2 players with entered scores are needed to settle",
+    settlementStakeRequired:"Please enter the amount per stroke",
+    settlementAllEven:"Nothing to settle (all tied)",
+    settlementHoleEven:"Tied",
+    settlementDoubleBadge:"2x",
+    settlementTotalsTitle:"Final total per player",
+    settlementFinalTitle:"Final settlement",
+    settlementHolesTitle:"Hole-by-hole detail",
+    settlementHoleCol:"Hole",
+    settlementDoubleCol:"2x",
+    settlementAmountCol:"Amount",
+    sortTeamView:"By Team",
+    sortRankView:"🏆 By Ranking",
+    rankColumnHeader:"Rank",
+    footer:"Field Golf Scorecard · Sign up and save to store your data in the cloud, accessible anytime.",
+    toastMaxTeams:"You can create up to 20 teams",
+    toastReset:"Reset complete",
+    toastCopied:"Result copied! Paste it on social media",
+    toastCopyFail:"Copy failed",
+    confirmRemoveTeam:function(name){ return 'Remove team "'+name+'"?'; },
+    confirmReset:"Reset all teams, scores, and hole info? This cannot be undone.",
+    copyDatePrefix:"📅",
+    copyTotalLabel:"Total",
+    copyFooter:"- Field Golf Scorecard -",
+    ocrTeamLabel:"Which team is this photo for?",
+    ocrAddTeamBtn:"+ Add Team",
+    loadFabTitle:"Load",
+    loadModalTitle:"Load Saved Rounds",
+    loadEmpty:"No saved rounds yet",
+    loadBackBtn:"◀ Back to list",
+    loadCompanionsLabel:"Companions",
+    loadTotalLabel:"Total",
+    loadHoleLabel:"Hole",
+    loadParLabel:"Par",
+    loadScoreLabel:"Score",
+    loadNoCourseName:"No course name",
+    loadNoDate:"No date",
+    loadFetchFail:"Failed to load",
+    loadYearAll:"All years",
+    loadNoMatch:"No matches found",
+    loadApplied:"Round loaded",
+    loadCourseFilterPlaceholder:"Search course name",
+    manualBtnTitle:"User Guide",
+    manualBtnText:" User Guide",
+    authFabTitle:"Account",
+    ocrFabTitle:"Enter by Photo",
+    saveFabTitle:"Save to Cloud",
+    adminFabTitle:"Admin Page",
+    authModalTitle:"Log In",
+    googleLoginBtn:"Sign in with Google",
+    kakaoLoginBtn:"Sign in with Kakao",
+    naverLoginBtn:"Sign in with Naver",
+    loggedInAs:"Logged in as:",
+    logoutBtn:"Log Out",
+    ocrModalTitle:"Enter via Scorecard Photo",
+    ocrIntroP1:'Pick one scorecard photo per team, then tap "Start Recognition" to auto-recognize and apply each team\'s scores. You can add or remove teams right below.',
+    ocrIntroP2:"⚠ If a score looks wrong after scanning, check that player and tap Re-check.",
+    ocrAnalyzeBtn:"Start Recognition",
+    ocrReviewIntro:"Select the players whose scores look wrong and tap Re-check to re-analyze the same photo more carefully for just those players.",
+    ocrReviewBtn:"Re-check Selected",
+    ocrSkipReviewBtn:"Skip Re-check (Save)",
+    saveModalTitle:"Save Round to Cloud",
+    saveIntroP:"The whole selected team's scores (you + companions) are saved as-is.",
+    saveTeamSelectLabel:"Select team to save",
+    saveConfirmBtn:"Save",
+    loadIntroP:"Selecting a round from the list loads it into the current scorecard right away.",
+    loadStatsBtn:"📊 My Score Stats",
+    adminModalTitle:"🛠 Admin Page",
+    adminGlobalToggleLabel:"Block all users except admin",
+    adminBlockMsgLabel:'Message shown when blocked (defaults to "Under maintenance." if left empty)',
+    adminBlockMsgPlaceholder:"Under maintenance.",
+    adminMaxViolationsLabel:"Warning count before auto-block for non-scorecard uploads (1-20)",
+    adminSaveGlobalBtn:"Save Settings",
+    adminUsersHeadLabel:"Logged-in Users",
+    adminRefreshBtn:"↻ Refresh",
+    adminStorageUsageLink:"📦 Check Storage Usage (Firebase Console) ↗",
+    manualModalTitle:"📖 User Guide",
+    manualLoginTitle:"Log In",
+    manualLoginDesc:'Tap the <b>👤 Account</b> button in the bottom right and sign in with Google, Kakao, or Naver to save rounds to the cloud and load them again later.',
+    manualTeamTitle:"Team Setup",
+    manualTeamDesc:'On the <b>Teams</b> tab, pick the number of holes (9 or 18), add teams, and enter player names. You can create up to 20 teams.',
+    manualScoreTitle:"Enter Score",
+    manualScoreDesc:'On the <b>Enter Score</b> tab, pick the par for each hole and use the +/- buttons to record each player\'s score hole by hole.',
+    manualOcrTitle:"Recognize Score from a Photo",
+    manualOcrDesc:'Tap the <b>📷</b> button in the bottom right, upload one scorecard photo per team, and tap "Start Recognition" to have the scores entered automatically.',
+    manualOcrStep1:'<b>My selection</b>: Marks your own score. The first row is picked by default, but you can tap another player if the photo wasn\'t yours.',
+    manualOcrStep2:'<b>Re-check Selected</b>: Check only the players whose scores were misread, then tap this to re-analyze the same photo more carefully.',
+    manualOcrStep3:'<b>Skip Re-check (Save)</b>: If nothing needs fixing, use this button to close the window right away.',
+    manualOcrStep4:'<b>To fix it again later</b>: After saving, you can still change the score and My selection anytime with the <b>✏ Edit</b> button in the 📂 Load list.',
+    manualWarningTitle:"Upload Warning",
+    manualWarningDesc:'Uploading a photo that isn\'t a scorecard (a person, a landscape, or anything unrelated) triggers a <b>warning popup</b>. After <b>2 warnings</b>, uploading one again a <b>3rd time</b> automatically <b>blocks your access</b>. Please only upload real scorecard photos.',
+    manualResultTitle:"View & Share Results",
+    manualResultDesc:'The <b>Results</b> tab shows the full scores by team or by ranking, and you can swipe the table sideways to see all 18 holes. Tap <b>Copy Results</b> to turn it into an image you can paste straight into KakaoTalk or social media.',
+    manualCloudSaveTitle:"Save to Cloud",
+    manualCloudSaveDesc:'Tap the <b>☁</b> button in the bottom right, sign in, and pick a team to save -- that whole team\'s (you + companions) hole-by-hole scores are kept in the cloud as-is.',
+    manualLoadTitle:"Load & Delete",
+    manualLoadDesc:'Tap the <b>📂</b> button in the bottom right to see your saved rounds, and search by course name or year. Tapping a round loads it right away, and the <b>✏ Edit</b> button lets you change the score and My selection later too (reflected immediately in My Score Stats). Delete with the ✕ button in the top right.',
+    manualStatsTitle:"My Score Stats",
+    manualStatsDesc:'Tap <b>📊 My Score Stats</b> at the top of the Load window to see your average/best score, average over par, and the ratio of par/bogey/double-bogey-or-worse at a glance, for the last 10, last 20, or all rounds.',
+    manualLangTitle:"Change Language",
+    manualLangDesc:'Use the <b>🌐 Language</b> button in the top right to switch instantly between Korean, English, Japanese, and Chinese.',
+    manualFooter:"If you have any questions, tap this button again anytime ⛳",
+    manualContactDesc:"For any inquiries, please contact manager@skyjang.com.",
+    statsUnder:"Birdie or better",
+    statsPar:"Par",
+    statsBogey:"Bogey",
+    statsDouble:"Double bogey or worse",
+    statsNoData:"No saved rounds to show stats for.",
+    statsAll:"All",
+    statsRecentN:function(n){ return "Last "+n; },
+    statsTotalRounds:"Total Rounds",
+    statsRecentScore:"Recent Score",
+    statsAvgScore:"Average Score",
+    statsBestScore:"Best Score",
+    statsAvgOverPar:"Average Over Par",
+    loadLoading:"Loading...",
+    loginRequired:"Login required."
+  },
+  ja:{
+    title:"⛳ ゴルフスコアカード",
+    courseNamePlaceholder:"コース名を入力してください",
+    courseSubPlaceholder:"コース(前半/後半) 例: トマト、アップル",
+    langBtn:"🌐 Language",
+    tabSetup:"👥 チーム設定",
+    tabPlay:"🏌️ スコア入力",
+    tabResult:"📋 結果",
+    holeCountLabel:"ホール数選択",
+    hole9:"9ホール",
+    hole18:"18ホール",
+    addTeam:"+ チーム追加 (最大20チーム)",
+    resetAll:"全体初期化",
+    teamNamePlaceholder:"チーム名",
+    playerPlaceholder:function(n){ return "プレイヤー"+n; },
+    removeTeam:"✕ 削除",
+    holeNotePlaceholder:"このホールの特徴を入力(ドッグレッグ、バンカー、OB、グリーンの傾斜など)",
+    prevHole:"◀ 前のホール",
+    nextHole:"次のホール ▶",
+    holeLabel:function(n){ return n+"番ホール"; },
+    courseNameEmpty:"コース名未入力",
+    holesSuffix:"ホール",
+    tableCategory:"区分",
+    tableTotal:"合計",
+    outLabel:"アウト",
+    inLabel:"イン",
+    copyResult:"📋 結果をコピー(SNS共有)",
+    shareModalTitle:"共有方法を選択してください",
+    shareAsText:"📝 テキストでコピー",
+    shareAsImage:"🖼️ 画像でコピー",
+    shareCancel:"キャンセル",
+    toastImageCopied:"画像がコピーされました!SNSに貼り付けてください",
+    toastImageSaved:"画像を保存しました。ギャラリーから共有してください",
+    toastImageFail:"画像の作成に失敗しました",
+    anonymizeLabel:"🙈 共有時に名前を隠す",
+    settlementLabel:"💰 賭けゴルフ精算",
+    settlementDesc:"スコア入力後、1打あたりの金額を入力して「精算する」を押すと、バーディー以上・パー4/5でトリプルボギー以上・パー3でダブルボギー以上が出たホールは2倍で計算し、ホールごとにやり取りする金額を表示します。(保存されず画面にのみ表示されます)",
+    settlementTeamSelectLabel:"精算するチーム",
+    settlementStakePlaceholder:"1打あたりの金額 (例: 1000)",
+    settlementCalcBtn:"精算する",
+    settlementUnit:" ウォン",
+    settlementNeedTwoPlayers:"精算するにはスコアを入力した参加者が2人以上必要です",
+    settlementStakeRequired:"1打あたりの金額を入力してください",
+    settlementAllEven:"やり取りする金額はありません (全員同点)",
+    settlementHoleEven:"同点",
+    settlementDoubleBadge:"2倍",
+    settlementTotalsTitle:"プレイヤー別最終合計",
+    settlementFinalTitle:"最終精算内訳",
+    settlementHolesTitle:"ホール別詳細",
+    settlementHoleCol:"ホール",
+    settlementDoubleCol:"2倍",
+    settlementAmountCol:"精算金額",
+    sortTeamView:"チーム別表示",
+    sortRankView:"🏆 順位別表示",
+    rankColumnHeader:"順位",
+    footer:"Field Golf Scorecard · 会員登録後に保存するとクラウドDBに保存され、いつでも呼び出せます。",
+    toastMaxTeams:"チームは最大20個まで作成できます",
+    toastReset:"初期化されました",
+    toastCopied:"結果がコピーされました!SNSに貼り付けてください",
+    toastCopyFail:"コピーに失敗しました",
+    confirmRemoveTeam:function(name){ return '"'+name+'"チームを削除しますか?'; },
+    confirmReset:"すべてのチーム、スコア、ホール情報を初期化しますか?この操作は元に戻せません。",
+    copyDatePrefix:"📅",
+    copyTotalLabel:"合計",
+    copyFooter:"- Field Golf Scorecard -",
+    ocrTeamLabel:"どのチームの写真ですか?",
+    ocrAddTeamBtn:"+ チーム追加",
+    loadFabTitle:"読み込み",
+    loadModalTitle:"保存したラウンドを読み込む",
+    loadEmpty:"保存されたラウンドがありません",
+    loadBackBtn:"◀ リストに戻る",
+    loadCompanionsLabel:"同伴者",
+    loadTotalLabel:"合計",
+    loadHoleLabel:"ホール",
+    loadParLabel:"パー",
+    loadScoreLabel:"スコア",
+    loadNoCourseName:"コース名未入力",
+    loadNoDate:"日付未入力",
+    loadFetchFail:"読み込みに失敗しました",
+    loadYearAll:"すべての年",
+    loadNoMatch:"該当する結果がありません",
+    loadApplied:"ラウンドを読み込みました",
+    loadCourseFilterPlaceholder:"コース名で検索",
+    manualBtnTitle:"使用説明書",
+    manualBtnText:" 使用説明書",
+    authFabTitle:"アカウント",
+    ocrFabTitle:"写真で入力",
+    saveFabTitle:"クラウド保存",
+    adminFabTitle:"管理者ページ",
+    authModalTitle:"ログイン",
+    googleLoginBtn:"Googleでログイン",
+    kakaoLoginBtn:"Kakaoでログイン",
+    naverLoginBtn:"Naverでログイン",
+    loggedInAs:"ログイン中:",
+    logoutBtn:"ログアウト",
+    ocrModalTitle:"スコアカード写真で入力",
+    ocrIntroP1:'チームごとにスコアカード写真を1枚ずつ選んで「認識開始」を押すと、チーム別に自動認識されて反映されます。チームは下でそのまま追加・削除できます。',
+    ocrIntroP2:"⚠ スキャン後にスコアが正確でない場合は、該当プレイヤーにチェックを入れて再確認を押してください。",
+    ocrAnalyzeBtn:"認識開始",
+    ocrReviewIntro:"スコアがおかしいプレイヤーを選んで再確認を押すと、同じ写真を選んだプレイヤーだけ再度精密に分析します。",
+    ocrReviewBtn:"選択した項目を再確認",
+    ocrSkipReviewBtn:"再確認をスキップ(保存)",
+    saveModalTitle:"ラウンドをクラウドに保存",
+    saveIntroP:"選択したチームの全スコア(本人+同伴者含む)がそのまま保存されます。",
+    saveTeamSelectLabel:"保存するチームを選択",
+    saveConfirmBtn:"保存する",
+    loadIntroP:"リストからラウンドを選ぶと、現在のスコアカードにすぐ読み込まれます。",
+    loadStatsBtn:"📊 マイスコア統計",
+    adminModalTitle:"🛠 管理者ページ",
+    adminGlobalToggleLabel:"管理者を除く全員のアクセスを禁止",
+    adminBlockMsgLabel:'アクセス禁止時に表示するメッセージ(空欄の場合「点検中です。」と表示)',
+    adminBlockMsgPlaceholder:"点検中です。",
+    adminMaxViolationsLabel:"スコアカードでない写真をアップロードした際に自動でアクセス禁止になる警告累積回数 (1~20)",
+    adminSaveGlobalBtn:"設定を保存",
+    adminUsersHeadLabel:"ログインユーザー一覧",
+    adminRefreshBtn:"↻ 更新",
+    adminStorageUsageLink:"📦 Storage使用量を確認 (Firebaseコンソール) ↗",
+    manualModalTitle:"📖 使用説明書",
+    manualLoginTitle:"ログイン",
+    manualLoginDesc:'右下の<b>👤 アカウント</b>ボタンからGoogle・Kakao・Naverでログインすると、ラウンドをクラウドに保存していつでも読み込めます。',
+    manualTeamTitle:"チーム設定",
+    manualTeamDesc:'<b>チーム設定</b>タブでホール数(9ホール/18ホール)を選び、チームを追加して参加者の名前を入力してください。チームは最大20個まで作成できます。',
+    manualScoreTitle:"スコア入力",
+    manualScoreDesc:'<b>スコア入力</b>タブでホールごとにパー(Par)を選び、+/-ボタンで各プレイヤーのスコアをホールごとに記録してください。',
+    manualOcrTitle:"写真でスコア認識",
+    manualOcrDesc:'右下の<b>📷</b>ボタンでチームごとにスコアカード写真を1枚アップロードし、「認識開始」を押すと自動でスコアが入力されます。',
+    manualOcrStep1:'<b>My選択</b>: 自分のスコアを表示します。通常は1行目が自動で選択されますが、自分の写真でない場合は他の人をタップして変更できます。',
+    manualOcrStep2:'<b>選択した項目を再確認</b>: スコアが誤って認識されたプレイヤーだけチェックして押すと、同じ写真を再度精密に分析します。',
+    manualOcrStep3:'<b>再確認をスキップ(保存)</b>: 修正する箇所がなければ、このボタンでそのままウィンドウを閉じられます。',
+    manualOcrStep4:'<b>後で修正したい場合</b>: 保存した後でも📂読み込みリストの<b>✏ 修正</b>ボタンでスコアとMy指定をいつでも変更できます。',
+    manualWarningTitle:"アップロード時の注意事項",
+    manualWarningDesc:'スコアカードではない写真(人物、風景など無関係な写真)をアップロードすると<b>警告ポップアップ</b>が表示されます。警告が<b>2回</b>累積した後、<b>3回目</b>にも同様の写真をアップロードすると、自動的に<b>アクセスが禁止</b>されます。必ず実際のスコアカード写真のみをアップロードしてください。',
+    manualResultTitle:"結果確認 & 共有",
+    manualResultDesc:'<b>結果</b>タブでチーム別・順位別に全スコアを確認でき、表を横にスワイプすると18ホールまですべて見られます。<b>結果をコピー</b>を押すと画像が作成され、KakaoTalkやSNSにそのまま貼り付けられます。',
+    manualCloudSaveTitle:"クラウド保存",
+    manualCloudSaveDesc:'右下の<b>☁</b>ボタンでログイン後に保存するチームを選ぶと、そのチーム全体(本人+同伴者)のホールごとのスコアがそのままクラウドに保管されます。',
+    manualLoadTitle:"読み込み & 削除",
+    manualLoadDesc:'右下の<b>📂</b>ボタンで保存されたラウンド一覧を見て、ゴルフ場名や年で検索できます。リストをタップするとすぐ読み込まれ、<b>✏ 修正</b>ボタンでスコアとMy指定を後から変更することもできます(マイスコア統計にすぐ反映されます)。右上の✕ボタンで削除できます。',
+    manualStatsTitle:"マイスコア統計",
+    manualStatsDesc:'読み込みウィンドウ上部の<b>📊 マイスコア統計</b>ボタンを押すと、直近10回・20回・全体を基準に平均/ベストスコア、平均オーバーパー、パー・ボギー・ダブルボギー以上の割合を一目で確認できます。',
+    manualLangTitle:"言語変更",
+    manualLangDesc:'右上の<b>🌐 Language</b>ボタンで韓国語・英語・日本語・中国語のうち好きな言語にすぐ切り替えられます。',
+    manualFooter:"ご不明な点があれば、このボタンをいつでも再度押してご確認ください ⛳",
+    manualContactDesc:"お問い合わせは manager@skyjang.com までご連絡ください。",
+    statsUnder:"バーディ以上",
+    statsPar:"パー",
+    statsBogey:"ボギー",
+    statsDouble:"ダブルボギー以上",
+    statsNoData:"統計を表示できる保存済みラウンドがありません。",
+    statsAll:"全体",
+    statsRecentN:function(n){ return "直近"+n+"回"; },
+    statsTotalRounds:"総ラウンド数",
+    statsRecentScore:"直近スコア",
+    statsAvgScore:"平均スコア",
+    statsBestScore:"ベストスコア",
+    statsAvgOverPar:"平均オーバーパー",
+    loadLoading:"読み込み中...",
+    loginRequired:"ログインが必要です。"
+  },
+  zh:{
+    title:"⛳ 高尔夫记分卡",
+    courseNamePlaceholder:"请输入球场名称",
+    courseSubPlaceholder:"球道(前九/后九) 例: 番茄,苹果",
+    langBtn:"🌐 Language",
+    tabSetup:"👥 队伍设置",
+    tabPlay:"🏌️ 输入成绩",
+    tabResult:"📋 结果",
+    holeCountLabel:"选择洞数",
+    hole9:"9洞",
+    hole18:"18洞",
+    addTeam:"+ 添加队伍(最多20队)",
+    resetAll:"全部重置",
+    teamNamePlaceholder:"队伍名称",
+    playerPlaceholder:function(n){ return "球员"+n; },
+    removeTeam:"✕ 删除",
+    holeNotePlaceholder:"记录本洞特点(狗腿、沙坑、OB、果岭坡度等)",
+    prevHole:"◀ 上一洞",
+    nextHole:"下一洞 ▶",
+    holeLabel:function(n){ return "第"+n+"洞"; },
+    courseNameEmpty:"未输入球场名称",
+    holesSuffix:"洞",
+    tableCategory:"项目",
+    tableTotal:"总计",
+    outLabel:"前九",
+    inLabel:"后九",
+    copyResult:"📋 复制结果(社交分享)",
+    shareModalTitle:"请选择分享方式",
+    shareAsText:"📝 复制为文本",
+    shareAsImage:"🖼️ 复制为图片",
+    shareCancel:"取消",
+    toastImageCopied:"图片已复制!请粘贴到社交媒体",
+    toastImageSaved:"图片已保存,请从相册分享",
+    toastImageFail:"图片生成失败",
+    anonymizeLabel:"🙈 分享时隐藏姓名",
+    settlementLabel:"💰 打赌结算",
+    settlementDesc:"输入完成绩后,请输入每杆金额并点击“结算”,小鸟球以上、Par4·5三柏忌以上、Par3双柏忌以上出现的球洞将按2倍计算,并显示每洞应付/应收的金额。(不会保存,仅在屏幕上显示)",
+    settlementTeamSelectLabel:"结算的队伍",
+    settlementStakePlaceholder:"每杆金额 (例如: 1000)",
+    settlementCalcBtn:"结算",
+    settlementUnit:" 韩元",
+    settlementNeedTwoPlayers:"至少需要2名已输入成绩的选手才能结算",
+    settlementStakeRequired:"请输入每杆金额",
+    settlementAllEven:"没有需要结算的金额 (全部平局)",
+    settlementHoleEven:"平局",
+    settlementDoubleBadge:"2倍",
+    settlementTotalsTitle:"各选手最终合计",
+    settlementFinalTitle:"最终结算明细",
+    settlementHolesTitle:"逐洞详细记录",
+    settlementHoleCol:"球洞",
+    settlementDoubleCol:"2倍",
+    settlementAmountCol:"结算金额",
+    sortTeamView:"按队伍显示",
+    sortRankView:"🏆 按排名显示",
+    rankColumnHeader:"排名",
+    footer:"Field Golf Scorecard · 注册后保存即可存入云端数据库,随时可以调取。",
+    toastMaxTeams:"最多可以创建20支队伍",
+    toastReset:"已重置",
+    toastCopied:"结果已复制!请粘贴到社交媒体",
+    toastCopyFail:"复制失败",
+    confirmRemoveTeam:function(name){ return '要删除队伍"'+name+'"吗?'; },
+    confirmReset:"要重置所有队伍、成绩和球洞信息吗?此操作无法撤销。",
+    copyDatePrefix:"📅",
+    copyTotalLabel:"总计",
+    copyFooter:"- Field Golf Scorecard -",
+    ocrTeamLabel:"这是哪个队伍的照片?",
+    ocrAddTeamBtn:"+ 添加队伍",
+    loadFabTitle:"加载",
+    loadModalTitle:"加载已保存的回合",
+    loadEmpty:"暂无已保存的回合",
+    loadBackBtn:"◀ 返回列表",
+    loadCompanionsLabel:"同伴",
+    loadTotalLabel:"总计",
+    loadHoleLabel:"洞",
+    loadParLabel:"标准杆",
+    loadScoreLabel:"成绩",
+    loadNoCourseName:"未输入球场名称",
+    loadNoDate:"未输入日期",
+    loadFetchFail:"加载失败",
+    loadYearAll:"全部年份",
+    loadNoMatch:"没有匹配结果",
+    loadApplied:"已加载回合",
+    loadCourseFilterPlaceholder:"搜索球场名称",
+    manualBtnTitle:"使用说明书",
+    manualBtnText:" 使用说明书",
+    authFabTitle:"账户",
+    ocrFabTitle:"拍照录入",
+    saveFabTitle:"云端保存",
+    adminFabTitle:"管理页面",
+    authModalTitle:"登录",
+    googleLoginBtn:"使用 Google 登录",
+    kakaoLoginBtn:"使用 Kakao 登录",
+    naverLoginBtn:"使用 Naver 登录",
+    loggedInAs:"已登录:",
+    logoutBtn:"退出登录",
+    ocrModalTitle:"通过记分卡照片录入",
+    ocrIntroP1:'为每支队伍选择一张记分卡照片,点击"开始识别"即可按队伍自动识别并分别应用。可以在下方直接添加或删除队伍。',
+    ocrIntroP2:"⚠ 扫描后如果成绩不准确,请勾选该球员后点击重新检查。",
+    ocrAnalyzeBtn:"开始识别",
+    ocrReviewIntro:"勾选成绩有误的球员后点击重新检查,会对同一张照片重新进行精细分析,只修改所选球员。",
+    ocrReviewBtn:"重新检查所选",
+    ocrSkipReviewBtn:"跳过重新检查(保存)",
+    saveModalTitle:"将回合保存到云端",
+    saveIntroP:"所选队伍的全部成绩(本人+同伴)将原样保存。",
+    saveTeamSelectLabel:"选择要保存的队伍",
+    saveConfirmBtn:"保存",
+    loadIntroP:"从列表中选择一个回合,即可立即加载到当前记分卡。",
+    loadStatsBtn:"📊 我的成绩统计",
+    adminModalTitle:"🛠 管理页面",
+    adminGlobalToggleLabel:"封禁除管理员外的所有用户",
+    adminBlockMsgLabel:'封禁时显示的提示信息(留空则显示"维护中。")',
+    adminBlockMsgPlaceholder:"维护中。",
+    adminMaxViolationsLabel:"上传非记分卡照片时自动封禁所需的累计警告次数 (1~20)",
+    adminSaveGlobalBtn:"保存设置",
+    adminUsersHeadLabel:"登录用户列表",
+    adminRefreshBtn:"↻ 刷新",
+    adminStorageUsageLink:"📦 查看 Storage 用量(Firebase 控制台)↗",
+    manualModalTitle:"📖 使用说明书",
+    manualLoginTitle:"登录",
+    manualLoginDesc:'点击右下角的<b>👤 账户</b>按钮,使用 Google、Kakao 或 Naver 账号登录后,即可将回合保存到云端并随时重新加载。',
+    manualTeamTitle:"队伍设置",
+    manualTeamDesc:'在<b>队伍设置</b>标签页选择洞数(9洞/18洞),添加队伍并输入参赛者姓名。最多可创建20支队伍。',
+    manualScoreTitle:"输入成绩",
+    manualScoreDesc:'在<b>输入成绩</b>标签页为每个球洞选择标准杆(Par),并用+/-按钮逐洞记录每位球员的成绩。',
+    manualOcrTitle:"通过照片识别成绩",
+    manualOcrDesc:'点击右下角的<b>📷</b>按钮,为每支队伍上传一张记分卡照片,点击"开始识别"即可自动录入成绩。',
+    manualOcrStep1:'<b>My 选择</b>:标记本人的成绩。默认自动选中第一行,如果照片不是本人的,可以点击其他人进行更改。',
+    manualOcrStep2:'<b>重新检查所选</b>:只勾选识别错误的球员并点击此按钮,即可对同一张照片重新进行精细分析。',
+    manualOcrStep3:'<b>跳过重新检查(保存)</b>:如果没有需要修改的地方,可用此按钮直接关闭窗口。',
+    manualOcrStep4:'<b>之后想再修改</b>:保存后仍可通过📂加载列表中的<b>✏ 编辑</b>按钮随时修改成绩和 My 指定。',
+    manualWarningTitle:"上传注意事项",
+    manualWarningDesc:'上传非记分卡照片(人物、风景等无关照片)时会弹出<b>警告提示</b>。累计警告<b>2次</b>后,<b>第3次</b>再次上传时将自动<b>封禁访问权限</b>。请务必只上传真实的记分卡照片。',
+    manualResultTitle:"查看结果 & 分享",
+    manualResultDesc:'在<b>结果</b>标签页可按队伍或排名查看全部成绩,左右滑动表格可查看全部18洞。点击<b>复制结果</b>会生成图片,可直接粘贴到 KakaoTalk 或社交媒体。',
+    manualCloudSaveTitle:"云端保存",
+    manualCloudSaveDesc:'点击右下角的<b>☁</b>按钮,登录后选择要保存的队伍,该队伍全部(本人+同伴)的逐洞成绩将原样保存到云端。',
+    manualLoadTitle:"加载 & 删除",
+    manualLoadDesc:'点击右下角的<b>📂</b>按钮查看已保存的回合列表,可按球场名称或年份搜索。点击列表即可立即加载,<b>✏ 编辑</b>按钮可随时修改成绩和 My 指定(会立即反映到我的成绩统计)。可用右上角的✕按钮删除。',
+    manualStatsTitle:"我的成绩统计",
+    manualStatsDesc:'点击加载窗口上方的<b>📊 我的成绩统计</b>按钮,即可一目了然地查看最近10次·20次·全部的平均/最佳成绩、平均超标杆数,以及标准杆·柏忌·双柏忌以上的比例。',
+    manualLangTitle:"更改语言",
+    manualLangDesc:'使用右上角的<b>🌐 Language</b>按钮,可在韩语、英语、日语、中文之间随时切换。',
+    manualFooter:"如有疑问,请随时再次点击此按钮查看 ⛳",
+    manualContactDesc:"如有疑问,请联系 manager@skyjang.com。",
+    statsUnder:"小鸟球以上",
+    statsPar:"标准杆",
+    statsBogey:"柏忌",
+    statsDouble:"双柏忌以上",
+    statsNoData:"没有可用于统计的已保存回合。",
+    statsAll:"全部",
+    statsRecentN:function(n){ return "最近"+n+"次"; },
+    statsTotalRounds:"总回合数",
+    statsRecentScore:"最近成绩",
+    statsAvgScore:"平均成绩",
+    statsBestScore:"最佳成绩",
+    statsAvgOverPar:"平均超标杆数",
+    loadLoading:"加载中...",
+    loginRequired:"需要登录。"
+  }
+};
+
+function t(key){
+  var dict = I18N[(state && state.lang) || 'ko'];
+  var v = dict[key];
+  if(typeof v === 'function'){
+    var args = Array.prototype.slice.call(arguments, 1);
+    return v.apply(null, args);
+  }
+  return v;
+}
+
+
+/* ---------------- Language switcher ---------------- */
+var langBtn = document.getElementById('langBtn');
+var langDropdown = document.getElementById('langDropdown');
+
+langBtn.addEventListener('click', function(e){
+  e.stopPropagation();
+  langDropdown.classList.toggle('show');
+});
+document.addEventListener('click', function(){
+  langDropdown.classList.remove('show');
+});
+langDropdown.addEventListener('click', function(e){
+  var btn = e.target.closest('button[data-lang]');
+  if(!btn) return;
+  e.stopPropagation();
+  state.lang = btn.dataset.lang;
+  relocalizeDefaultPlayerNames();
+  save();
+  langDropdown.classList.remove('show');
+  applyStaticTranslations();
+  renderAll();
+  // 로그인 상태라면 이 언어를 계정의 "기본 언어"로도 저장해서, 다음에 다른
+  // 기기/브라우저에서 이 계정으로 로그인했을 때도 자동으로 적용되게 합니다
+  // (js/auth.js의 applyPreferredLanguage). 로그인 안 한 상태면 아무 일도
+  // 일어나지 않고, 방금 위에서 저장한 이 브라우저의 localStorage만 적용됩니다.
+  if(window.__sjAuth && typeof window.__sjAuth.savePreferredLanguage === 'function'){
+    window.__sjAuth.savePreferredLanguage(state.lang);
+  }
+});
+
+/* True if this name is still one of the auto-generated default names (in any supported language),
+   i.e. the user never customized it, so it's safe to translate. */
+function isDefaultPlayerName(name, idx){
+  return Object.keys(I18N).some(function(lang){
+    return I18N[lang].playerPlaceholder(idx+1) === name;
+  });
+}
+
+function relocalizeDefaultPlayerNames(){
+  state.teams.forEach(function(team){
+    team.players.forEach(function(pname, pi){
+      if(isDefaultPlayerName(pname, pi)){
+        team.players[pi] = t('playerPlaceholder', pi+1);
+      }
+    });
+  });
+}
+
+function applyStaticTranslations(){
+  document.documentElement.lang = state.lang;
+  document.title = t('title');
+  document.getElementById('appTitle').textContent = t('title');
+  document.getElementById('courseName').placeholder = t('courseNamePlaceholder');
+  document.getElementById('courseSub').placeholder = t('courseSubPlaceholder');
+  document.getElementById('tabSetupBtn').textContent = t('tabSetup');
+  document.getElementById('tabPlayBtn').textContent = t('tabPlay');
+  document.getElementById('tabResultBtn').textContent = t('tabResult');
+  document.getElementById('holeCountLabel').textContent = t('holeCountLabel');
+  document.getElementById('hole9Btn').textContent = t('hole9');
+  document.getElementById('hole18Btn').textContent = t('hole18');
+  document.getElementById('addTeamBtn').textContent = t('addTeam');
+  document.getElementById('resetBtn').textContent = t('resetAll');
+  document.getElementById('holeNote').placeholder = t('holeNotePlaceholder');
+  document.getElementById('prevHoleBtn').textContent = t('prevHole');
+  document.getElementById('nextHoleBtn').textContent = t('nextHole');
+  document.getElementById('copyBtn').textContent = t('copyResult');
+  document.getElementById('shareModalTitle').textContent = t('shareModalTitle');
+  document.getElementById('shareAsTextBtn').textContent = t('shareAsText');
+  document.getElementById('shareAsImageBtn').textContent = t('shareAsImage');
+  document.getElementById('shareCancelBtn').textContent = t('shareCancel');
+  document.getElementById('anonymizeLabel').textContent = t('anonymizeLabel');
+  var settlementLabelEl = document.getElementById('settlementLabel');
+  if(settlementLabelEl) settlementLabelEl.textContent = t('settlementLabel');
+  var settlementDescEl = document.getElementById('settlementDesc');
+  if(settlementDescEl) settlementDescEl.textContent = t('settlementDesc');
+  var settlementTeamSelectLabelEl = document.getElementById('settlementTeamSelectLabel');
+  if(settlementTeamSelectLabelEl) settlementTeamSelectLabelEl.textContent = t('settlementTeamSelectLabel');
+  var settlementStakeInputEl = document.getElementById('settlementStakeInput');
+  if(settlementStakeInputEl) settlementStakeInputEl.placeholder = t('settlementStakePlaceholder');
+  var settlementCalcBtnEl = document.getElementById('settlementCalcBtn');
+  if(settlementCalcBtnEl) settlementCalcBtnEl.textContent = t('settlementCalcBtn');
+  document.getElementById('sortTeamBtn').textContent = t('sortTeamView');
+  document.getElementById('sortRankBtn').textContent = t('sortRankView');
+  document.getElementById('footerText').textContent = t('footer');
+  var ocrTeamLabelEl = document.getElementById('sjOcrTeamLabel');
+  if(ocrTeamLabelEl) ocrTeamLabelEl.textContent = t('ocrTeamLabel');
+  var ocrAddTeamBtnEl = document.getElementById('sjOcrAddTeamBtn');
+  if(ocrAddTeamBtnEl) ocrAddTeamBtnEl.textContent = t('ocrAddTeamBtn');
+  var loadFabEl = document.getElementById('sjLoadFab');
+  if(loadFabEl) loadFabEl.title = t('loadFabTitle');
+  var loadModalTitleEl = document.getElementById('sjLoadModalTitle');
+  if(loadModalTitleEl) loadModalTitleEl.textContent = t('loadModalTitle');
+  var loadCourseFilterEl = document.getElementById('sjLoadCourseFilter');
+  if(loadCourseFilterEl) loadCourseFilterEl.placeholder = t('loadCourseFilterPlaceholder');
+  Array.prototype.forEach.call(langDropdown.querySelectorAll('button[data-lang]'), function(b){
+    b.classList.toggle('active', b.dataset.lang === state.lang);
+  });
+
+  var manualBtnTitleEl = document.getElementById('sjManualBtn');
+  if(manualBtnTitleEl) manualBtnTitleEl.title = t('manualBtnTitle');
+  var manualBtnTextEl = document.querySelector('#sjManualBtn .manual-btn-text');
+  if(manualBtnTextEl) manualBtnTextEl.textContent = t('manualBtnText');
+  var authFabEl = document.getElementById('sjAuthFab');
+  if(authFabEl) authFabEl.title = t('authFabTitle');
+  var ocrFabEl = document.getElementById('sjOcrFab');
+  if(ocrFabEl) ocrFabEl.title = t('ocrFabTitle');
+  var saveFabEl = document.getElementById('sjSaveFab');
+  if(saveFabEl) saveFabEl.title = t('saveFabTitle');
+  var adminFabEl = document.getElementById('sjAdminFab');
+  if(adminFabEl) adminFabEl.title = t('adminFabTitle');
+
+  /* Generic pass for every other newly-added translatable element --
+     the auth/ocr/save/load/admin/manual modal chrome. Keeping these on
+     data-i18n* attributes (instead of one getElementById line per
+     element like the block above) is what makes the large manual
+     modal content and the admin panel labels manageable to translate. */
+  Array.prototype.forEach.call(document.querySelectorAll('[data-i18n]'), function(el){
+    var v = t(el.getAttribute('data-i18n'));
+    if(v !== undefined) el.textContent = v;
+  });
+  Array.prototype.forEach.call(document.querySelectorAll('[data-i18n-html]'), function(el){
+    var v = t(el.getAttribute('data-i18n-html'));
+    if(v !== undefined) el.innerHTML = v;
+  });
+  Array.prototype.forEach.call(document.querySelectorAll('[data-i18n-title]'), function(el){
+    var v = t(el.getAttribute('data-i18n-title'));
+    if(v !== undefined) el.title = v;
+  });
+  Array.prototype.forEach.call(document.querySelectorAll('[data-i18n-placeholder]'), function(el){
+    var v = t(el.getAttribute('data-i18n-placeholder'));
+    if(v !== undefined) el.placeholder = v;
+  });
+}
+
