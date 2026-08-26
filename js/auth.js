@@ -268,7 +268,11 @@ function openNativeProviderLogin(provider){
     return;
   }
   setStatus((provider === "kakao" ? "카카오" : "네이버") + " 로그인 중...");
-  Browser.open({ url: NATIVE_AUTH_WEB_URL + "?nativeLogin=" + provider }).catch(function(e){
+  // toolbarColor: 이 브라우저 창의 상단 주소창 바탕색입니다. iOS 정책상 실제
+  // 웹사이트 주소(tonadojb.github.io)를 사용자에게 숨길 수는 없지만(피싱 방지를
+  // 위해 애플이 요구하는 부분), 색깔만큼은 앱의 기본 브랜드 색(styles.css의
+  // --primary)에 맞춰서 화면 전환이 조금 더 자연스럽게 보이도록 했습니다.
+  Browser.open({ url: NATIVE_AUTH_WEB_URL + "?nativeLogin=" + provider, toolbarColor: "#4338ca" }).catch(function(e){
     setStatus("오류: " + (e && e.message ? e.message : e), true);
   });
 }
@@ -308,7 +312,14 @@ var __sjNativeLoginTarget = new URLSearchParams(window.location.search).get("nat
 
 function redirectTokenToApp(provider, accessToken){
   setStatus("로그인 완료! 앱으로 돌아가는 중...");
-  window.location.href = NATIVE_AUTH_SCHEME + "://authcallback?provider=" + encodeURIComponent(provider) + "&access_token=" + encodeURIComponent(accessToken);
+  var url = NATIVE_AUTH_SCHEME + "://authcallback?provider=" + encodeURIComponent(provider) + "&access_token=" + encodeURIComponent(accessToken);
+  // 위 setStatus() 직후 바로 페이지를 이동시키면 브라우저가 "로그인 완료!" 문구를
+  // 화면에 그릴 틈도 없이 넘어가버려서, 방금 전 "OO 로그인 중..." 문구가 그대로
+  // 남아있는 것처럼 보일 수 있습니다. 아주 짧게 쉬었다가 이동해서 이 문구가
+  // 실제로 화면에 표시되도록 합니다.
+  setTimeout(function(){
+    window.location.href = url;
+  }, 400);
 }
 
 // ---- 카카오 로그인 ----
