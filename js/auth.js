@@ -310,8 +310,23 @@ if(isNativeApp()){
 // 보여주는 대신 커스텀 스킴으로 앱에 토큰을 넘기고 돌아갑니다.
 var __sjNativeLoginTarget = new URLSearchParams(window.location.search).get("nativeLogin");
 
+if(__sjNativeLoginTarget){
+  // 이 페이지는 네이티브 앱이 로그인 중계용으로 잠깐 연 것뿐인데, 이 브라우저가
+  // (시스템 Safari와 로그인 상태를 공유하다 보니) 예전에 이 사이트에 로그인해둔
+  // 계정을 그대로 보여주는 경우가 있습니다. 지금은 그 정보가 오히려 "로그인
+  // 중인데 이미 로그인됨?" 처럼 혼란만 주므로, 진행 상황 문구만 보이도록
+  // 로그인/로그아웃 영역을 숨기고 모달을 강제로 열어둡니다.
+  var __sjBridgeLoggedOut = sj("sjAuthLoggedOut");
+  var __sjBridgeLoggedIn = sj("sjAuthLoggedIn");
+  if(__sjBridgeLoggedOut) __sjBridgeLoggedOut.style.display = "none";
+  if(__sjBridgeLoggedIn) __sjBridgeLoggedIn.style.display = "none";
+  var __sjBridgeModal = sj("sjAuthModal");
+  if(__sjBridgeModal) __sjBridgeModal.classList.add("open");
+  setStatus((__sjNativeLoginTarget === "kakao" ? "카카오" : "네이버") + " 로그인 진행 중입니다...");
+}
+
 function redirectTokenToApp(provider, accessToken){
-  setStatus("로그인 완료! 앱으로 돌아가는 중...");
+  setStatus((provider === "kakao" ? "카카오" : "네이버") + " 로그인 성공! 앱으로 돌아가는 중...");
   var url = NATIVE_AUTH_SCHEME + "://authcallback?provider=" + encodeURIComponent(provider) + "&access_token=" + encodeURIComponent(accessToken);
   // 위 setStatus() 직후 바로 페이지를 이동시키면 브라우저가 "로그인 완료!" 문구를
   // 화면에 그릴 틈도 없이 넘어가버려서, 방금 전 "OO 로그인 중..." 문구가 그대로
@@ -546,6 +561,14 @@ function renderAuthUI(user){
   var loggedOut = sj("sjAuthLoggedOut");
   var loggedIn = sj("sjAuthLoggedIn");
   var adminFab = sj("sjAdminFab");
+  if(__sjNativeLoginTarget){
+    // 이 브라우저 탭이 (시스템 Safari와 로그인 상태를 공유해서) 예전 로그인
+    // 세션을 뒤늦게 감지하더라도, 네이티브 앱 로그인 중계 중에는 계속 숨겨둡니다
+    // -- 위 부트스트랩 코드의 설명을 참고하세요.
+    if(loggedOut) loggedOut.style.display = "none";
+    if(loggedIn) loggedIn.style.display = "none";
+    return;
+  }
   if(user){
     if(loggedOut) loggedOut.style.display = "none";
     if(loggedIn) loggedIn.style.display = "block";

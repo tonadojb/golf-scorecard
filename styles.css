@@ -87,7 +87,7 @@ table td.even{color:var(--text);}
 .settlement-inline-label{font-size:12px;font-weight:700;color:var(--primary-dark);display:block;margin-bottom:6px;}
 #settlementTeamSelect{width:100%;padding:8px 10px;border-radius:8px;border:1px solid #d7d8ec;font-weight:600;color:var(--text);margin-bottom:10px;background:#fff;}
 .settlement-input-row{display:flex;gap:8px;margin-bottom:12px;}
-.settlement-input-row input{flex:1;min-width:0;padding:10px;border-radius:8px;border:1px solid #d7d8ec;font-weight:600;}
+.settlement-input-row input{flex:1;min-width:0;padding:10px;border-radius:8px;border:1px solid #d7d8ec;font-weight:600;font-size:16px;}
 .settlement-input-row .btn-primary{width:auto;flex:0 0 auto;margin-bottom:0;padding:10px 16px;}
 .settlement-subtitle{font-size:13px;font-weight:700;color:var(--primary-dark);margin:14px 0 6px;}
 .settlement-table{width:100%;border-collapse:collapse;font-size:13px;}
