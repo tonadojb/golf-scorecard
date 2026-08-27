@@ -223,22 +223,19 @@ if(googleBtn){
 // 완료합니다. 예전에는 카카오/네이버 각각에 거의 같은 코드가 따로 있었는데, 이번에
 // "네이티브 앱에서는 시스템 브라우저를 거쳐 돌아온 토큰으로도 로그인을 완료해야 하는"
 // 세 번째 경로(아래 appUrlOpen 리스너)가 추가되면서 하나로 합쳤습니다.
-// 카카오/네이버 모두 각자의 리다이렉트 단계 자체는 페이지 이동이라 멈출 일이
-// 없지만, 그 이후 공통으로 거치는 이 서버 왕복(kakaoAuth/naverAuth 호출 →
-// Firebase 커스텀 토큰으로 로그인)에는 안전장치가 전혀 없었습니다. 여기서
-// 응답이 없으면(서버 콜드 스타트, 네트워크 문제 등) "OO 로그인 처리 중..."
-// 문구에서 영원히 멈춰있고 원인도 알 수 없었던 부분이라, 구글 네이티브
-// 로그인과 같은 방식(withTimeout)으로 각 단계를 감싸서 일정 시간 안에 응답이
-// 없으면 구체적인 에러가 뜨도록 했습니다.
-// payload는 provider별로 다릅니다: 네이버는 { accessToken }, 카카오는
-// { code, redirectUri }(팝업 대신 리다이렉트 방식으로 바꾸면서 액세스 토큰이
-// 아니라 인가 코드만 받기 때문 -- 아래 카카오 로그인 섹션 설명 참고).
-function finishProviderLogin(provider, payload, authUrl){
+// 카카오/네이버 각각의 팝업(카카오)/리다이렉트(네이버) 자체는 아래에서 따로
+// 타임아웃을 두지만, 그 이후 공통으로 거치는 이 서버 왕복(kakaoAuth/naverAuth
+// 호출 → Firebase 커스텀 토큰으로 로그인)에는 안전장치가 전혀 없었습니다.
+// 여기서 응답이 없으면(서버 콜드 스타트, 네트워크 문제 등) "OO 로그인 처리
+// 중..." 문구에서 영원히 멈춰있고 원인도 알 수 없었던 부분이라, 구글
+// 네이티브 로그인과 같은 방식(withTimeout)으로 각 단계를 감싸서 일정 시간
+// 안에 응답이 없으면 구체적인 에러가 뜨도록 했습니다.
+function finishProviderLogin(provider, accessToken, authUrl){
   var providerLabel = provider === "kakao" ? "카카오" : "네이버";
   withTimeout(fetch(authUrl, {
     method: "POST",
     headers: { "Content-Type": "application/json" },
-    body: JSON.stringify(payload)
+    body: JSON.stringify({ accessToken: accessToken })
   }).then(function(res){ return res.json(); }), 20000, providerLabel + " 로그인 서버 처리")
     .then(function(data){
       if(data && data.error){ throw new Error(data.error); }
@@ -306,24 +303,13 @@ if(isNativeApp()){
       var qIndex = url.indexOf("?");
       var params = new URLSearchParams(qIndex >= 0 ? url.slice(qIndex + 1) : "");
       var provider = params.get("provider");
-      if(provider === "kakao"){
-        var code = params.get("code");
-        var redirectUri = params.get("redirect_uri");
-        if(!code || !redirectUri){
-          setStatus("로그인 결과를 확인하지 못했습니다.", true);
-          return;
-        }
-        setStatus("카카오 로그인 처리 중...");
-        finishProviderLogin("kakao", { code: code, redirectUri: redirectUri }, KAKAO_AUTH_URL);
-        return;
-      }
       var accessToken = params.get("access_token");
       if(!provider || !accessToken){
         setStatus("로그인 결과를 확인하지 못했습니다.", true);
         return;
       }
-      setStatus("네이버 로그인 처리 중...");
-      finishProviderLogin("naver", { accessToken: accessToken }, NAVER_AUTH_URL);
+      setStatus((provider === "kakao" ? "카카오" : "네이버") + " 로그인 처리 중...");
+      finishProviderLogin(provider, accessToken, provider === "kakao" ? KAKAO_AUTH_URL : NAVER_AUTH_URL);
     });
   }
 }
@@ -348,16 +334,9 @@ if(__sjNativeLoginTarget){
   setStatus((__sjNativeLoginTarget === "kakao" ? "카카오" : "네이버") + " 로그인 진행 중입니다...");
 }
 
-// payload: 카카오는 { code, redirectUri }, 네이버는 { accessToken } -- 카카오는
-// 리다이렉트 방식에서 액세스 토큰을 바로 안 주고 인가 코드만 주기 때문에
-// 커스텀 스킴으로도 code/redirect_uri를 그대로 넘겨서, 앱이 받은 뒤 다시
-// finishProviderLogin에서 서버(kakaoAuth)로 보내 액세스 토큰과 교환합니다.
-function redirectTokenToApp(provider, payload){
+function redirectTokenToApp(provider, accessToken){
   setStatus((provider === "kakao" ? "카카오" : "네이버") + " 로그인 성공! 앱으로 돌아가는 중...");
-  var qs = provider === "kakao"
-    ? ("code=" + encodeURIComponent(payload.code) + "&redirect_uri=" + encodeURIComponent(payload.redirectUri))
-    : ("access_token=" + encodeURIComponent(payload.accessToken));
-  var url = NATIVE_AUTH_SCHEME + "://authcallback?provider=" + encodeURIComponent(provider) + "&" + qs;
+  var url = NATIVE_AUTH_SCHEME + "://authcallback?provider=" + encodeURIComponent(provider) + "&access_token=" + encodeURIComponent(accessToken);
   // 위 setStatus() 직후 바로 페이지를 이동시키면 브라우저가 "로그인 완료!" 문구를
   // 화면에 그릴 틈도 없이 넘어가버려서, 방금 전 "OO 로그인 중..." 문구가 그대로
   // 남아있는 것처럼 보일 수 있습니다. 아주 짧게 쉬었다가 이동해서 이 문구가
@@ -368,46 +347,46 @@ function redirectTokenToApp(provider, payload){
 }
 
 // ---- 카카오 로그인 ----
-// 예전에는 window.Kakao.Auth.login()으로 kauth.kakao.com 팝업 창을 띄우고
-// success/fail 콜백으로 결과를 받았습니다. 그런데 네이티브 앱이 여는 인앱
-// 브라우저(SFSafariViewController)는 window.open()으로 여는 팝업을 제대로
-// 지원하지 않아서(iOS 자체의 알려진 제약 -- 새 탭 UI가 없어서 팝업이 열려도
-// 부모 창과 통신할 방법이 없음), success/fail 콜백이 영영 호출되지 않고
-// "카카오 로그인 중..."에 멈춰있었습니다(withTimeout 안전장치로 처음 확인됨).
-// 네이버가 이미 쓰고 있는 것과 같은 "페이지 전체 이동" 방식(Auth.authorize)으로
-// 바꿔서 팝업 자체를 없앴습니다. 다만 카카오는 이 방식에서 액세스 토큰을 바로
-// 안 주고 "인가 코드"만 주기 때문에(카카오 정책상 고정, 토큰 직접 반환 미지원),
-// 실제 액세스 토큰 교환은 서버(kakaoAuth 함수)에서 코드를 받아 처리합니다.
 function ensureKakaoInit(){
   if(window.Kakao && !window.Kakao.isInitialized()){
     window.Kakao.init(KAKAO_JS_KEY);
   }
 }
 
-// 카카오 개발자센터의 "카카오 로그인 리다이렉트 URI"에 등록해둔 값과 정확히
-// 일치해야 합니다(현재 https://app.skyjang.com/ 로 등록). 네이티브 앱이 연
-// 시스템(인앱) 브라우저 안에서도 이 코드는 실제 이 웹사이트 주소에서만
-// 실행되므로, 쿼리스트링(?nativeLogin=kakao)을 뺀 origin+pathname을 그대로
-// 씁니다 -- 네이버 콜백 URL과 동일한 방식입니다.
-function kakaoRedirectUri(){
-  return window.location.origin + window.location.pathname;
+// window.Kakao.Auth.login()은 카카오가 kauth.kakao.com 팝업 창을 띄우고 그
+// 창에서의 결과를 success/fail 콜백으로 알려주는 방식입니다. 그런데 이 팝업이
+// (브라우저/확장 프로그램의 팝업 차단, 팝업 안에서의 다른 오류 등으로) 제대로
+// 안 열리거나 응답을 못 받으면 두 콜백 다 영원히 호출되지 않아서, 화면은 그냥
+// "카카오 로그인 중..."에 멈춰있고 콘솔에도 아무 단서가 안 남았습니다. 아래
+// kakaoAuthLoginPromise()로 콜백을 Promise로 감싼 뒤 withTimeout을 씌워서,
+// 일정 시간 안에 응답이 없으면 그걸 명확한 에러로 바꿔줍니다.
+function kakaoAuthLoginPromise(){
+  return new Promise(function(resolve, reject){
+    window.Kakao.Auth.login({
+      success: function(authObj){ resolve(authObj); },
+      fail: function(err){
+        var msg = (err && (err.error_description || err.error)) || JSON.stringify(err);
+        reject(new Error(msg));
+      }
+    });
+  });
 }
 
-// 네이티브 앱 중계 여부는 authorize() 호출 시점의 __sjNativeLoginTarget으로
-// 판단해서 state 파라미터에 실어 보냅니다 -- 카카오가 돌아올 때 이 state를
-// 그대로 돌려주므로, 리다이렉트로 돌아온 새 페이지 로드에서도(주소가
-// ?code=...&state=... 로 바뀌어 nativeLogin 쿼리가 사라진 뒤에도) 이 흐름이
-// 네이티브 앱 중계용이었는지를 정확히 복원할 수 있습니다.
-function startKakaoLoginFlow(){
+// onToken이 있으면(=네이티브 앱이 연 시스템 브라우저 탭인 경우) 이 브라우저 탭에서
+// 바로 로그인을 마무리하지 않고, 받은 액세스 토큰을 그대로 onToken에 넘겨서
+// 앱으로 돌려보내는 데에만 씁니다.
+function startKakaoLoginFlow(onToken){
   if(!window.Kakao){
     setStatus("카카오 SDK를 불러오지 못했습니다.", true);
     return;
   }
   ensureKakaoInit();
   setStatus("카카오 로그인 중...");
-  window.Kakao.Auth.authorize({
-    redirectUri: kakaoRedirectUri(),
-    state: __sjNativeLoginTarget === "kakao" ? "nativeLogin=kakao" : ""
+  withTimeout(kakaoAuthLoginPromise(), 25000, "카카오 로그인").then(function(authObj){
+    if(onToken){ onToken(authObj.access_token); return; }
+    finishProviderLogin("kakao", authObj.access_token, KAKAO_AUTH_URL);
+  }).catch(function(e){
+    setStatus("카카오 로그인 실패: " + (e && e.message ? e.message : e), true);
   });
 }
 
@@ -422,41 +401,13 @@ if(kakaoBtn){
   });
 }
 
-function extractKakaoCode(){
-  return new URLSearchParams(window.location.search).get("code");
-}
-
-function handleKakaoLoginSuccess(){
-  var code = extractKakaoCode();
-  if(!code){
-    setStatus("카카오 로그인 코드를 확인하지 못했습니다.", true);
-    return;
-  }
-  var redirectUri = kakaoRedirectUri();
-  // 주소창에 남은 code/state 쿼리를 지워서 새로고침해도 반복 처리되지
-  // 않도록 정리합니다(code는 이미 위에서 변수로 꺼내뒀으므로 지금 지워도 안전).
-  if(window.history && window.history.replaceState){
-    window.history.replaceState(null, "", window.location.pathname);
-  }
-  if(__sjNativeLoginTarget === "kakao"){
-    redirectTokenToApp("kakao", { code: code, redirectUri: redirectUri });
-    return;
-  }
-  setStatus("카카오 로그인 처리 중...");
-  finishProviderLogin("kakao", { code: code, redirectUri: redirectUri }, KAKAO_AUTH_URL);
-}
-
 // 네이티브 앱이 열어준 시스템 브라우저 탭이면, 사용자가 버튼을 다시 누르지 않아도
-// 바로 카카오 로그인을 시작합니다(단, 아직 코드를 안 받아온 첫 진입일 때만 --
-// 카카오 리다이렉트로 돌아온 두 번째 로드에서는 다시 시작하면 안 됩니다).
-if(__sjNativeLoginTarget === "kakao" && window.Kakao && !extractKakaoCode()){
-  startKakaoLoginFlow();
-}
-
-// 카카오 로그인 후 이 페이지로 돌아왔을 때(=주소에 "?code=..."가 실제로
-// 붙어있을 때)만 로그인 처리를 이어갑니다.
-if(extractKakaoCode()){
-  handleKakaoLoginSuccess();
+// 바로 카카오 로그인을 시작합니다 (kakao.js는 이 스크립트보다 먼저 로드되는
+// defer 스크립트라 이 시점엔 이미 window.Kakao를 쓸 수 있습니다).
+if(__sjNativeLoginTarget === "kakao" && window.Kakao){
+  startKakaoLoginFlow(function(accessToken){
+    redirectTokenToApp("kakao", accessToken);
+  });
 }
 
 // ---- 네이버 로그인 ----
@@ -515,11 +466,11 @@ function handleNaverLoginSuccess(){
     window.history.replaceState(null, "", window.location.pathname + window.location.search);
   }
   if(__sjNativeLoginTarget === "naver"){
-    redirectTokenToApp("naver", { accessToken: accessToken });
+    redirectTokenToApp("naver", accessToken);
     return;
   }
   setStatus("네이버 로그인 처리 중...");
-  finishProviderLogin("naver", { accessToken: accessToken }, NAVER_AUTH_URL);
+  finishProviderLogin("naver", accessToken, NAVER_AUTH_URL);
 }
 
 // 네이버 로그인 후 이 페이지로 돌아왔을 때(=주소 뒤에 "#access_token=..."이 실제로
