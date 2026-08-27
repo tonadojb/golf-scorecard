@@ -223,23 +223,15 @@ if(googleBtn){
 // 완료합니다. 예전에는 카카오/네이버 각각에 거의 같은 코드가 따로 있었는데, 이번에
 // "네이티브 앱에서는 시스템 브라우저를 거쳐 돌아온 토큰으로도 로그인을 완료해야 하는"
 // 세 번째 경로(아래 appUrlOpen 리스너)가 추가되면서 하나로 합쳤습니다.
-// 카카오/네이버 각각의 팝업(카카오)/리다이렉트(네이버) 자체는 아래에서 따로
-// 타임아웃을 두지만, 그 이후 공통으로 거치는 이 서버 왕복(kakaoAuth/naverAuth
-// 호출 → Firebase 커스텀 토큰으로 로그인)에는 안전장치가 전혀 없었습니다.
-// 여기서 응답이 없으면(서버 콜드 스타트, 네트워크 문제 등) "OO 로그인 처리
-// 중..." 문구에서 영원히 멈춰있고 원인도 알 수 없었던 부분이라, 구글
-// 네이티브 로그인과 같은 방식(withTimeout)으로 각 단계를 감싸서 일정 시간
-// 안에 응답이 없으면 구체적인 에러가 뜨도록 했습니다.
 function finishProviderLogin(provider, accessToken, authUrl){
-  var providerLabel = provider === "kakao" ? "카카오" : "네이버";
-  withTimeout(fetch(authUrl, {
+  fetch(authUrl, {
     method: "POST",
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify({ accessToken: accessToken })
-  }).then(function(res){ return res.json(); }), 20000, providerLabel + " 로그인 서버 처리")
+  }).then(function(res){ return res.json(); })
     .then(function(data){
       if(data && data.error){ throw new Error(data.error); }
-      return withTimeout(signInWithCustomToken(auth, data.customToken), 15000, providerLabel + " 로그인 연결").then(function(result){
+      return signInWithCustomToken(auth, data.customToken).then(function(result){
         return { result: result, displayName: data.displayName, photoURL: data.photoURL };
       });
     }).then(function(o){
@@ -353,25 +345,6 @@ function ensureKakaoInit(){
   }
 }
 
-// window.Kakao.Auth.login()은 카카오가 kauth.kakao.com 팝업 창을 띄우고 그
-// 창에서의 결과를 success/fail 콜백으로 알려주는 방식입니다. 그런데 이 팝업이
-// (브라우저/확장 프로그램의 팝업 차단, 팝업 안에서의 다른 오류 등으로) 제대로
-// 안 열리거나 응답을 못 받으면 두 콜백 다 영원히 호출되지 않아서, 화면은 그냥
-// "카카오 로그인 중..."에 멈춰있고 콘솔에도 아무 단서가 안 남았습니다. 아래
-// kakaoAuthLoginPromise()로 콜백을 Promise로 감싼 뒤 withTimeout을 씌워서,
-// 일정 시간 안에 응답이 없으면 그걸 명확한 에러로 바꿔줍니다.
-function kakaoAuthLoginPromise(){
-  return new Promise(function(resolve, reject){
-    window.Kakao.Auth.login({
-      success: function(authObj){ resolve(authObj); },
-      fail: function(err){
-        var msg = (err && (err.error_description || err.error)) || JSON.stringify(err);
-        reject(new Error(msg));
-      }
-    });
-  });
-}
-
 // onToken이 있으면(=네이티브 앱이 연 시스템 브라우저 탭인 경우) 이 브라우저 탭에서
 // 바로 로그인을 마무리하지 않고, 받은 액세스 토큰을 그대로 onToken에 넘겨서
 // 앱으로 돌려보내는 데에만 씁니다.
@@ -382,11 +355,14 @@ function startKakaoLoginFlow(onToken){
   }
   ensureKakaoInit();
   setStatus("카카오 로그인 중...");
-  withTimeout(kakaoAuthLoginPromise(), 25000, "카카오 로그인").then(function(authObj){
-    if(onToken){ onToken(authObj.access_token); return; }
-    finishProviderLogin("kakao", authObj.access_token, KAKAO_AUTH_URL);
-  }).catch(function(e){
-    setStatus("카카오 로그인 실패: " + (e && e.message ? e.message : e), true);
+  window.Kakao.Auth.login({
+    success: function(authObj){
+      if(onToken){ onToken(authObj.access_token); return; }
+      finishProviderLogin("kakao", authObj.access_token, KAKAO_AUTH_URL);
+    },
+    fail: function(err){
+      setStatus("카카오 로그인 실패: " + JSON.stringify(err), true);
+    }
   });
 }
 
