@@ -43,15 +43,12 @@ var NAVER_CLIENT_ID = "jdkW2uYK23DCwxrCeVWu";
 // 앱 안의 WKWebView는 항상 "capacitor://localhost" 라는 특수 주소에서 실행되고,
 // iOS에서는 이 주소를 http/https로 바꿀 방법이 없습니다(WKWebView가 http/https는
 // 이미 자체적으로 처리하는 스킴이라 Capacitor가 가로챌 수 없음). 그래서 카카오/네이버
-// 로그인만큼은 앱 내부가 아니라 실제 이 웹사이트(커스텀 도메인 golfscore.skyjang.com,
+// 로그인만큼은 앱 내부가 아니라 실제 이 웹사이트(커스텀 도메인 app.skyjang.com,
 // GitHub Pages를 이 도메인으로 연결해둔 것이며 이미 양쪽 개발자센터에 등록되어
-// 있는 정상적인 https 주소 -- 2026-08-28 이전에는 app.skyjang.com이었는데, 나중에
-// skyjang.com 아래 다른 앱을 추가로 만들 것을 대비해 앱마다 구분되는 서브도메인을
-// 쓰기로 하고 이 골프 스코어카드 앱은 golfscore.skyjang.com으로 옮겼습니다)를
-// 시스템 브라우저로 열어서 진행하고, 로그인이 끝나면 아래 커스텀 URL Scheme으로
-// 다시 앱으로 돌아옵니다
+// 있는 정상적인 https 주소)를 시스템 브라우저로 열어서 진행하고, 로그인이
+// 끝나면 아래 커스텀 URL Scheme으로 다시 앱으로 돌아옵니다
 // (ios-app/ios/App/App/Info.plist의 CFBundleURLSchemes에 동일한 값이 등록되어 있어야 합니다).
-var NATIVE_AUTH_WEB_URL = "https://golfscore.skyjang.com/";
+var NATIVE_AUTH_WEB_URL = "https://app.skyjang.com/";
 var NATIVE_AUTH_SCHEME = "com.skyjang.golfscorecard";
 
 // 관리자 페이지(🛠)는 이 이메일로 로그인했을 때만 노출됩니다. 실제 접근 제어는
@@ -284,7 +281,7 @@ function openNativeProviderLogin(provider){
   }
   setStatus((provider === "kakao" ? "카카오" : "네이버") + " 로그인 중...");
   // toolbarColor: 이 브라우저 창의 상단 주소창 바탕색입니다. iOS 정책상 실제
-  // 웹사이트 주소(golfscore.skyjang.com)를 사용자에게 숨길 수는 없지만(피싱 방지를
+  // 웹사이트 주소(app.skyjang.com)를 사용자에게 숨길 수는 없지만(피싱 방지를
   // 위해 애플이 요구하는 부분), 색깔만큼은 앱의 기본 브랜드 색(styles.css의
   // --primary)에 맞춰서 화면 전환이 조금 더 자연스럽게 보이도록 했습니다.
   Browser.open({ url: NATIVE_AUTH_WEB_URL + "?nativeLogin=" + provider, toolbarColor: "#4338ca" }).catch(function(e){
@@ -388,7 +385,7 @@ function ensureKakaoInit(){
 }
 
 // 카카오 개발자센터의 "카카오 로그인 리다이렉트 URI"에 등록해둔 값과 정확히
-// 일치해야 합니다(현재 https://golfscore.skyjang.com/ 로 등록). 네이티브 앱이 연
+// 일치해야 합니다(현재 https://app.skyjang.com/ 로 등록). 네이티브 앱이 연
 // 시스템(인앱) 브라우저 안에서도 이 코드는 실제 이 웹사이트 주소에서만
 // 실행되므로, 쿼리스트링(?nativeLogin=kakao)을 뺀 origin+pathname을 그대로
 // 씁니다 -- 네이버 콜백 URL과 동일한 방식입니다.
