@@ -11,7 +11,7 @@
      있었을 가능성이 있습니다(정산하기 이후 화면이 확대된 채 안 풀리는
      문제). js 파일들처럼 styles.css를 고칠 때마다 이 버전 값도 반드시
      함께 올려주세요. -->
-<link rel="stylesheet" href="styles.css?v=20260921a">
+<link rel="stylesheet" href="styles.css?v=20260921b">
 
 </head>
 <body>
@@ -327,6 +327,27 @@
 </div>
 <div id="sjAdminStatsBar" class="sj-admin-stats-bar"></div>
 <a href="https://console.firebase.google.com/project/skyjang-golfscore/storage/skyjang-golfscore.firebasestorage.app/usage" target="_blank" rel="noopener noreferrer" class="sj-admin-storage-link" data-i18n="adminStorageUsageLink">📦 Storage 사용량 확인 (Firebase 콘솔) ↗</a>
+
+<!-- 2026-09-21 추가: 구독 현황 -- 요금제별 구독자 수 / 연도 선택 가능한 월별
+     결제 합계 그래프. js/admin.js의 loadSubscriptionStats()가 채운다. -->
+<div class="sj-admin-section-title">💳 구독 현황</div>
+<div id="sjAdminSubStatsBar" class="sj-admin-stats-bar"></div>
+<div class="sj-admin-chart-card">
+<div class="sj-admin-chart-title">요금제별 구독자 수</div>
+<div id="sjAdminPlanChart"></div>
+</div>
+<div class="sj-admin-chart-card">
+<div class="sj-admin-chart-title-row">
+<span class="sj-admin-chart-title">월별 결제 합계</span>
+<select id="sjAdminRevenueYearSelect" class="sj-admin-year-select"></select>
+</div>
+<div id="sjAdminRevenueChart"></div>
+<div id="sjAdminRevenueLegend" class="sj-viz-legend"></div>
+<div id="sjAdminRevenueYearTotal" class="sj-admin-year-total"></div>
+<button type="button" id="sjAdminRevenueTableToggle" class="sj-admin-table-toggle-btn">표로 보기</button>
+<div id="sjAdminRevenueTable" class="sj-admin-revenue-table" style="display:none;"></div>
+</div>
+<div class="sj-admin-note">※ 결제 합계 그래프는 2026년 9월 21일부터의 실제 결제 내역만 쌓입니다. 이전 결제 이력은 소급 반영되지 않습니다.</div>
 <div class="sj-admin-users-head">
 <span data-i18n="adminUsersHeadLabel">로그인 사용자 목록</span>
 <button type="button" id="sjAdminRefreshBtn" class="sj-secondary sj-admin-refresh-btn" data-i18n="adminRefreshBtn">↻ 새로고침</button>
@@ -441,7 +462,7 @@
 <script src="js/ocr.js?v=20260823f" defer></script>
 <script src="js/cloud-save.js?v=20260823f" defer></script>
 <script src="js/cloud-load.js?v=20260823g" defer></script>
-<script src="js/admin.js?v=20260823f" defer></script>
+<script src="js/admin.js?v=20260921a" defer></script>
 
 </body>
 </html>

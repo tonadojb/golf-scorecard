@@ -10,6 +10,16 @@
   var GET_USER_VIOLATIONS_URL = "https://asia-northeast3-skyjang-golfscore.cloudfunctions.net/adminGetUserViolations";
   var GET_VIOLATION_PHOTO_URL = "https://asia-northeast3-skyjang-golfscore.cloudfunctions.net/adminGetViolationPhoto";
   var DELETE_VIOLATION_PHOTO_URL = "https://asia-northeast3-skyjang-golfscore.cloudfunctions.net/adminDeleteViolationPhoto";
+  var SUB_STATS_URL = "https://asia-northeast3-skyjang-golfscore.cloudfunctions.net/adminGetSubscriptionStats";
+
+  // 2026-09-21 추가: 구독 현황(요금제별 구독자 수 / 월별 결제 그래프)에 쓰는 고정
+  // 팔레트 -- dataviz 스킬의 카테고리 팔레트 1~4번 슬롯을 그대로 썼다(인접 쌍
+  // CVD 검증 통과된 순서라 임의로 바꾸지 말 것). 요금제 키 순서와 색이 항상
+  // 고정으로 짝지어져야 어느 그래프에서도 "베이직=파랑"처럼 색이 흔들리지 않는다.
+  var PLAN_KEYS_ORDER = ["basic", "pro", "pro_year1", "pro_year2"];
+  var PLAN_COLORS = { basic: "#2a78d6", pro: "#eb6834", pro_year1: "#1baf7a", pro_year2: "#eda100" };
+  var PLAN_SHORT_LABELS = { basic: "베이직", pro: "프로 월간", pro_year1: "프로 1년", pro_year2: "프로 2년" };
+  var lastSubStats = null; // { subscriberCounts, currentMRR, monthlyRevenue, planLabels } -- 연도 셀렉트 바뀔 때 재요청 없이 필터링만 새로 하려고 캐싱.
 
   function escapeHtmlLocal(s){
     return String(s == null ? "" : s).replace(/[&<>"']/g, function(c){
@@ -345,17 +355,310 @@
   function bindRefresh(){
     var btn = sj("sjAdminRefreshBtn");
     if(!btn) return;
-    btn.addEventListener("click", function(){ loadUsers(); });
+    btn.addEventListener("click", function(){ loadUsers(); loadSubscriptionStats(); });
+  }
+
+  /* ---------------- 구독 현황 (2026-09-21 추가) ----------------
+     요금제별 구독자 수 막대그래프 + 연도 선택 가능한 월별 결제 합계 누적
+     막대그래프. 외부 차트 라이브러리 없이 인라인 SVG로 직접 그린다 -- 이
+     앱에는 이미 html2canvas 말고는 별도 시각화 라이브러리가 없어서, 이거
+     하나만을 위해 새 스크립트를 추가하기보다 가볍게 직접 구현했다. */
+
+  function fmtKRW(n){
+    var v = Math.round(n || 0);
+    return v.toLocaleString("ko-KR") + "원";
+  }
+
+  // 0을 포함해 4개의 "깔끔한" 눈금값을 만든다 (예: 최대값 27 -> [0,10,20,30]).
+  function niceAxisMax(maxVal){
+    if(!maxVal || maxVal <= 0) return 4;
+    var rough = maxVal / 4;
+    var mag = Math.pow(10, Math.floor(Math.log(rough) / Math.LN10));
+    var norm = rough / mag;
+    var step;
+    if(norm <= 1) step = 1 * mag;
+    else if(norm <= 2) step = 2 * mag;
+    else if(norm <= 5) step = 5 * mag;
+    else step = 10 * mag;
+    return step * 4;
+  }
+
+  function svgEl(tag, attrs){
+    var el = document.createElementNS("http://www.w3.org/2000/svg", tag);
+    for(var k in attrs){ el.setAttribute(k, attrs[k]); }
+    return el;
+  }
+
+  // 위쪽 두 모서리만 둥근(r=4, 스펙의 "4px rounded data-end, square at baseline")
+  // 막대 path를 만든다. h가 반지름보다 작으면(막대가 아주 낮으면) 사각형으로 대체.
+  function roundedTopRectPath(x, y, w, h, r){
+    if(h <= 0) return "";
+    var rr = Math.min(r, w / 2, h);
+    if(rr <= 0.5){
+      return "M" + x + "," + (y + h) + " L" + x + "," + y + " L" + (x + w) + "," + y + " L" + (x + w) + "," + (y + h) + " Z";
+    }
+    return "M" + x + "," + (y + h) +
+      " L" + x + "," + (y + rr) +
+      " Q" + x + "," + y + " " + (x + rr) + "," + y +
+      " L" + (x + w - rr) + "," + y +
+      " Q" + (x + w) + "," + y + " " + (x + w) + "," + (y + rr) +
+      " L" + (x + w) + "," + (y + h) + " Z";
+  }
+
+  // 차트 전용 툴팁 하나를 재사용한다 (마크마다 새로 안 만듦).
+  var vizTooltipEl = null;
+  function getVizTooltip(){
+    if(vizTooltipEl) return vizTooltipEl;
+    vizTooltipEl = document.createElement("div");
+    vizTooltipEl.className = "sj-viz-tooltip";
+    document.body.appendChild(vizTooltipEl);
+    return vizTooltipEl;
+  }
+  function showVizTooltip(evt, valueText, labelText){
+    var tip = getVizTooltip();
+    tip.innerHTML = "";
+    var strong = document.createElement("span");
+    strong.className = "sj-viz-tooltip-value";
+    strong.textContent = valueText; // 값이 먼저, 굵게 (untrusted 텍스트라 textContent만 사용)
+    var sub = document.createElement("span");
+    sub.className = "sj-viz-tooltip-label";
+    sub.textContent = labelText;
+    tip.appendChild(strong);
+    tip.appendChild(sub);
+    tip.style.left = (evt.clientX + 12) + "px";
+    tip.style.top = (evt.clientY + 12) + "px";
+    tip.style.display = "flex";
+  }
+  function hideVizTooltip(){
+    if(vizTooltipEl) vizTooltipEl.style.display = "none";
+  }
+
+  function renderSubStatsBar(stats){
+    var bar = sj("sjAdminSubStatsBar");
+    if(!bar) return;
+    if(!stats){ bar.innerHTML = ""; return; }
+    var totalPaid = PLAN_KEYS_ORDER.reduce(function(sum, k){ return sum + (stats.subscriberCounts[k] || 0); }, 0);
+    bar.innerHTML =
+      '<div class="sj-admin-stat-tile"><div class="sj-admin-stat-label">유료 구독자 수</div><div class="sj-admin-stat-value">' + totalPaid + '</div></div>' +
+      '<div class="sj-admin-stat-tile"><div class="sj-admin-stat-label">현재 예상 월 정기 수익</div><div class="sj-admin-stat-value">' + fmtKRW(stats.currentMRR) + '</div></div>';
+  }
+
+  // 요금제별 구독자 수 -- 단일 시리즈 막대그래프(카테고리별 색만 다름, 범례는
+  // 필요 없음 -- x축 라벨 자체가 정체성 채널). 값 라벨을 막대 위에 직접 표기.
+  function renderPlanChart(counts){
+    var host = sj("sjAdminPlanChart");
+    if(!host) return;
+    host.innerHTML = "";
+    var width = Math.max(240, host.clientWidth || 280);
+    var height = 160, padTop = 22, padBottom = 24, padSide = 12;
+    var plotH = height - padTop - padBottom;
+    var maxVal = niceAxisMax(Math.max.apply(null, PLAN_KEYS_ORDER.map(function(k){ return counts[k] || 0; })));
+    var svg = svgEl("svg", { viewBox: "0 0 " + width + " " + height, width: "100%", height: height, role: "img", "aria-label": "요금제별 구독자 수" });
+
+    // 눈금선(hairline) 4단
+    for(var g = 0; g <= 4; g++){
+      var gy = padTop + plotH - (plotH * g / 4);
+      svg.appendChild(svgEl("line", { x1: padSide, x2: width - padSide, y1: gy, y2: gy, class: "sj-viz-gridline" }));
+    }
+
+    var slotW = (width - padSide * 2) / PLAN_KEYS_ORDER.length;
+    var barW = Math.min(24, slotW * 0.5);
+    PLAN_KEYS_ORDER.forEach(function(key, i){
+      var val = counts[key] || 0;
+      var cx = padSide + slotW * i + slotW / 2;
+      var barH = maxVal > 0 ? (val / maxVal) * plotH : 0;
+      var barY = padTop + plotH - barH;
+      var path = svgEl("path", {
+        d: roundedTopRectPath(cx - barW / 2, barY, barW, barH, 4),
+        fill: PLAN_COLORS[key], class: "sj-viz-bar"
+      });
+      var hit = svgEl("rect", { x: cx - slotW / 2, y: padTop, width: slotW, height: plotH, fill: "transparent", style: "cursor:pointer;" });
+      hit.addEventListener("pointermove", function(k, v){ return function(e){ showVizTooltip(e, v + "명", PLAN_SHORT_LABELS[k]); }; }(key, val));
+      hit.addEventListener("pointerleave", hideVizTooltip);
+      svg.appendChild(path);
+      svg.appendChild(hit);
+      var valueLabel = svgEl("text", { x: cx, y: barY - 6, class: "sj-viz-value-label", "text-anchor": "middle" });
+      valueLabel.textContent = String(val);
+      svg.appendChild(valueLabel);
+      var catLabel = svgEl("text", { x: cx, y: height - 6, class: "sj-viz-axis-label", "text-anchor": "middle" });
+      catLabel.textContent = PLAN_SHORT_LABELS[key];
+      svg.appendChild(catLabel);
+    });
+    host.appendChild(svg);
+  }
+
+  function monthsForYear(monthlyRevenue, year){
+    var byYm = {};
+    (monthlyRevenue || []).forEach(function(m){ byYm[m.yearMonth] = m; });
+    var out = [];
+    for(var mo = 1; mo <= 12; mo++){
+      var ym = year + "-" + String(mo).padStart(2, "0");
+      out.push(byYm[ym] || { yearMonth: ym, totalKRW: 0, byPlan: {} });
+    }
+    return out;
+  }
+
+  function renderRevenueLegend(planLabels){
+    var el = sj("sjAdminRevenueLegend");
+    if(!el) return;
+    el.innerHTML = "";
+    PLAN_KEYS_ORDER.forEach(function(key){
+      var item = document.createElement("span");
+      item.className = "sj-viz-legend-item";
+      var swatch = document.createElement("span");
+      swatch.className = "sj-viz-legend-swatch";
+      swatch.style.background = PLAN_COLORS[key];
+      var label = document.createElement("span");
+      label.textContent = (planLabels && planLabels[key]) || PLAN_SHORT_LABELS[key];
+      item.appendChild(swatch);
+      item.appendChild(label);
+      el.appendChild(item);
+    });
+  }
+
+  // 월별 결제 합계 -- 요금제별로 쌓은 스택 막대그래프. 세그먼트 사이 2px
+  // 여백(surface gap)은 각 세그먼트를 그린 뒤 이음매에 배경색 얇은 선을
+  // 덧그려서 표현한다. 맨 위 세그먼트만 위쪽이 둥글고(전체 막대 기준),
+  // 바닥은 각지게 -- marks-and-anatomy 스펙 그대로.
+  function renderRevenueChart(months){
+    var host = sj("sjAdminRevenueChart");
+    if(!host) return;
+    host.innerHTML = "";
+    var width = Math.max(320, host.clientWidth || 480);
+    var height = 200, padTop = 28, padBottom = 22, padSide = 10;
+    var plotH = height - padTop - padBottom;
+    var totals = months.map(function(m){ return m.totalKRW || 0; });
+    var maxVal = niceAxisMax(Math.max.apply(null, totals));
+    var svg = svgEl("svg", { viewBox: "0 0 " + width + " " + height, width: "100%", height: height, role: "img", "aria-label": "월별 결제 합계" });
+
+    for(var g = 0; g <= 4; g++){
+      var gy = padTop + plotH - (plotH * g / 4);
+      svg.appendChild(svgEl("line", { x1: padSide, x2: width - padSide, y1: gy, y2: gy, class: "sj-viz-gridline" }));
+    }
+
+    var slotW = (width - padSide * 2) / 12;
+    var barW = Math.min(24, slotW * 0.6);
+    months.forEach(function(m, i){
+      var cx = padSide + slotW * i + slotW / 2;
+      var total = m.totalKRW || 0;
+      var stackH = maxVal > 0 ? (total / maxVal) * plotH : 0;
+      var barTop = padTop + plotH - stackH;
+      var clipId = "sjRevClip" + i;
+      var clip = svgEl("clipPath", { id: clipId });
+      clip.appendChild(svgEl("path", { d: roundedTopRectPath(cx - barW / 2, barTop, barW, stackH, 4) }));
+      svg.appendChild(clip);
+
+      var group = svgEl("g", { "clip-path": "url(#" + clipId + ")" });
+      var cursorY = padTop + plotH; // 바닥부터 쌓아 올라간다
+      PLAN_KEYS_ORDER.forEach(function(key){
+        var amt = (m.byPlan && m.byPlan[key]) || 0;
+        if(amt <= 0) return;
+        var segH = (amt / maxVal) * plotH;
+        var segY = cursorY - segH;
+        var rect = svgEl("rect", { x: cx - barW / 2, y: segY, width: barW, height: segH, fill: PLAN_COLORS[key] });
+        group.appendChild(rect);
+        // 세그먼트 사이 2px 여백(다음 세그먼트와의 경계에 표면색 얇은 선).
+        group.appendChild(svgEl("rect", { x: cx - barW / 2, y: segY, width: barW, height: 2, class: "sj-viz-seg-gap" }));
+        cursorY = segY;
+      });
+      svg.appendChild(group);
+
+      var hit = svgEl("rect", { x: cx - slotW / 2, y: padTop, width: slotW, height: plotH, fill: "transparent", style: "cursor:pointer;" });
+      hit.addEventListener("pointermove", function(mm){ return function(e){
+        var lines = PLAN_KEYS_ORDER.filter(function(k){ return (mm.byPlan && mm.byPlan[k]); })
+          .map(function(k){ return PLAN_SHORT_LABELS[k] + " " + fmtKRW(mm.byPlan[k]); }).join(" · ");
+        showVizTooltip(e, fmtKRW(mm.totalKRW || 0), lines || "결제 내역 없음");
+      }; }(m));
+      hit.addEventListener("pointerleave", hideVizTooltip);
+      svg.appendChild(hit);
+
+      if(total > 0){
+        var valueLabel = svgEl("text", { x: cx, y: barTop - 6, class: "sj-viz-value-label", "text-anchor": "middle" });
+        valueLabel.textContent = total.toLocaleString("ko-KR");
+        svg.appendChild(valueLabel);
+      }
+      var moLabel = svgEl("text", { x: cx, y: height - 4, class: "sj-viz-axis-label", "text-anchor": "middle" });
+      moLabel.textContent = (i + 1) + "월";
+      svg.appendChild(moLabel);
+    });
+    host.appendChild(svg);
+  }
+
+  function renderRevenueTable(months, planLabels){
+    var el = sj("sjAdminRevenueTable");
+    if(!el) return;
+    var head = "<tr><th>월</th>" + PLAN_KEYS_ORDER.map(function(k){ return "<th>" + escapeHtmlLocal((planLabels && planLabels[k]) || PLAN_SHORT_LABELS[k]) + "</th>"; }).join("") + "<th>합계</th></tr>";
+    var rows = months.map(function(m, i){
+      var cells = PLAN_KEYS_ORDER.map(function(k){ return "<td>" + fmtKRW((m.byPlan && m.byPlan[k]) || 0) + "</td>"; }).join("");
+      return "<tr><td>" + (i + 1) + "월</td>" + cells + "<td><b>" + fmtKRW(m.totalKRW || 0) + "</b></td></tr>";
+    }).join("");
+    el.innerHTML = "<table>" + head + rows + "</table>";
+  }
+
+  function renderRevenueForYear(year){
+    if(!lastSubStats) return;
+    var months = monthsForYear(lastSubStats.monthlyRevenue, year);
+    renderRevenueChart(months);
+    renderRevenueLegend(lastSubStats.planLabels);
+    renderRevenueTable(months, lastSubStats.planLabels);
+    var yearTotal = months.reduce(function(sum, m){ return sum + (m.totalKRW || 0); }, 0);
+    var totalEl = sj("sjAdminRevenueYearTotal");
+    if(totalEl) totalEl.textContent = year + "년 총 결제액: " + fmtKRW(yearTotal);
+  }
+
+  function populateYearSelect(monthlyRevenue){
+    var select = sj("sjAdminRevenueYearSelect");
+    if(!select) return;
+    var years = {};
+    (monthlyRevenue || []).forEach(function(m){ years[m.yearMonth.slice(0, 4)] = true; });
+    var thisYear = new Date().getFullYear();
+    years[String(thisYear)] = true; // 결제 이력이 아직 없어도 올해는 항상 선택 가능하게.
+    var yearList = Object.keys(years).sort().reverse();
+    var prevValue = select.value;
+    select.innerHTML = yearList.map(function(y){ return '<option value="' + y + '">' + y + '년</option>'; }).join("");
+    select.value = yearList.indexOf(prevValue) !== -1 ? prevValue : String(thisYear);
+  }
+
+  function loadSubscriptionStats(){
+    return withIdToken(function(idToken){
+      return authedFetch(SUB_STATS_URL, idToken);
+    }).then(function(data){
+      lastSubStats = data;
+      renderSubStatsBar(data);
+      renderPlanChart(data.subscriberCounts || {});
+      populateYearSelect(data.monthlyRevenue || []);
+      var select = sj("sjAdminRevenueYearSelect");
+      renderRevenueForYear(select ? select.value : String(new Date().getFullYear()));
+    }).catch(function(e){
+      var bar = sj("sjAdminSubStatsBar");
+      if(bar){ bar.innerHTML = '<div class="sj-status error">구독 통계 불러오기 실패: ' + escapeHtmlLocal(e && e.message ? e.message : e) + '</div>'; }
+    });
+  }
+
+  function bindRevenueControls(){
+    var select = sj("sjAdminRevenueYearSelect");
+    if(select){ select.addEventListener("change", function(){ renderRevenueForYear(select.value); }); }
+    var toggleBtn = sj("sjAdminRevenueTableToggle");
+    var tableEl = sj("sjAdminRevenueTable");
+    if(toggleBtn && tableEl){
+      toggleBtn.addEventListener("click", function(){
+        var showing = tableEl.style.display !== "none";
+        tableEl.style.display = showing ? "none" : "";
+        toggleBtn.textContent = showing ? "표로 보기" : "그래프로 보기";
+      });
+    }
   }
 
   function onOpen(){
     loadConfig();
     loadUsers();
+    loadSubscriptionStats();
   }
 
   bindUserListEvents();
   bindGlobalBlockSave();
   bindRefresh();
+  bindRevenueControls();
 
   window.__sjAdmin = { onOpen: onOpen };
 })();

@@ -276,6 +276,38 @@ footer.credit{text-align:center;color:var(--muted);font-size:11px;padding:14px;}
 .sj-admin-violation-photo-full{max-width:100%;border-radius:8px;display:block;}
 .sj-admin-violation-loading,.sj-admin-violation-empty{font-size:12px;color:#888;text-align:center;padding:8px 0;}
 
+/* ---------------- 구독 현황 그래프 (2026-09-21 추가) ----------------
+   dataviz 스킬의 카테고리 팔레트(1~4번 슬롯: 파랑/주황/아쿠아/노랑, 인접쌍
+   CVD 검증 통과 순서)를 베이직/프로월간/프로1년/프로2년에 고정 배정해서
+   js/admin.js가 그대로 참조한다(PLAN_COLORS). */
+.sj-admin-section-title{font-weight:700;font-size:13px;color:var(--primary-dark);margin:18px 0 8px;}
+.sj-admin-chart-card{background:#fff;border:1px solid #e5e7eb;border-radius:12px;padding:12px 14px 8px;margin-bottom:12px;}
+.sj-admin-chart-title{font-weight:700;font-size:12.5px;color:#1f2b24;}
+.sj-admin-chart-title-row{display:flex;align-items:center;justify-content:space-between;gap:8px;margin-bottom:2px;}
+.sj-admin-year-select{width:auto;padding:5px 8px;border:1px solid #d7d8ec;border-radius:7px;font-size:12.5px;font-weight:700;color:var(--primary-dark);background:#fff;font-family:inherit;}
+.sj-admin-year-total{font-size:12px;font-weight:700;color:var(--primary-dark);text-align:right;margin:2px 2px 6px;}
+.sj-admin-note{font-size:10.5px;color:#9a9c8f;text-align:center;line-height:1.5;margin:4px 0 14px;}
+.sj-admin-table-toggle-btn{display:block;margin:0 auto 8px;border:none;background:none;color:#4338ca;font-size:11.5px;font-weight:700;text-decoration:underline;cursor:pointer;padding:2px;}
+.sj-admin-revenue-table{overflow-x:auto;margin-bottom:8px;}
+.sj-admin-revenue-table table{width:100%;border-collapse:collapse;font-size:11px;}
+.sj-admin-revenue-table th,.sj-admin-revenue-table td{border:1px solid #e5e7eb;padding:5px 6px;text-align:right;white-space:nowrap;}
+.sj-admin-revenue-table th:first-child,.sj-admin-revenue-table td:first-child{text-align:left;}
+.sj-admin-revenue-table th{background:#f5f6fc;color:var(--primary-dark);}
+
+/* 차트 공통 -- 막대/선/라벨/범례/툴팁. 이 앱은 다크모드를 별도로 지원하지
+   않아서(라이트 모드 전용) 팔레트도 라이트 값만 쓴다. */
+.sj-viz-gridline{stroke:#e5e7eb;stroke-width:1;}
+.sj-viz-bar{transition:opacity .1s;}
+.sj-viz-seg-gap{fill:#ffffff;}
+.sj-viz-value-label{font-size:10.5px;font-weight:700;fill:#1f2b24;font-family:inherit;}
+.sj-viz-axis-label{font-size:10px;fill:#6b7a72;font-family:inherit;}
+.sj-viz-legend{display:flex;flex-wrap:wrap;gap:10px;justify-content:center;margin:4px 0 2px;}
+.sj-viz-legend-item{display:flex;align-items:center;gap:5px;font-size:11px;color:#6b7a72;}
+.sj-viz-legend-swatch{width:10px;height:10px;border-radius:3px;flex:0 0 auto;}
+.sj-viz-tooltip{position:fixed;display:none;flex-direction:column;gap:1px;background:#1f2b24;color:#fff;padding:6px 9px;border-radius:8px;font-size:11.5px;pointer-events:none;z-index:30000;box-shadow:0 4px 12px rgba(0,0,0,0.25);max-width:220px;}
+.sj-viz-tooltip-value{font-weight:700;font-size:12.5px;}
+.sj-viz-tooltip-label{color:#c3c2b7;}
+
 /* ---------------- Block overlay (접속금지 / 전체점검) ---------------- */
 .sj-block-overlay{position:fixed;inset:0;background:rgba(18,20,32,0.94);display:flex;align-items:center;justify-content:center;z-index:20000;padding:20px;}
 .sj-block-box{background:#fff;border-radius:16px;padding:28px 24px;max-width:340px;width:100%;text-align:center;box-shadow:0 10px 30px rgba(0,0,0,0.35);}
