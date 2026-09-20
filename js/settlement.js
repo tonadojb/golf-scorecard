@@ -352,16 +352,22 @@ function buildSettlementCaptureHtml(team, data, globalStake){
     }).join('') :
     '<div style="color:#6b6f8a;font-size:12px;">' + escapeHtml(t('settlementAllEven')) + '</div>';
 
+  /* 2026-09 수정: 예전에는 홀 하나의 모든 거래를 쉼표로 이어붙인 한 줄로
+     압축해서 보여줬는데("9(P4 ×2) 장경진→정용호 4,000, 장경진→이경석 6,000, ..."),
+     실제 화면(홀별 상세 내역 카드)처럼 홀마다 카드로 나누고 거래 내역을 한
+     줄씩 보여줘서 공유 이미지도 한눈에 읽기 쉽게 만듭니다. */
   var holesHtml = data.holeResults.map(function(hr){
-    var amountsText = hr.amounts.length ?
+    var amountsHtml = hr.amounts.length ?
       hr.amounts.map(function(am){
-        return settlementPlayerLabel(team, am.payer) + '→' + settlementPlayerLabel(team, am.payee) + ' ' + settlementFormatPlain(am.amount);
-      }).join(', ') :
-      t('settlementHoleEven');
-    var multNote = hr.effectiveMultiplier > 1 ? (' ×' + hr.effectiveMultiplier) : '';
-    return '<div style="padding:4px 0;border-bottom:1px solid #f0f0f5;font-size:11px;color:#232336;">' +
-      '<strong>' + hr.hole + '</strong>(P' + hr.par + multNote + ') ' + amountsText +
-      '</div>';
+        return '<div style="padding:2px 0;">' + settlementPlayerLabel(team, am.payer) + ' → ' + settlementPlayerLabel(team, am.payee) + ' : <strong>' + settlementFormatPlain(am.amount) + '</strong></div>';
+      }).join('') :
+      '<div style="color:#9295ac;">' + escapeHtml(t('settlementHoleEven')) + '</div>';
+    var multBadge = hr.effectiveMultiplier > 1 ?
+      ' <span style="background:#eef0ff;color:#4338ca;border-radius:6px;padding:1px 6px;font-size:10px;font-weight:700;">×' + hr.effectiveMultiplier + '</span>' : '';
+    return '<div style="border:1px solid #e5e7eb;border-radius:10px;padding:8px 10px;margin-bottom:6px;">' +
+      '<div style="font-size:12px;font-weight:700;color:#232336;margin-bottom:4px;">' + hr.hole + escapeHtml(t('holesSuffix')) + ' <span style="color:#9295ac;font-weight:500;">P' + hr.par + '</span>' + multBadge + '</div>' +
+      '<div style="font-size:12px;color:#232336;">' + amountsHtml + '</div>' +
+    '</div>';
   }).join('');
 
   return '' +
