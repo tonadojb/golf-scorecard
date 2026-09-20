@@ -249,14 +249,11 @@
 <button class="sj-close" data-close>×</button>
 <h3>💳 구독 안내</h3>
 <p id="sjPaywallReason" style="font-size:13px;color:#666;margin-top:0;"></p>
-<!-- 2026-09-21 추가: 웹(포트원) 카드 등록은 결제대행사(KG이니시스 등) 정책상 이름/연락처/이메일이
-     필수입니다 -- data-web-only라 iOS 앱(RevenueCat)에서는 자동으로 숨겨집니다. 카카오/네이버
-     로그인은 계정에 이메일이 없는 경우가 많아 이메일도 직접 입력받습니다(로그인 계정에
-     이메일이 있으면 openPaywall()이 미리 채워줍니다). -->
+<!-- 2026-09-21 추가: 웹(포트원) 카드 등록은 결제대행사(KG이니시스 등) 정책상 이름/연락처가
+     필수입니다 -- data-web-only라 iOS 앱(RevenueCat)에서는 자동으로 숨겨집니다. -->
 <div id="sjPaywallCustomerFields" data-web-only="1" style="display:flex;flex-direction:column;gap:8px;margin:0 0 12px;">
 <input type="text" id="sjPaywallName" placeholder="이름 (카드 등록에 필요)" style="padding:9px 10px;border:1px solid #d7d8ec;border-radius:8px;font-size:14px;box-sizing:border-box;">
 <input type="tel" id="sjPaywallPhone" placeholder="연락처 (- 없이 숫자만, 예: 01012345678)" style="padding:9px 10px;border:1px solid #d7d8ec;border-radius:8px;font-size:14px;box-sizing:border-box;">
-<input type="email" id="sjPaywallEmail" placeholder="이메일 (카드 등록/영수증에 필요)" style="padding:9px 10px;border:1px solid #d7d8ec;border-radius:8px;font-size:14px;box-sizing:border-box;">
 </div>
 <div id="sjPaywallPlans" style="display:flex;flex-direction:column;gap:10px;margin:12px 0;">
 <div class="sj-paywall-plan" data-plan="basic" style="border:1px solid #e5e7eb;border-radius:10px;padding:12px;">
@@ -435,7 +432,7 @@
      js/subscription.js가 이 전역(window.PortOne)을 호출한다. -->
 <script src="https://cdn.portone.io/v2/browser-sdk.js" defer></script>
 <script type="module" src="js/auth.js?v=20260828a"></script>
-<script src="js/subscription.js?v=20260921b" defer></script>
+<script src="js/subscription.js?v=20260921a" defer></script>
 <script src="js/ocr.js?v=20260823f" defer></script>
 <script src="js/cloud-save.js?v=20260823f" defer></script>
 <script src="js/cloud-load.js?v=20260823g" defer></script>

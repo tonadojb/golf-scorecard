@@ -98,13 +98,6 @@
     if(reasonEl) reasonEl.textContent = pendingReasonMessage || "구독하면 계속 스캔할 수 있어요.";
     setStatus(statusEl, "");
     if(!modal) return;
-    // 로그인 계정에 이름/이메일이 있으면 미리 채워준다 (카카오/네이버 로그인은
-    // 이메일이 없는 경우가 많아 빈 채로 두고 사용자가 직접 입력하게 한다).
-    var u0 = getCurrentUser();
-    var nameEl0 = sj("sjPaywallName");
-    var emailEl0 = sj("sjPaywallEmail");
-    if(u0 && nameEl0 && !nameEl0.value){ nameEl0.value = u0.displayName || ""; }
-    if(u0 && emailEl0 && !emailEl0.value){ emailEl0.value = u0.email || ""; }
     // 2년/3년 프로 장기구독은 웹(포트원) 전용이라 iOS 앱에서는 숨긴다
     // (애플은 자동갱신 구독 기간을 최대 1년까지만 허용).
     var webOnlyEls = document.querySelectorAll("[data-web-only]");
@@ -205,19 +198,15 @@
       return;
     }
     // 2026-09-21: KG이니시스(카드 등록/PC)는 이름·연락처·이메일을 필수로 요구합니다
-    // (누락 시 "issueId violates the rule REQUIRED" 등으로 실패). 카카오/네이버
-    // 로그인 계정은 auth.js가 이메일을 저장하지 않아 u.email이 비어있는 경우가
-    // 흔하므로, 로그인 계정 값 대신 결제창 입력칸(sjPaywallEmail) 값을 그대로 쓴다
-    // (openPaywall()이 계정에 이메일이 있으면 미리 채워주고, 없으면 직접 입력받는다).
+    // (누락 시 "issueId violates the rule REQUIRED" 등으로 실패). 이메일은
+    // 로그인 계정에서, 이름/연락처는 결제창의 입력칸에서 받습니다.
     var nameEl = sj("sjPaywallName");
     var phoneEl = sj("sjPaywallPhone");
-    var emailEl = sj("sjPaywallEmail");
     var fullName = nameEl && nameEl.value ? nameEl.value.trim() : "";
     var phoneNumber = phoneEl && phoneEl.value ? phoneEl.value.trim() : "";
-    var email = emailEl && emailEl.value ? emailEl.value.trim() : (u.email || "");
     if(!fullName){ setStatus(statusEl, "이름을 입력해주세요.", true); return; }
     if(!phoneNumber){ setStatus(statusEl, "연락처를 입력해주세요.", true); return; }
-    if(!email){ setStatus(statusEl, "이메일을 입력해주세요.", true); return; }
+    if(!u.email){ setStatus(statusEl, "이메일 정보가 없는 계정입니다. 이메일이 확인되는 계정으로 로그인해주세요.", true); return; }
     setStatus(statusEl, "카드 등록 창을 여는 중...");
     window.PortOne.requestIssueBillingKey({
       storeId: PORTONE_STORE_ID,
@@ -225,7 +214,7 @@
       billingKeyMethod: "CARD",
       issueId: "issue-" + u.uid + "-" + Date.now(),
       issueName: "골프 스코어카드 " + (PLAN_LABELS[plan] || "구독") + " 구독",
-      customer: { customerId: u.uid, fullName: fullName, phoneNumber: phoneNumber, email: email }
+      customer: { customerId: u.uid, fullName: fullName, phoneNumber: phoneNumber, email: u.email }
     }).then(function(result){
       if(!result || result.code){
         setStatus(statusEl, "카드 등록에 실패했습니다: " + ((result && result.message) || "알 수 없는 오류"), true);
