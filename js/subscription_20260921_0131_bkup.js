@@ -22,14 +22,9 @@
 
   // App Store Connect에 등록한(그리고 RevenueCat에 연결해둔) 실제 상품 ID의 일부입니다.
   // firebase-backend/functions/subscription.js의 IOS_PRODUCT_PLAN과 반드시 맞춰주세요.
-  // 2026-09-20: 애플은 자동갱신 구독 기간을 최대 1년까지만 허용합니다. pro_year1(1년)은
-  // 애플도 지원하는 기간이라 여기 자동갱신 상품으로 등록해뒀지만, 아래
-  // "com.skyjang.golfscorecard.pro.yearly"는 아직 실제로 App Store Connect에 만들지
-  // 않은 자리표시자(placeholder)입니다 -- 상품을 만들고 RevenueCat에 연결한 뒤 실제
-  // product ID로 바꿔주세요(그 전까지는 눌러도 "구독 준비 중" 메시지만 뜹니다, basic/pro와
-  // 동일). pro_year2/pro_year3(2년/3년)는 애플 자동갱신 구독으로 만들 수 없어서(최대 1년
-  // 제한) 여기 목록에 없고, 항상 웹(포트원) 결제 전용입니다.
-  var IOS_PRODUCT_IDS = { basic: "com.skyjang.golfscorecard.basic.monthly", pro: "com.skyjang.golfscorecard.pro.monthly", pro_year1: "com.skyjang.golfscorecard.pro.yearly" };
+  // 2026-09-20: 애플은 자동갱신 구독 기간을 최대 1년까지만 허용해서(2년/3년 자동갱신
+  // 불가) pro_year2/pro_year3는 여기 목록에 없습니다 -- 웹(포트원) 전용입니다.
+  var IOS_PRODUCT_IDS = { basic: "com.skyjang.golfscorecard.basic.monthly", pro: "com.skyjang.golfscorecard.pro.monthly" };
 
   // 결제창(카드 등록) 및 주문명에 쓰는 요금제별 표시 이름.
   // firebase-backend/functions/subscription.js의 PLAN_DEFS.label과 맞춰둘 것.

@@ -11,7 +11,7 @@
      있었을 가능성이 있습니다(정산하기 이후 화면이 확대된 채 안 풀리는
      문제). js 파일들처럼 styles.css를 고칠 때마다 이 버전 값도 반드시
      함께 올려주세요. -->
-<link rel="stylesheet" href="styles.css?v=20260921a">
+<link rel="stylesheet" href="styles.css?v=20260827a">
 
 </head>
 <body>
@@ -269,18 +269,16 @@
 <div style="font-size:13px;color:#666;margin:4px 0 10px;">무제한 스캔 &amp; 저장</div>
 <button type="button" class="sj-primary sj-paywall-buy-btn" data-plan="pro" style="margin:0;">프로 구독하기</button>
 </div>
-<!-- 2026-09-21 수정: 프로 장기구독(선불 할인). 애플은 자동갱신 구독을 최대 1년까지만
-     허용해서 1년 옵션은 iOS(RevenueCat)에서도 제공 가능하지만(App Store Connect에
-     실제 상품을 만들기 전까지는 "구독 준비 중" 메시지만 뜸), 2년/3년은 자동갱신으로
-     만들 수 없어 웹(포트원) 결제 전용이다 -- 그 두 버튼에만 data-web-only를 달아
+<!-- 2026-09-20 추가: 프로 장기구독(선불 할인). 애플이 자동갱신 구독을 최대 1년까지만
+     허용해서 2년/3년은 웹(포트원) 결제 전용이다 -- data-web-only는
      js/subscription.js의 openPaywall()이 iOS 앱에서 자동으로 숨긴다. -->
-<div class="sj-paywall-plan" style="border:1px solid #e5e7eb;border-radius:10px;padding:12px;">
+<div class="sj-paywall-plan" data-web-only="1" style="border:1px solid #e5e7eb;border-radius:10px;padding:12px;">
 <div style="font-weight:700;font-size:15px;">프로 장기구독 · 미리 내면 더 저렴해요</div>
-<div style="font-size:13px;color:#666;margin:4px 0 10px;">무제한 스캔 &amp; 저장 (2년/3년은 웹 결제 전용)</div>
+<div style="font-size:13px;color:#666;margin:4px 0 10px;">무제한 스캔 &amp; 저장 (웹 결제 전용)</div>
 <div style="display:flex;flex-direction:column;gap:6px;">
-<button type="button" class="sj-paywall-longterm-btn sj-paywall-buy-btn" data-plan="pro_year1">1년 9,900원 (월 825원 상당)</button>
-<button type="button" class="sj-paywall-longterm-btn sj-paywall-buy-btn" data-plan="pro_year2" data-web-only="1">2년 18,900원 (월 788원 상당)</button>
-<button type="button" class="sj-paywall-longterm-btn sj-paywall-buy-btn" data-plan="pro_year3" data-web-only="1">3년 27,900원 (월 775원 상당)</button>
+<button type="button" class="sj-secondary sj-paywall-buy-btn" data-plan="pro_year1" style="margin:0;">1년 9,900원 (월 825원 상당)</button>
+<button type="button" class="sj-secondary sj-paywall-buy-btn" data-plan="pro_year2" style="margin:0;">2년 18,900원 (월 788원 상당)</button>
+<button type="button" class="sj-secondary sj-paywall-buy-btn" data-plan="pro_year3" style="margin:0;">3년 27,900원 (월 775원 상당)</button>
 </div>
 </div>
 </div>
@@ -437,7 +435,7 @@
      js/subscription.js가 이 전역(window.PortOne)을 호출한다. -->
 <script src="https://cdn.portone.io/v2/browser-sdk.js" defer></script>
 <script type="module" src="js/auth.js?v=20260828a"></script>
-<script src="js/subscription.js?v=20260921c" defer></script>
+<script src="js/subscription.js?v=20260921b" defer></script>
 <script src="js/ocr.js?v=20260823f" defer></script>
 <script src="js/cloud-save.js?v=20260823f" defer></script>
 <script src="js/cloud-load.js?v=20260823g" defer></script>
