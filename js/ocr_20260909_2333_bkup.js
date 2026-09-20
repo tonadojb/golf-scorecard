@@ -273,10 +273,6 @@
                   if(window.__sjAuth && window.__sjAuth.handleBlocked){ window.__sjAuth.handleBlocked(data.error); }
                   throw new Error(data.error || "접속이 제한되었습니다.");
                 }
-                if(data && data.quotaExceeded){
-                  if(window.__sjSubscription){ window.__sjSubscription.openPaywall(data.error); }
-                  throw new Error(data.error || "무료 스캔 횟수를 모두 사용했습니다. 구독이 필요합니다.");
-                }
                 if(data && data.notScorecard){
                   alert(data.error || "스코어카드로 인식되지 않는 이미지입니다. 스코어카드 사진을 다시 올려주세요.");
                   throw new Error(data.error || "스코어카드가 아닙니다.");
@@ -373,10 +369,6 @@
                   if(window.__sjAuth && window.__sjAuth.handleBlocked){ window.__sjAuth.handleBlocked(data.error); }
                   throw new Error(data.error || "접속이 제한되었습니다.");
                 }
-                if(data && data.quotaExceeded){
-                  if(window.__sjSubscription){ window.__sjSubscription.openPaywall(data.error); }
-                  throw new Error(data.error || "무료 스캔 횟수를 모두 사용했습니다. 구독이 필요합니다.");
-                }
                 if(data && data.error){ throw new Error(data.error); }
                 var ordered = reorderPlayers(data.players);
                 indices.forEach(function(pi){
@@ -446,7 +438,6 @@
       renderOcrTeamList();
       refreshRemoveButtonsVisibility();
       renderOcrReviewSection();
-      if(window.__sjSubscription){ window.__sjSubscription.refreshBanner(); }
     }
   };
 })();

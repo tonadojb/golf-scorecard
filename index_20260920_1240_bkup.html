@@ -83,6 +83,7 @@
      정산까지 마치고 나면 스크롤을 맨 아래까지 내려야 이 버튼들이 나와서 불편하다는
      피드백이 있어 위로 올렸습니다 (id는 그대로라 settlement.js/share.js의 동작에는
      영향 없습니다). -->
+<button id="settlementShareImageBtn" class="btn-primary" type="button" style="display:none;">🖼️ 정산 결과 이미지로 공유</button>
 <button id="copyBtn" class="btn-primary">📋 결과 복사하기 (SNS 공유)</button>
 <div id="resultCaptureArea">
 <div id="resultSummary"></div>
@@ -106,7 +107,6 @@
 <input type="number" id="settlementStakeInput" min="0" step="1000" placeholder="타당 금액 (예: 1000)">
 <button id="settlementCalcBtn" class="btn-primary" type="button">정산하기</button>
 </div>
-<button id="settlementShareImageBtn" class="btn-primary" type="button" style="display:none;margin-top:10px;letter-spacing:inherit;">🖼️ 정산 결과 이미지로 공유</button>
 <div id="settlementResult"></div>
 </div>
 </section>
@@ -171,14 +171,12 @@
   </a>
   <div class="sj-site-footer-info" style="max-width:640px;margin:18px auto 0;padding:14px 16px;border-top:1px solid #e5e7eb;font-size:12px;color:#6b7280;line-height:1.7;text-align:center;">
     <div style="margin-bottom:8px;">
-      <strong>🆓 최초 20회, 평생 무료로 체험</strong> (매달 초기화되지 않는 1회성 혜택입니다)<br>
-      이후 이용료: 베이직 월 1,100원(월 15회 스캔 &amp; 저장) · 프로 월 2,200원(무제한 스캔 &amp; 저장)<br>
-      프로 장기구독(웹 결제 전용, 더 저렴해요): 1년 9,900원 · 2년 18,900원 · 3년 27,900원
+      <strong>무료 20회 평생 이용</strong> · 베이직 월 1,100원(월 30회 스캔 &amp; 저장) · 프로 월 2,200원(무제한 스캔 &amp; 저장)
     </div>
     <div>
       스카이장랩스(SkyJANG Labs) · 대표 장중배 · 사업자등록번호 320-01-04154<br>
       경기도 안양시 동안구 시민대로 109, 공장동 20층 2008호(호계동, 에이스하이테크시티범계)<br>
-      통신판매업신고번호 신고번호 발급 진행중 · 연락처 010-3926-4502 · 이메일 <a href="mailto:manager@skyjang.com" style="color:#4338ca;">manager@skyjang.com</a><br>
+      통신판매업신고번호 신고번호 발급 진행중 · 이메일 <a href="mailto:manager@skyjang.com" style="color:#4338ca;">manager@skyjang.com</a><br>
       <a href="terms.html" style="color:#4338ca;">이용약관</a> · <a href="privacy.html" style="color:#4338ca;">개인정보처리방침</a> · <a href="refund.html" style="color:#4338ca;">환불정책</a>
     </div>
   </div>
@@ -252,25 +250,13 @@
 <div id="sjPaywallPlans" style="display:flex;flex-direction:column;gap:10px;margin:12px 0;">
 <div class="sj-paywall-plan" data-plan="basic" style="border:1px solid #e5e7eb;border-radius:10px;padding:12px;">
 <div style="font-weight:700;font-size:15px;">베이직 · 월 1,100원</div>
-<div style="font-size:13px;color:#666;margin:4px 0 10px;">매달 15회 스캔 &amp; 저장</div>
+<div style="font-size:13px;color:#666;margin:4px 0 10px;">매달 30회 스캔 &amp; 저장</div>
 <button type="button" class="sj-primary sj-paywall-buy-btn" data-plan="basic" style="margin:0;">베이직 구독하기</button>
 </div>
 <div class="sj-paywall-plan" data-plan="pro" style="border:1px solid #e5e7eb;border-radius:10px;padding:12px;">
 <div style="font-weight:700;font-size:15px;">프로 · 월 2,200원</div>
 <div style="font-size:13px;color:#666;margin:4px 0 10px;">무제한 스캔 &amp; 저장</div>
 <button type="button" class="sj-primary sj-paywall-buy-btn" data-plan="pro" style="margin:0;">프로 구독하기</button>
-</div>
-<!-- 2026-09-20 추가: 프로 장기구독(선불 할인). 애플이 자동갱신 구독을 최대 1년까지만
-     허용해서 2년/3년은 웹(포트원) 결제 전용이다 -- data-web-only는
-     js/subscription.js의 openPaywall()이 iOS 앱에서 자동으로 숨긴다. -->
-<div class="sj-paywall-plan" data-web-only="1" style="border:1px solid #e5e7eb;border-radius:10px;padding:12px;">
-<div style="font-weight:700;font-size:15px;">프로 장기구독 · 미리 내면 더 저렴해요</div>
-<div style="font-size:13px;color:#666;margin:4px 0 10px;">무제한 스캔 &amp; 저장 (웹 결제 전용)</div>
-<div style="display:flex;flex-direction:column;gap:6px;">
-<button type="button" class="sj-secondary sj-paywall-buy-btn" data-plan="pro_year1" style="margin:0;">1년 9,900원 (월 825원 상당)</button>
-<button type="button" class="sj-secondary sj-paywall-buy-btn" data-plan="pro_year2" style="margin:0;">2년 18,900원 (월 788원 상당)</button>
-<button type="button" class="sj-secondary sj-paywall-buy-btn" data-plan="pro_year3" style="margin:0;">3년 27,900원 (월 775원 상당)</button>
-</div>
 </div>
 </div>
 <button type="button" class="sj-secondary" id="sjPaywallRestoreBtn" style="display:none;">구매 복원</button>
@@ -415,10 +401,10 @@
 <script src="js/render-setup.js?v=20260823f" defer></script>
 <script src="js/render-play.js?v=20260823f" defer></script>
 <script src="js/render-result.js?v=20260823f" defer></script>
-<script src="js/settlement.js?v=20260920b" defer></script>
+<script src="js/settlement.js?v=20260825j" defer></script>
 <script src="js/share.js?v=20260823f" defer></script>
 <script src="js/app.js?v=20260823g" defer></script>
-<script src="js/ui-modals.js?v=20260920a" defer></script>
+<script src="js/ui-modals.js?v=20260823f" defer></script>
 <script src="https://developers.kakao.com/sdk/js/kakao.js" defer></script>
 <script src="https://static.nid.naver.com/js/naveridlogin_js_sdk_2.0.2.js" defer></script>
 <!-- 2026-09 추가: 웹(브라우저) 구독 결제용 포트원(PortOne) V2 브라우저 SDK. iOS 앱
@@ -426,7 +412,7 @@
      js/subscription.js가 이 전역(window.PortOne)을 호출한다. -->
 <script src="https://cdn.portone.io/v2/browser-sdk.js" defer></script>
 <script type="module" src="js/auth.js?v=20260828a"></script>
-<script src="js/subscription.js?v=20260920b" defer></script>
+<script src="js/subscription.js?v=20260909a" defer></script>
 <script src="js/ocr.js?v=20260823f" defer></script>
 <script src="js/cloud-save.js?v=20260823f" defer></script>
 <script src="js/cloud-load.js?v=20260823g" defer></script>

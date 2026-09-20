@@ -14,6 +14,10 @@
   if(sjManualBtnEl){ sjManualBtnEl.addEventListener("click", function(){ sjOpen("sjManualModal"); }); }
   sj("sjOcrFab").addEventListener("click", function(){
     if(window.__sjOcr && window.__sjOcr.onOpen){ window.__sjOcr.onOpen(); }
+    // 2026-09-20: sjOcrModal을 열 때마다 무료/구독 사용량 배너(및 "구독 관리" 버튼)를
+    // 다시 그려준다. 이 호출이 빠져 있으면 로그인 상태에서도 배너가 절대 채워지지
+    // 않아서 "구독 모달"로 들어갈 방법이 화면 어디에도 없게 된다.
+    if(window.__sjSubscription && window.__sjSubscription.refreshBanner){ window.__sjSubscription.refreshBanner(); }
     sjOpen("sjOcrModal");
   });
   sj("sjSaveFab").addEventListener("click", function(){
