@@ -172,8 +172,8 @@
   <div class="sj-site-footer-info" style="max-width:640px;margin:18px auto 0;padding:14px 16px;border-top:1px solid #e5e7eb;font-size:12px;color:#6b7280;line-height:1.7;text-align:center;">
     <div style="margin-bottom:8px;">
       <strong>🆓 최초 20회, 평생 무료로 체험</strong> (매달 초기화되지 않는 1회성 혜택입니다)<br>
-      이후 이용료: 베이직 월 1,100원(월 15회 스캔 &amp; 저장) · 프로 월 1,900원(무제한 스캔 &amp; 저장)<br>
-      프로 장기구독(웹 결제 전용, 더 저렴해요): 1년 9,900원 · 2년 18,900원 · 3년 27,900원
+      이후 이용료: 베이직 월 1,100원(월 6회 스캔 &amp; 저장) · 프로 월 1,900원(무제한 스캔 &amp; 저장)<br>
+      프로 장기구독(웹 결제 전용, 더 저렴해요): 1년 9,900원 · 2년 16,900원
     </div>
     <div>
       스카이장랩스(SkyJANG Labs) · 대표 장중배 · 사업자등록번호 320-01-04154<br>
@@ -261,7 +261,7 @@
 <div id="sjPaywallPlans" style="display:flex;flex-direction:column;gap:10px;margin:12px 0;">
 <div class="sj-paywall-plan" data-plan="basic" style="border:1px solid #e5e7eb;border-radius:10px;padding:12px;">
 <div style="font-weight:700;font-size:15px;">베이직 · 월 1,100원</div>
-<div style="font-size:13px;color:#666;margin:4px 0 10px;">매달 15회 스캔 &amp; 저장</div>
+<div style="font-size:13px;color:#666;margin:4px 0 10px;">매달 6회 스캔 &amp; 저장</div>
 <button type="button" class="sj-primary sj-paywall-buy-btn" data-plan="basic" style="margin:0;">베이직 구독하기</button>
 </div>
 <div class="sj-paywall-plan" data-plan="pro" style="border:1px solid #e5e7eb;border-radius:10px;padding:12px;">
@@ -271,16 +271,16 @@
 </div>
 <!-- 2026-09-21 수정: 프로 장기구독(선불 할인). 애플은 자동갱신 구독을 최대 1년까지만
      허용해서 1년 옵션은 iOS(RevenueCat)에서도 제공 가능하지만(App Store Connect에
-     실제 상품을 만들기 전까지는 "구독 준비 중" 메시지만 뜸), 2년/3년은 자동갱신으로
-     만들 수 없어 웹(포트원) 결제 전용이다 -- 그 두 버튼에만 data-web-only를 달아
-     js/subscription.js의 openPaywall()이 iOS 앱에서 자동으로 숨긴다. -->
+     실제 상품을 만들기 전까지는 "구독 준비 중" 메시지만 뜸), 2년은 자동갱신으로
+     만들 수 없어 웹(포트원) 결제 전용이다 -- 그 버튼에만 data-web-only를 달아
+     js/subscription.js의 openPaywall()이 iOS 앱에서 자동으로 숨긴다. 3년 옵션은
+     2년 대비 할인폭이 미미해(월 환산 12원 차이) 매력이 없다고 판단, 제거했다. -->
 <div class="sj-paywall-plan" style="border:1px solid #e5e7eb;border-radius:10px;padding:12px;">
 <div style="font-weight:700;font-size:15px;">프로 장기구독 · 미리 내면 더 저렴해요</div>
-<div style="font-size:13px;color:#666;margin:4px 0 10px;">무제한 스캔 &amp; 저장 (2년/3년은 웹 결제 전용)</div>
+<div style="font-size:13px;color:#666;margin:4px 0 10px;">무제한 스캔 &amp; 저장 (2년은 웹 결제 전용)</div>
 <div style="display:flex;flex-direction:column;gap:6px;">
 <button type="button" class="sj-paywall-longterm-btn sj-paywall-buy-btn" data-plan="pro_year1">1년 9,900원 (월 825원 상당)</button>
-<button type="button" class="sj-paywall-longterm-btn sj-paywall-buy-btn" data-plan="pro_year2" data-web-only="1">2년 18,900원 (월 788원 상당)</button>
-<button type="button" class="sj-paywall-longterm-btn sj-paywall-buy-btn" data-plan="pro_year3" data-web-only="1">3년 27,900원 (월 775원 상당)</button>
+<button type="button" class="sj-paywall-longterm-btn sj-paywall-buy-btn" data-plan="pro_year2" data-web-only="1">2년 16,900원 (월 704원 상당)</button>
 </div>
 </div>
 </div>
@@ -437,7 +437,7 @@
      js/subscription.js가 이 전역(window.PortOne)을 호출한다. -->
 <script src="https://cdn.portone.io/v2/browser-sdk.js" defer></script>
 <script type="module" src="js/auth.js?v=20260828a"></script>
-<script src="js/subscription.js?v=20260921c" defer></script>
+<script src="js/subscription.js?v=20260921d" defer></script>
 <script src="js/ocr.js?v=20260823f" defer></script>
 <script src="js/cloud-save.js?v=20260823f" defer></script>
 <script src="js/cloud-load.js?v=20260823g" defer></script>

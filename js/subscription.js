@@ -27,13 +27,14 @@
   // "com.skyjang.golfscorecard.pro.yearly"는 아직 실제로 App Store Connect에 만들지
   // 않은 자리표시자(placeholder)입니다 -- 상품을 만들고 RevenueCat에 연결한 뒤 실제
   // product ID로 바꿔주세요(그 전까지는 눌러도 "구독 준비 중" 메시지만 뜹니다, basic/pro와
-  // 동일). pro_year2/pro_year3(2년/3년)는 애플 자동갱신 구독으로 만들 수 없어서(최대 1년
+  // 동일). pro_year2(2년)는 애플 자동갱신 구독으로 만들 수 없어서(최대 1년
   // 제한) 여기 목록에 없고, 항상 웹(포트원) 결제 전용입니다.
   var IOS_PRODUCT_IDS = { basic: "com.skyjang.golfscorecard.basic.monthly", pro: "com.skyjang.golfscorecard.pro.monthly", pro_year1: "com.skyjang.golfscorecard.pro.yearly" };
 
   // 결제창(카드 등록) 및 주문명에 쓰는 요금제별 표시 이름.
   // firebase-backend/functions/subscription.js의 PLAN_DEFS.label과 맞춰둘 것.
-  var PLAN_LABELS = { basic: "베이직 월간", pro: "프로 월간", pro_year1: "프로 1년", pro_year2: "프로 2년", pro_year3: "프로 3년" };
+  // 2026-09-21: 3년 선불(pro_year3)은 2년 대비 할인폭이 미미해 요금제에서 제거함.
+  var PLAN_LABELS = { basic: "베이직 월간", pro: "프로 월간", pro_year1: "프로 1년", pro_year2: "프로 2년" };
 
   var isNative = !!(window.Capacitor && typeof window.Capacitor.isNativePlatform === "function" && window.Capacitor.isNativePlatform());
   var rcConfiguredForUid = null; // 마지막으로 configure()에 성공한 uid -- 로그인 계정이 바뀌면 다시 설정
