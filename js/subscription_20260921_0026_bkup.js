@@ -197,24 +197,13 @@
       setStatus(statusEl, "결제 모듈을 불러오지 못했습니다. 새로고침 후 다시 시도해주세요.", true);
       return;
     }
-    // 2026-09-21: KG이니시스(카드 등록/PC)는 이름·연락처·이메일을 필수로 요구합니다
-    // (누락 시 "issueId violates the rule REQUIRED" 등으로 실패). 이메일은
-    // 로그인 계정에서, 이름/연락처는 결제창의 입력칸에서 받습니다.
-    var nameEl = sj("sjPaywallName");
-    var phoneEl = sj("sjPaywallPhone");
-    var fullName = nameEl && nameEl.value ? nameEl.value.trim() : "";
-    var phoneNumber = phoneEl && phoneEl.value ? phoneEl.value.trim() : "";
-    if(!fullName){ setStatus(statusEl, "이름을 입력해주세요.", true); return; }
-    if(!phoneNumber){ setStatus(statusEl, "연락처를 입력해주세요.", true); return; }
-    if(!u.email){ setStatus(statusEl, "이메일 정보가 없는 계정입니다. 이메일이 확인되는 계정으로 로그인해주세요.", true); return; }
     setStatus(statusEl, "카드 등록 창을 여는 중...");
     window.PortOne.requestIssueBillingKey({
       storeId: PORTONE_STORE_ID,
       channelKey: PORTONE_CHANNEL_KEY,
       billingKeyMethod: "CARD",
-      issueId: "issue-" + u.uid + "-" + Date.now(),
       issueName: "골프 스코어카드 " + (PLAN_LABELS[plan] || "구독") + " 구독",
-      customer: { customerId: u.uid, fullName: fullName, phoneNumber: phoneNumber, email: u.email }
+      customer: { customerId: u.uid, email: u.email || undefined }
     }).then(function(result){
       if(!result || result.code){
         setStatus(statusEl, "카드 등록에 실패했습니다: " + ((result && result.message) || "알 수 없는 오류"), true);
