@@ -249,15 +249,6 @@
 <button class="sj-close" data-close>×</button>
 <h3>💳 구독 안내</h3>
 <p id="sjPaywallReason" style="font-size:13px;color:#666;margin-top:0;"></p>
-<!-- 2026-09-22(2차) 추가: 결제수단 선택(카드/카카오페이/네이버페이). data-web-only라
-     iOS 앱(RevenueCat)에서는 자동으로 숨겨집니다(iOS는 애플 In-App Purchase만 사용).
-     카카오페이/네이버페이는 포트원 채널 심사가 끝나기 전까지는 선택은 되지만
-     js/subscription.js의 purchaseWeb()이 안내 메시지를 띄우고 결제를 막습니다. -->
-<div id="sjPaywallPayMethod" data-web-only="1" style="display:flex;gap:14px;margin:0 0 10px;font-size:13px;color:#333;">
-<label style="display:flex;align-items:center;gap:4px;cursor:pointer;"><input type="radio" name="sjPayMethod" value="CARD" checked> 카드</label>
-<label style="display:flex;align-items:center;gap:4px;cursor:pointer;"><input type="radio" name="sjPayMethod" value="KAKAOPAY"> 카카오페이</label>
-<label style="display:flex;align-items:center;gap:4px;cursor:pointer;"><input type="radio" name="sjPayMethod" value="NAVERPAY"> 네이버페이</label>
-</div>
 <!-- 2026-09-21 추가: 웹(포트원) 카드 등록은 결제대행사(KG이니시스 등) 정책상 이름/연락처/이메일이
      필수입니다 -- data-web-only라 iOS 앱(RevenueCat)에서는 자동으로 숨겨집니다. 카카오/네이버
      로그인은 계정에 이메일이 없는 경우가 많아 이메일도 직접 입력받습니다(로그인 계정에
@@ -469,7 +460,7 @@
      js/subscription.js가 이 전역(window.PortOne)을 호출한다. -->
 <script src="https://cdn.portone.io/v2/browser-sdk.js" defer></script>
 <script type="module" src="js/auth.js?v=20260922b"></script>
-<script src="js/subscription.js?v=20260922c" defer></script>
+<script src="js/subscription.js?v=20260922b" defer></script>
 <script src="js/ocr.js?v=20260823f" defer></script>
 <script src="js/cloud-save.js?v=20260823f" defer></script>
 <script src="js/cloud-load.js?v=20260823g" defer></script>

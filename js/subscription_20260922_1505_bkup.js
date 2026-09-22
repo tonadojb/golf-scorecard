@@ -16,30 +16,9 @@
      공개 식별자입니다. firebase-backend/functions/webBilling.js의 같은 이름 상수와
      반드시 정확히 같은 값이어야 합니다. */
   /* 2026-09-20: 포트원 테스트 채널("KG이니시스 테스트") 값으로 채움. 실연동 전환 시
-     이 값을 실연동 채널의 Store ID로 반드시 교체해야 합니다. */
+     이 두 값을 실연동 채널의 Store ID/Channel Key로 반드시 교체해야 합니다. */
   var PORTONE_STORE_ID = "store-4a0faef7-5c25-4689-a9cc-fd61002a795c";
-
-  /* 2026-09-22(2차) 추가: 카카오페이/네이버페이(결제형)를 추가하면서 카드 전용
-     단일 채널 키를 결제수단별 맵으로 바꿨다. 포트원은 결제수단(정확히는 PG
-     계약)마다 별도의 "채널"이라 채널 키가 서로 다르고, 빌링키 발급 시 쓴 채널과
-     실제 청구(재청구 포함) 시 채널이 반드시 같아야 한다. 카카오페이/네이버페이는
-     아직 포트원 콘솔에서 실채널 심사가 끝나지 않아 아래 두 값은 플레이스홀더다 --
-     콘솔에서 채널을 만들면 나오는 (심사 전이면 테스트) Channel Key로 교체해야
-     실제로 결제가 된다. firebase-backend/functions/webBilling.js의
-     PORTONE_CHANNEL_KEYS와 정확히 같은 값이어야 한다. */
-  var PORTONE_CHANNEL_KEY_CARD = "channel-key-9b1249e8-88bd-45d3-bb0f-ea684410cd9f";
-  var PORTONE_CHANNEL_KEY_KAKAOPAY = "channel-key-KAKAOPAY_PLACEHOLDER";
-  var PORTONE_CHANNEL_KEY_NAVERPAY = "channel-key-NAVERPAY_PLACEHOLDER";
-
-  // 결제수단별 { 채널 키, requestIssueBillingKey에 넘길 billingKeyMethod }.
-  // 카카오페이/네이버페이는 포트원 문서상 간편결제(EASY_PAY) 방식으로 빌링키를
-  // 발급받는다. PLACEHOLDER가 남아있는 동안은 purchaseWeb()이 결제를 막고
-  // 안내 메시지를 띄운다.
-  var PAY_METHOD_CHANNELS = {
-    CARD: { channelKey: PORTONE_CHANNEL_KEY_CARD, billingKeyMethod: "CARD", label: "카드" },
-    KAKAOPAY: { channelKey: PORTONE_CHANNEL_KEY_KAKAOPAY, billingKeyMethod: "EASY_PAY", label: "카카오페이" },
-    NAVERPAY: { channelKey: PORTONE_CHANNEL_KEY_NAVERPAY, billingKeyMethod: "EASY_PAY", label: "네이버페이" }
-  };
+  var PORTONE_CHANNEL_KEY = "channel-key-9b1249e8-88bd-45d3-bb0f-ea684410cd9f";
 
   // App Store Connect에 등록한(그리고 RevenueCat에 연결해둔) 실제 상품 ID의 일부입니다.
   // firebase-backend/functions/subscription.js의 IOS_PRODUCT_PLAN과 반드시 맞춰주세요.
@@ -285,28 +264,17 @@
     if(!fullName){ setStatus(statusEl, "이름을 입력해주세요.", true); return; }
     if(!phoneNumber){ setStatus(statusEl, "연락처를 입력해주세요.", true); return; }
     if(!email){ setStatus(statusEl, "이메일을 입력해주세요.", true); return; }
-
-    // 2026-09-22(2차) 추가: 결제창의 결제수단 라디오 버튼(name="sjPayMethod")에서
-    // 선택된 값을 읽는다. 라디오가 아직 안 그려졌거나(구버전 캐시 등) 선택된 값이
-    // 없으면 기존과 동일하게 카드로 취급한다.
-    var payMethodEl = document.querySelector('input[name="sjPayMethod"]:checked');
-    var payMethod = (payMethodEl && PAY_METHOD_CHANNELS[payMethodEl.value]) ? payMethodEl.value : "CARD";
-    var channelConf = PAY_METHOD_CHANNELS[payMethod];
-    if(/PLACEHOLDER/.test(channelConf.channelKey)){
-      setStatus(statusEl, channelConf.label + " 결제는 아직 채널 심사가 끝나지 않아 준비 중입니다. 카드로 결제해주세요.", true);
-      return;
-    }
-    setStatus(statusEl, channelConf.label + " 등록 창을 여는 중...");
+    setStatus(statusEl, "카드 등록 창을 여는 중...");
     window.PortOne.requestIssueBillingKey({
       storeId: PORTONE_STORE_ID,
-      channelKey: channelConf.channelKey,
-      billingKeyMethod: channelConf.billingKeyMethod,
+      channelKey: PORTONE_CHANNEL_KEY,
+      billingKeyMethod: "CARD",
       issueId: "issue-" + u.uid + "-" + Date.now(),
       issueName: "골프 스코어카드 " + (PLAN_LABELS[plan] || "구독") + " 구독",
       customer: { customerId: u.uid, fullName: fullName, phoneNumber: phoneNumber, email: email }
     }).then(function(result){
       if(!result || result.code){
-        setStatus(statusEl, channelConf.label + " 등록에 실패했습니다: " + ((result && result.message) || "알 수 없는 오류"), true);
+        setStatus(statusEl, "카드 등록에 실패했습니다: " + ((result && result.message) || "알 수 없는 오류"), true);
         return;
       }
       setStatus(statusEl, "결제를 진행하는 중...");
@@ -314,7 +282,7 @@
         return fetch(WEB_SUBSCRIBE_URL, {
           method: "POST",
           headers: { "Content-Type": "application/json", "Authorization": "Bearer " + idToken },
-          body: JSON.stringify({ plan: plan, billingKey: result.billingKey, payMethod: payMethod })
+          body: JSON.stringify({ plan: plan, billingKey: result.billingKey })
         });
       }).then(function(res){ return res.json(); })
         .then(function(data){
