@@ -654,14 +654,6 @@ function renderAuthUI(user){
     if(adminFab) adminFab.style.display = (user.email === ADMIN_EMAIL) ? "" : "none";
     startPresenceHeartbeat();
     applyPreferredLanguage(user);
-    // 2026-09-22 추가: 로그인 상태가 확인되는 즉시 구독/사용량 상태를 미리 한 번
-    // 조회해둔다. 이걸 안 해두면 사용자가 나중에 OCR 모달을 열 때 그 순간에야
-    // 조회를 시작해서 "구독 관리" 배너가 뒤늦게 뜨는 지연이 생긴다 -- 여기서
-    // 미리 캐시해두면 js/subscription.js의 refreshBannerFast()가 그 캐시를
-    // 즉시 그려줘서 체감 지연이 사라진다.
-    if(window.__sjSubscription && window.__sjSubscription.preloadStatus){
-      window.__sjSubscription.preloadStatus();
-    }
   } else {
     if(loggedOut) loggedOut.style.display = "block";
     if(loggedIn) loggedIn.style.display = "none";

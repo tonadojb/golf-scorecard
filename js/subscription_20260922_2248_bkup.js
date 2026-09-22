@@ -91,19 +91,6 @@
       .catch(function(e){ console.error("구독 상태 조회 실패", e); return null; });
   }
 
-  /* 2026-09-22 추가: OCR 모달을 열 때마다 refreshStatus()를 새로 호출하면
-     ID 토큰 갱신 + 클라우드 함수 호출(네트워크 왕복 두 번)이 끝날 때까지
-     배너가 비어있어서 체감 지연이 있었다. 직전에 조회해둔 lastStatus가
-     있으면 그걸로 먼저 즉시 배너를 그리고(값이 바뀌었을 가능성은 낮으니
-     대부분 그대로 맞다), 최신 값은 이 함수가 그대로 내부적으로 호출하는
-     refreshStatus()가 백그라운드에서 가져와 조용히 다시 그린다 -- 화면
-     깜빡임 없이 지연만 없어진다. ui-modals.js가 모달을 열 때마다 이 함수를
-     부른다(과거의 refreshBanner를 대체). */
-  function refreshBannerFast(){
-    if(lastStatus){ renderQuotaBanner(lastStatus); }
-    return refreshStatus();
-  }
-
   /* ---------------- 결제창(모달) ---------------- */
 
   function openPaywall(reasonMessage){
@@ -309,13 +296,7 @@
   window.__sjSubscription = {
     openPaywall: openPaywall,
     closePaywall: closePaywall,
-    refreshBanner: refreshBannerFast,
-    // 2026-09-22 추가: 로그인 직후(auth.js의 renderAuthUI)에 미리 한 번
-    // 조회해서 lastStatus를 채워두는 용도 -- 이렇게 하면 사용자가 실제로
-    // OCR 모달을 열 때는 이미 캐시가 준비되어 있어 refreshBannerFast()가
-    // 항상 즉시 그릴 수 있다. 배너를 직접 그리지 않는 "조용한" 버전이라
-    // refreshStatus를 그대로 노출한다.
-    preloadStatus: refreshStatus,
+    refreshBanner: refreshStatus,
     getLastStatus: function(){ return lastStatus; }
   };
 })();
