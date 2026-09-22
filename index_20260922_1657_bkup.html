@@ -188,8 +188,18 @@
       <div style="display:flex;justify-content:space-between;gap:10px;padding:3px 0;border-bottom:1px solid #f3f4f6;">
         <span>베이직 · 월 6회 스캔 &amp; 저장</span><span style="color:#374151;font-weight:600;white-space:nowrap;">월 1,100원</span>
       </div>
-      <div style="display:flex;justify-content:space-between;gap:10px;padding:3px 0;">
+      <div style="display:flex;justify-content:space-between;gap:10px;padding:3px 0 10px;border-bottom:1px solid #f3f4f6;">
         <span>프로 · 무제한 스캔 &amp; 저장</span><span style="color:#374151;font-weight:600;white-space:nowrap;">월 1,900원</span>
+      </div>
+      <div style="font-size:11px;color:#9ca3af;font-weight:600;letter-spacing:.02em;margin:10px 0 4px;">프로 단건결제 (웹 전용, 자동갱신 없음)</div>
+      <div style="display:flex;justify-content:space-between;gap:10px;padding:3px 0;">
+        <span>1개월</span><span style="color:#374151;font-weight:600;white-space:nowrap;">1,900원</span>
+      </div>
+      <div style="display:flex;justify-content:space-between;gap:10px;padding:3px 0;">
+        <span>2개월</span><span style="color:#374151;font-weight:600;white-space:nowrap;">3,600원</span>
+      </div>
+      <div style="display:flex;justify-content:space-between;gap:10px;padding:3px 0;">
+        <span>3개월</span><span style="color:#374151;font-weight:600;white-space:nowrap;">4,900원</span>
       </div>
     </div>
 
@@ -306,6 +316,22 @@
 <div style="font-weight:700;font-size:15px;">프로 · 월 1,900원</div>
 <div style="font-size:13px;color:#666;margin:4px 0 10px;">무제한 스캔 &amp; 저장</div>
 <button type="button" class="sj-primary sj-paywall-buy-btn" data-plan="pro" style="margin:0;">프로 구독하기</button>
+</div>
+<!-- 2026-09-22 수정: 기존 프로 장기구독(1년/2년 자동재청구)이 NHN KCP 전자결제
+     등록 심사에서 반려됐다("장기서비스(~2년 구독) 입점 불가 -- 단건결제는 최대
+     3개월, 자동결제는 월간단위만 가능"). 그래서 1년/2년을 전부 없애고, 대신
+     프로를 1~3개월치 미리 한 번만 결제하는 "단건결제(비갱신)"로 교체했다.
+     iOS는 이 상품 자체가 없어서(애초에 KCP 심사와 무관, 애플은 basic/pro 월간
+     자동갱신만 사용) 이 블록 전체에 data-web-only를 달아 iOS 앱에서는 자동으로
+     숨긴다. -->
+<div class="sj-paywall-plan" data-web-only="1" style="border:1px solid #e5e7eb;border-radius:10px;padding:12px;">
+<div style="font-weight:700;font-size:15px;">프로 단건결제 · 자동갱신 없이 원하는 기간만</div>
+<div style="font-size:13px;color:#666;margin:4px 0 10px;">무제한 스캔 &amp; 저장 (결제 후 자동으로 다시 청구되지 않고, 기간이 끝나면 무료로 전환됩니다)</div>
+<div style="display:flex;flex-direction:column;gap:6px;">
+<button type="button" class="sj-paywall-longterm-btn sj-paywall-buy-btn" data-plan="pro_1mo">1개월 1,900원</button>
+<button type="button" class="sj-paywall-longterm-btn sj-paywall-buy-btn" data-plan="pro_2mo">2개월 3,600원 (월 1,800원 상당)</button>
+<button type="button" class="sj-paywall-longterm-btn sj-paywall-buy-btn" data-plan="pro_3mo">3개월 4,900원 (월 1,633원 상당)</button>
+</div>
 </div>
 </div>
 <button type="button" class="sj-secondary" id="sjPaywallRestoreBtn" style="display:none;">구매 복원</button>

@@ -43,14 +43,16 @@
 
   // App Store Connect에 등록한(그리고 RevenueCat에 연결해둔) 실제 상품 ID의 일부입니다.
   // firebase-backend/functions/subscription.js의 IOS_PRODUCT_PLAN과 반드시 맞춰주세요.
-  // 2026-09-22: 장기(1년/2년) 요금제를 웹/iOS 양쪽에서 전부 제거했고, 뒤이어
-  // 추가했던 프로 1/2/3개월 단건결제(웹 전용) 옵션도 다시 없앴습니다. 이제
-  // 웹/iOS 모두 basic/pro 월간 자동갱신 구독 두 가지만 남습니다.
+  // 2026-09-22: 장기(1년/2년) 요금제를 웹/iOS 양쪽에서 전부 제거했습니다. iOS는
+  // basic/pro 월간 자동갱신 구독만 남습니다. 프로의 1/2/3개월 단건결제
+  // (pro_1mo/pro_2mo/pro_3mo)는 NHN KCP 심사 정책(단건결제는 최대 3개월까지만
+  // 허용) 때문에 생긴, 웹(포트원) 결제 전용 상품이라 여기 목록에 없습니다
+  // (openPaywall()이 [data-web-only] 마크업을 보고 iOS 앱에서는 자동으로 숨김).
   var IOS_PRODUCT_IDS = { basic: "com.skyjang.golfscorecard.basic.monthly", pro: "com.skyjang.golfscorecard.pro.monthly" };
 
   // 결제창(카드 등록) 및 주문명에 쓰는 요금제별 표시 이름.
   // firebase-backend/functions/subscription.js의 PLAN_DEFS.label과 맞춰둘 것.
-  var PLAN_LABELS = { basic: "베이직 월간", pro: "프로 월간" };
+  var PLAN_LABELS = { basic: "베이직 월간", pro: "프로 월간", pro_1mo: "프로 1개월(단건)", pro_2mo: "프로 2개월(단건)", pro_3mo: "프로 3개월(단건)" };
 
   var isNative = !!(window.Capacitor && typeof window.Capacitor.isNativePlatform === "function" && window.Capacitor.isNativePlatform());
   var rcConfiguredForUid = null; // 마지막으로 configure()에 성공한 uid -- 로그인 계정이 바뀌면 다시 설정

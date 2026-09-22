@@ -13,14 +13,18 @@
   var SUB_STATS_URL = "https://asia-northeast3-skyjang-golfscore.cloudfunctions.net/adminGetSubscriptionStats";
 
   // 2026-09-21 추가: 구독 현황(요금제별 구독자 수 / 월별 결제 그래프)에 쓰는 고정
-  // 팔레트 -- dataviz 스킬의 카테고리 팔레트 1~2번 슬롯을 그대로 썼다(인접 쌍
+  // 팔레트 -- dataviz 스킬의 카테고리 팔레트 1~4번 슬롯을 그대로 썼다(인접 쌍
   // CVD 검증 통과된 순서라 임의로 바꾸지 말 것). 요금제 키 순서와 색이 항상
   // 고정으로 짝지어져야 어느 그래프에서도 "베이직=파랑"처럼 색이 흔들리지 않는다.
-  // (2026-09-22: 한때 프로 단건결제 1/2/3개월 옵션이 있어 카테고리가 5개까지
-  // 늘었었지만, 그 옵션 자체를 없애면서 베이직/프로 두 카테고리로 되돌렸다.)
-  var PLAN_KEYS_ORDER = ["basic", "pro"];
-  var PLAN_COLORS = { basic: "#2a78d6", pro: "#eb6834" };
-  var PLAN_SHORT_LABELS = { basic: "베이직", pro: "프로 월간" };
+  // 2026-09-22: 장기(1년/2년) 요금제를 없애고 프로 단건결제(1/2/3개월)로
+  // 교체하면서 카테고리가 4개->5개로 늘어, dataviz 팔레트 5번 슬롯(마젠타)을
+  // 추가로 썼다(1~4번 슬롯 순서/색은 그대로 유지 -- 인접쌍 CVD 검증 통과 순서라
+  // 임의로 바꾸지 말 것). "node scripts/validate_palette.js
+  // "#2a78d6,#eb6834,#1baf7a,#eda100,#e87ba4" --mode light"로 5개 슬롯 전부
+  // 재검증 완료(PASS, 기존과 동일한 대비 WARN은 직접 라벨로 이미 충족).
+  var PLAN_KEYS_ORDER = ["basic", "pro", "pro_1mo", "pro_2mo", "pro_3mo"];
+  var PLAN_COLORS = { basic: "#2a78d6", pro: "#eb6834", pro_1mo: "#1baf7a", pro_2mo: "#eda100", pro_3mo: "#e87ba4" };
+  var PLAN_SHORT_LABELS = { basic: "베이직", pro: "프로 월간", pro_1mo: "프로 1개월", pro_2mo: "프로 2개월", pro_3mo: "프로 3개월" };
   var lastSubStats = null; // { subscriberCounts, currentMRR, monthlyRevenue, planLabels } -- 연도 셀렉트 바뀔 때 재요청 없이 필터링만 새로 하려고 캐싱.
 
   function escapeHtmlLocal(s){

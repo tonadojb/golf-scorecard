@@ -16,41 +16,24 @@
      공개 식별자입니다. firebase-backend/functions/webBilling.js의 같은 이름 상수와
      반드시 정확히 같은 값이어야 합니다. */
   /* 2026-09-20: 포트원 테스트 채널("KG이니시스 테스트") 값으로 채움. 실연동 전환 시
-     이 값을 실연동 채널의 Store ID로 반드시 교체해야 합니다. */
+     이 두 값을 실연동 채널의 Store ID/Channel Key로 반드시 교체해야 합니다. */
   var PORTONE_STORE_ID = "store-4a0faef7-5c25-4689-a9cc-fd61002a795c";
-
-  /* 2026-09-22(2차) 추가: 카카오페이/네이버페이(결제형)를 추가하면서 카드 전용
-     단일 채널 키를 결제수단별 맵으로 바꿨다. 포트원은 결제수단(정확히는 PG
-     계약)마다 별도의 "채널"이라 채널 키가 서로 다르고, 빌링키 발급 시 쓴 채널과
-     실제 청구(재청구 포함) 시 채널이 반드시 같아야 한다. 카카오페이/네이버페이는
-     아직 포트원 콘솔에서 실채널 심사가 끝나지 않아 아래 두 값은 플레이스홀더다 --
-     콘솔에서 채널을 만들면 나오는 (심사 전이면 테스트) Channel Key로 교체해야
-     실제로 결제가 된다. firebase-backend/functions/webBilling.js의
-     PORTONE_CHANNEL_KEYS와 정확히 같은 값이어야 한다. */
-  var PORTONE_CHANNEL_KEY_CARD = "channel-key-9b1249e8-88bd-45d3-bb0f-ea684410cd9f";
-  var PORTONE_CHANNEL_KEY_KAKAOPAY = "channel-key-KAKAOPAY_PLACEHOLDER";
-  var PORTONE_CHANNEL_KEY_NAVERPAY = "channel-key-NAVERPAY_PLACEHOLDER";
-
-  // 결제수단별 { 채널 키, requestIssueBillingKey에 넘길 billingKeyMethod }.
-  // 카카오페이/네이버페이는 포트원 문서상 간편결제(EASY_PAY) 방식으로 빌링키를
-  // 발급받는다. PLACEHOLDER가 남아있는 동안은 purchaseWeb()이 결제를 막고
-  // 안내 메시지를 띄운다.
-  var PAY_METHOD_CHANNELS = {
-    CARD: { channelKey: PORTONE_CHANNEL_KEY_CARD, billingKeyMethod: "CARD", label: "카드" },
-    KAKAOPAY: { channelKey: PORTONE_CHANNEL_KEY_KAKAOPAY, billingKeyMethod: "EASY_PAY", label: "카카오페이" },
-    NAVERPAY: { channelKey: PORTONE_CHANNEL_KEY_NAVERPAY, billingKeyMethod: "EASY_PAY", label: "네이버페이" }
-  };
+  var PORTONE_CHANNEL_KEY = "channel-key-9b1249e8-88bd-45d3-bb0f-ea684410cd9f";
 
   // App Store Connect에 등록한(그리고 RevenueCat에 연결해둔) 실제 상품 ID의 일부입니다.
   // firebase-backend/functions/subscription.js의 IOS_PRODUCT_PLAN과 반드시 맞춰주세요.
-  // 2026-09-22: 장기(1년/2년) 요금제를 웹/iOS 양쪽에서 전부 제거했고, 뒤이어
-  // 추가했던 프로 1/2/3개월 단건결제(웹 전용) 옵션도 다시 없앴습니다. 이제
-  // 웹/iOS 모두 basic/pro 월간 자동갱신 구독 두 가지만 남습니다.
-  var IOS_PRODUCT_IDS = { basic: "com.skyjang.golfscorecard.basic.monthly", pro: "com.skyjang.golfscorecard.pro.monthly" };
+  // 2026-09-20: 애플은 자동갱신 구독 기간을 최대 1년까지만 허용합니다. pro_year1(1년)은
+  // 애플도 지원하는 기간이라 여기 자동갱신 상품으로 등록해뒀지만, 아래
+  // "com.skyjang.golfscorecard.pro.yearly"는 아직 실제로 App Store Connect에 만들지
+  // 않은 자리표시자(placeholder)입니다 -- 상품을 만들고 RevenueCat에 연결한 뒤 실제
+  // product ID로 바꿔주세요(그 전까지는 눌러도 "구독 준비 중" 메시지만 뜹니다, basic/pro와
+  // 동일). pro_year2/pro_year3(2년/3년)는 애플 자동갱신 구독으로 만들 수 없어서(최대 1년
+  // 제한) 여기 목록에 없고, 항상 웹(포트원) 결제 전용입니다.
+  var IOS_PRODUCT_IDS = { basic: "com.skyjang.golfscorecard.basic.monthly", pro: "com.skyjang.golfscorecard.pro.monthly", pro_year1: "com.skyjang.golfscorecard.pro.yearly" };
 
   // 결제창(카드 등록) 및 주문명에 쓰는 요금제별 표시 이름.
   // firebase-backend/functions/subscription.js의 PLAN_DEFS.label과 맞춰둘 것.
-  var PLAN_LABELS = { basic: "베이직 월간", pro: "프로 월간" };
+  var PLAN_LABELS = { basic: "베이직 월간", pro: "프로 월간", pro_year1: "프로 1년", pro_year2: "프로 2년", pro_year3: "프로 3년" };
 
   var isNative = !!(window.Capacitor && typeof window.Capacitor.isNativePlatform === "function" && window.Capacitor.isNativePlatform());
   var rcConfiguredForUid = null; // 마지막으로 configure()에 성공한 uid -- 로그인 계정이 바뀌면 다시 설정
@@ -96,26 +79,6 @@
     if(manageBtn){ manageBtn.addEventListener("click", function(){ openPaywall(""); }); }
   }
 
-  /* 2026-09-22(2차) 추가: lastStatus는 메모리 변수라 "페이지를 새로고침한
-     직후 곧바로 OCR 아이콘을 누르는" 가장 흔한 테스트 상황에서는 아무 도움이
-     안 됐다 -- 새로고침하면 lastStatus가 다시 null로 초기화되고, 로그인 직후
-     preloadStatus()가 네트워크(토큰 갱신 + 클라우드 함수 호출)를 끝내기 전에
-     사용자가 먼저 클릭해버리면 예전과 똑같이 기다리게 된다. 그래서 마지막으로
-     받은 값을 uid별로 localStorage에도 저장해두고, 새로고침 직후에는 네트워크
-     응답을 기다리지 않고 이 캐시로 먼저 배너를 그린다(값이 사실과 다를 가능성은
-     매우 낮고, 실제 최신 값은 바로 이어서 백그라운드로 다시 받아와 조용히
-     덮어쓴다). */
-  function cacheKey(uid){ return "sj_quota_status_v1_" + uid; }
-  function loadCachedStatus(uid){
-    try{
-      var raw = window.localStorage && localStorage.getItem(cacheKey(uid));
-      return raw ? JSON.parse(raw) : null;
-    }catch(e){ return null; }
-  }
-  function saveCachedStatus(uid, data){
-    try{ if(window.localStorage){ localStorage.setItem(cacheKey(uid), JSON.stringify(data)); } }catch(e){}
-  }
-
   function refreshStatus(){
     var u = getCurrentUser();
     if(!u){ lastStatus = null; renderQuotaBanner(null); return Promise.resolve(null); }
@@ -125,32 +88,9 @@
       .then(function(data){
         lastStatus = data;
         renderQuotaBanner(data);
-        saveCachedStatus(u.uid, data);
         return data;
       })
       .catch(function(e){ console.error("구독 상태 조회 실패", e); return null; });
-  }
-
-  /* 로그인 상태가 확인되는 즉시(auth.js) 동기적으로 호출된다. localStorage
-     읽기는 네트워크를 타지 않으므로 즉시 끝나고, 캐시가 있으면 그 자리에서
-     바로 배너를 그린다 -- 새로고침 직후 첫 클릭에도 지연이 없다. */
-  function hydrateFromCache(uid){
-    if(lastStatus) return; // 이미 이번 세션에서 최신 값을 받은 상태라면 캐시로 덮어쓸 필요 없음
-    var cached = loadCachedStatus(uid);
-    if(cached){ lastStatus = cached; renderQuotaBanner(cached); }
-  }
-
-  /* 2026-09-22 추가: OCR 모달을 열 때마다 refreshStatus()를 새로 호출하면
-     ID 토큰 갱신 + 클라우드 함수 호출(네트워크 왕복 두 번)이 끝날 때까지
-     배너가 비어있어서 체감 지연이 있었다. 직전에 조회해둔(또는 캐시로
-     읽어들인) lastStatus가 있으면 그걸로 먼저 즉시 배너를 그리고(값이
-     바뀌었을 가능성은 낮으니 대부분 그대로 맞다), 최신 값은 이 함수가 그대로
-     내부적으로 호출하는 refreshStatus()가 백그라운드에서 가져와 조용히 다시
-     그린다 -- 화면 깜빡임 없이 지연만 없어진다. ui-modals.js가 모달을 열 때마다
-     이 함수를 부른다(과거의 refreshBanner를 대체). */
-  function refreshBannerFast(){
-    if(lastStatus){ renderQuotaBanner(lastStatus); }
-    return refreshStatus();
   }
 
   /* ---------------- 결제창(모달) ---------------- */
@@ -283,28 +223,17 @@
     if(!fullName){ setStatus(statusEl, "이름을 입력해주세요.", true); return; }
     if(!phoneNumber){ setStatus(statusEl, "연락처를 입력해주세요.", true); return; }
     if(!email){ setStatus(statusEl, "이메일을 입력해주세요.", true); return; }
-
-    // 2026-09-22(2차) 추가: 결제창의 결제수단 라디오 버튼(name="sjPayMethod")에서
-    // 선택된 값을 읽는다. 라디오가 아직 안 그려졌거나(구버전 캐시 등) 선택된 값이
-    // 없으면 기존과 동일하게 카드로 취급한다.
-    var payMethodEl = document.querySelector('input[name="sjPayMethod"]:checked');
-    var payMethod = (payMethodEl && PAY_METHOD_CHANNELS[payMethodEl.value]) ? payMethodEl.value : "CARD";
-    var channelConf = PAY_METHOD_CHANNELS[payMethod];
-    if(/PLACEHOLDER/.test(channelConf.channelKey)){
-      setStatus(statusEl, channelConf.label + " 결제는 아직 채널 심사가 끝나지 않아 준비 중입니다. 카드로 결제해주세요.", true);
-      return;
-    }
-    setStatus(statusEl, channelConf.label + " 등록 창을 여는 중...");
+    setStatus(statusEl, "카드 등록 창을 여는 중...");
     window.PortOne.requestIssueBillingKey({
       storeId: PORTONE_STORE_ID,
-      channelKey: channelConf.channelKey,
-      billingKeyMethod: channelConf.billingKeyMethod,
+      channelKey: PORTONE_CHANNEL_KEY,
+      billingKeyMethod: "CARD",
       issueId: "issue-" + u.uid + "-" + Date.now(),
       issueName: "골프 스코어카드 " + (PLAN_LABELS[plan] || "구독") + " 구독",
       customer: { customerId: u.uid, fullName: fullName, phoneNumber: phoneNumber, email: email }
     }).then(function(result){
       if(!result || result.code){
-        setStatus(statusEl, channelConf.label + " 등록에 실패했습니다: " + ((result && result.message) || "알 수 없는 오류"), true);
+        setStatus(statusEl, "카드 등록에 실패했습니다: " + ((result && result.message) || "알 수 없는 오류"), true);
         return;
       }
       setStatus(statusEl, "결제를 진행하는 중...");
@@ -312,7 +241,7 @@
         return fetch(WEB_SUBSCRIBE_URL, {
           method: "POST",
           headers: { "Content-Type": "application/json", "Authorization": "Bearer " + idToken },
-          body: JSON.stringify({ plan: plan, billingKey: result.billingKey, payMethod: payMethod })
+          body: JSON.stringify({ plan: plan, billingKey: result.billingKey })
         });
       }).then(function(res){ return res.json(); })
         .then(function(data){
@@ -369,14 +298,7 @@
   window.__sjSubscription = {
     openPaywall: openPaywall,
     closePaywall: closePaywall,
-    refreshBanner: refreshBannerFast,
-    // 2026-09-22 추가: 로그인 직후(auth.js의 renderAuthUI)에 미리 한 번
-    // 조회해서 lastStatus를 채워두는 용도 -- 이렇게 하면 사용자가 실제로
-    // OCR 모달을 열 때는 이미 캐시가 준비되어 있어 refreshBannerFast()가
-    // 항상 즉시 그릴 수 있다. 배너를 직접 그리지 않는 "조용한" 버전이라
-    // refreshStatus를 그대로 노출한다.
-    preloadStatus: refreshStatus,
-    hydrateFromCache: hydrateFromCache,
+    refreshBanner: refreshStatus,
     getLastStatus: function(){ return lastStatus; }
   };
 })();
