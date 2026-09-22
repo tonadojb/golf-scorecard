@@ -77,26 +77,6 @@
     if(manageBtn){ manageBtn.addEventListener("click", function(){ openPaywall(""); }); }
   }
 
-  /* 2026-09-22(2차) 추가: lastStatus는 메모리 변수라 "페이지를 새로고침한
-     직후 곧바로 OCR 아이콘을 누르는" 가장 흔한 테스트 상황에서는 아무 도움이
-     안 됐다 -- 새로고침하면 lastStatus가 다시 null로 초기화되고, 로그인 직후
-     preloadStatus()가 네트워크(토큰 갱신 + 클라우드 함수 호출)를 끝내기 전에
-     사용자가 먼저 클릭해버리면 예전과 똑같이 기다리게 된다. 그래서 마지막으로
-     받은 값을 uid별로 localStorage에도 저장해두고, 새로고침 직후에는 네트워크
-     응답을 기다리지 않고 이 캐시로 먼저 배너를 그린다(값이 사실과 다를 가능성은
-     매우 낮고, 실제 최신 값은 바로 이어서 백그라운드로 다시 받아와 조용히
-     덮어쓴다). */
-  function cacheKey(uid){ return "sj_quota_status_v1_" + uid; }
-  function loadCachedStatus(uid){
-    try{
-      var raw = window.localStorage && localStorage.getItem(cacheKey(uid));
-      return raw ? JSON.parse(raw) : null;
-    }catch(e){ return null; }
-  }
-  function saveCachedStatus(uid, data){
-    try{ if(window.localStorage){ localStorage.setItem(cacheKey(uid), JSON.stringify(data)); } }catch(e){}
-  }
-
   function refreshStatus(){
     var u = getCurrentUser();
     if(!u){ lastStatus = null; renderQuotaBanner(null); return Promise.resolve(null); }
@@ -106,29 +86,19 @@
       .then(function(data){
         lastStatus = data;
         renderQuotaBanner(data);
-        saveCachedStatus(u.uid, data);
         return data;
       })
       .catch(function(e){ console.error("구독 상태 조회 실패", e); return null; });
   }
 
-  /* 로그인 상태가 확인되는 즉시(auth.js) 동기적으로 호출된다. localStorage
-     읽기는 네트워크를 타지 않으므로 즉시 끝나고, 캐시가 있으면 그 자리에서
-     바로 배너를 그린다 -- 새로고침 직후 첫 클릭에도 지연이 없다. */
-  function hydrateFromCache(uid){
-    if(lastStatus) return; // 이미 이번 세션에서 최신 값을 받은 상태라면 캐시로 덮어쓸 필요 없음
-    var cached = loadCachedStatus(uid);
-    if(cached){ lastStatus = cached; renderQuotaBanner(cached); }
-  }
-
   /* 2026-09-22 추가: OCR 모달을 열 때마다 refreshStatus()를 새로 호출하면
      ID 토큰 갱신 + 클라우드 함수 호출(네트워크 왕복 두 번)이 끝날 때까지
-     배너가 비어있어서 체감 지연이 있었다. 직전에 조회해둔(또는 캐시로
-     읽어들인) lastStatus가 있으면 그걸로 먼저 즉시 배너를 그리고(값이
-     바뀌었을 가능성은 낮으니 대부분 그대로 맞다), 최신 값은 이 함수가 그대로
-     내부적으로 호출하는 refreshStatus()가 백그라운드에서 가져와 조용히 다시
-     그린다 -- 화면 깜빡임 없이 지연만 없어진다. ui-modals.js가 모달을 열 때마다
-     이 함수를 부른다(과거의 refreshBanner를 대체). */
+     배너가 비어있어서 체감 지연이 있었다. 직전에 조회해둔 lastStatus가
+     있으면 그걸로 먼저 즉시 배너를 그리고(값이 바뀌었을 가능성은 낮으니
+     대부분 그대로 맞다), 최신 값은 이 함수가 그대로 내부적으로 호출하는
+     refreshStatus()가 백그라운드에서 가져와 조용히 다시 그린다 -- 화면
+     깜빡임 없이 지연만 없어진다. ui-modals.js가 모달을 열 때마다 이 함수를
+     부른다(과거의 refreshBanner를 대체). */
   function refreshBannerFast(){
     if(lastStatus){ renderQuotaBanner(lastStatus); }
     return refreshStatus();
@@ -346,7 +316,6 @@
     // 항상 즉시 그릴 수 있다. 배너를 직접 그리지 않는 "조용한" 버전이라
     // refreshStatus를 그대로 노출한다.
     preloadStatus: refreshStatus,
-    hydrateFromCache: hydrateFromCache,
     getLastStatus: function(){ return lastStatus; }
   };
 })();

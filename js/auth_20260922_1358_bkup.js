@@ -659,15 +659,6 @@ function renderAuthUI(user){
     // 조회를 시작해서 "구독 관리" 배너가 뒤늦게 뜨는 지연이 생긴다 -- 여기서
     // 미리 캐시해두면 js/subscription.js의 refreshBannerFast()가 그 캐시를
     // 즉시 그려줘서 체감 지연이 사라진다.
-    // 2026-09-22(2차) 추가: 위 preloadStatus()는 네트워크 호출이라 새로고침
-    // 직후 곧바로 OCR 아이콘을 누르면 아직 응답이 안 와서 소용이 없었다.
-    // hydrateFromCache()는 localStorage를 동기적으로 읽어서 "지난번에 마지막으로
-    // 받았던 값"을 네트워크 없이 즉시 배너에 반영해준다 -- preloadStatus()보다
-    // 반드시 먼저 호출해야 한다(먼저 최신 값이 오면 굳이 캐시로 덮어쓰지 않게
-    // hydrateFromCache 내부에서 lastStatus 존재 여부를 확인함).
-    if(window.__sjSubscription && window.__sjSubscription.hydrateFromCache){
-      window.__sjSubscription.hydrateFromCache(user.uid);
-    }
     if(window.__sjSubscription && window.__sjSubscription.preloadStatus){
       window.__sjSubscription.preloadStatus();
     }
