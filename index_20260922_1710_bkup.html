@@ -111,7 +111,7 @@
 </div>
 </section>
 </main>
-<footer class="credit" id="footerText" style="padding:14px 16px 4px;text-align:center;" data-i18n-html="footerTagline">
+<footer class="credit" id="footerText" style="padding:14px 16px 4px;text-align:center;">
   <div style="font-weight:700;font-size:13px;color:#374151;letter-spacing:.02em;">⛳ Field Golf Scorecard</div>
   <div style="margin-top:4px;font-size:11px;color:#9ca3af;line-height:1.6;">
     회원가입 후 저장하면 클라우드에 보관되어 언제든 다시 불러올 수 있어요<br>
@@ -180,39 +180,34 @@
        요금제별로 한 줄씩 나오는 표 형태로 정리했다. 내용(문구/가격)은 그대로 두고
        레이아웃만 바꿨다. -->
   <div class="sj-site-footer-info" style="max-width:640px;margin:18px auto 0;padding:14px 16px;border-top:1px solid #e5e7eb;font-size:12px;color:#6b7280;text-align:center;">
-    <div style="margin-bottom:2px;font-weight:700;color:#374151;" data-i18n="freeTrialBadge">🆓 최초 20회, 평생 무료로 체험</div>
-    <div style="margin-bottom:12px;font-size:11px;color:#9ca3af;" data-i18n="freeTrialNote">매달 초기화되지 않는 1회성 혜택입니다</div>
+    <div style="margin-bottom:2px;font-weight:700;color:#374151;">🆓 최초 20회, 평생 무료로 체험</div>
+    <div style="margin-bottom:12px;font-size:11px;color:#9ca3af;">매달 초기화되지 않는 1회성 혜택입니다</div>
 
     <div style="display:inline-block;text-align:left;width:100%;max-width:300px;">
-      <div style="font-size:11px;color:#9ca3af;font-weight:600;letter-spacing:.02em;margin-bottom:4px;" data-i18n="pricingSectionLabel">이후 이용료 (자동갱신)</div>
-      <!-- 2026-09-22(4차) 추가: 아래 두 줄의 실제 텍스트/가격은 js/subscription.js의
-           applyLanguagePricing()이 언어(원화/달러)에 맞춰 채워준다 -- 자리표시용
-           한글 텍스트는 JS 실행 전(또는 실패 시) 대비용 기본값이다. -->
+      <div style="font-size:11px;color:#9ca3af;font-weight:600;letter-spacing:.02em;margin-bottom:4px;">이후 이용료 (자동갱신)</div>
       <div style="display:flex;justify-content:space-between;gap:10px;padding:3px 0;border-bottom:1px solid #f3f4f6;">
-        <span id="sjFooterPriceBasicLabel">베이직 · 월 6회 스캔 &amp; 저장</span><span id="sjFooterPriceBasicAmount" style="color:#374151;font-weight:600;white-space:nowrap;">월 1,100원</span>
+        <span>베이직 · 월 6회 스캔 &amp; 저장</span><span style="color:#374151;font-weight:600;white-space:nowrap;">월 1,100원</span>
       </div>
       <div style="display:flex;justify-content:space-between;gap:10px;padding:3px 0;">
-        <span id="sjFooterPriceProLabel">프로 · 무제한 스캔 &amp; 저장</span><span id="sjFooterPriceProAmount" style="color:#374151;font-weight:600;white-space:nowrap;">월 1,900원</span>
+        <span>프로 · 무제한 스캔 &amp; 저장</span><span style="color:#374151;font-weight:600;white-space:nowrap;">월 1,900원</span>
       </div>
     </div>
 
     <div style="margin-top:16px;padding-top:14px;border-top:1px solid #e5e7eb;">
-      <div data-i18n-html="bizInfoHtml">
-        <div style="font-weight:700;font-size:12px;color:#374151;margin-bottom:6px;">스카이장랩스 (SkyJANG Labs)</div>
-        <div style="font-size:11px;color:#9ca3af;line-height:1.8;">
-          대표 장중배 · 사업자등록번호 320-01-04154<br>
-          경기도 안양시 동안구 시민대로 109, 공장동 20층 2008호<br>
-          (호계동, 에이스하이테크시티범계)<br>
-          통신판매업신고번호 발급 진행중 · 010-3926-4502<br>
-          <a href="mailto:manager@skyjang.com" style="color:#9ca3af;text-decoration:underline;">manager@skyjang.com</a>
-        </div>
+      <div style="font-weight:700;font-size:12px;color:#374151;margin-bottom:6px;">스카이장랩스 (SkyJANG Labs)</div>
+      <div style="font-size:11px;color:#9ca3af;line-height:1.8;">
+        대표 장중배 · 사업자등록번호 320-01-04154<br>
+        경기도 안양시 동안구 시민대로 109, 공장동 20층 2008호<br>
+        (호계동, 에이스하이테크시티범계)<br>
+        통신판매업신고번호 발급 진행중 · 010-3926-4502<br>
+        <a href="mailto:manager@skyjang.com" style="color:#9ca3af;text-decoration:underline;">manager@skyjang.com</a>
       </div>
       <div style="margin-top:12px;display:flex;justify-content:center;align-items:center;gap:10px;font-size:11px;">
-        <a href="terms.html" style="color:#4338ca;" data-i18n="termsLinkLabel">이용약관</a>
+        <a href="terms.html" style="color:#4338ca;">이용약관</a>
         <span style="color:#d1d5db;">|</span>
-        <a href="privacy.html" style="color:#4338ca;" data-i18n="privacyLinkLabel">개인정보처리방침</a>
+        <a href="privacy.html" style="color:#4338ca;">개인정보처리방침</a>
         <span style="color:#d1d5db;">|</span>
-        <a href="refund.html" style="color:#4338ca;" data-i18n="refundLinkLabel">환불정책</a>
+        <a href="refund.html" style="color:#4338ca;">환불정책</a>
       </div>
     </div>
   </div>
@@ -281,43 +276,40 @@
      구독 안내 모달. js/subscription.js가 채우고 여닫는다. -->
 <div class="sj-modal-overlay" id="sjPaywallModal"><div class="sj-modal">
 <button class="sj-close" data-close>×</button>
-<h3 data-i18n="paywallTitle">💳 구독 안내</h3>
+<h3>💳 구독 안내</h3>
 <p id="sjPaywallReason" style="font-size:13px;color:#666;margin-top:0;"></p>
 <!-- 2026-09-22(2차) 추가: 결제수단 선택(카드/카카오페이/네이버페이). data-web-only라
      iOS 앱(RevenueCat)에서는 자동으로 숨겨집니다(iOS는 애플 In-App Purchase만 사용).
      카카오페이/네이버페이는 포트원 채널 심사가 끝나기 전까지는 선택은 되지만
-     js/subscription.js의 purchaseWeb()이 안내 메시지를 띄우고 결제를 막습니다.
-     2026-09-22(3차) 추가: 라벨 텍스트에 data-i18n을 달아 언어 전환 시 함께 바뀌게 함. -->
+     js/subscription.js의 purchaseWeb()이 안내 메시지를 띄우고 결제를 막습니다. -->
 <div id="sjPaywallPayMethod" data-web-only="1" style="display:flex;gap:14px;margin:0 0 10px;font-size:13px;color:#333;">
-<label style="display:flex;align-items:center;gap:4px;cursor:pointer;"><input type="radio" name="sjPayMethod" value="CARD" checked> <span data-i18n="payMethodCard">카드</span></label>
-<label style="display:flex;align-items:center;gap:4px;cursor:pointer;"><input type="radio" name="sjPayMethod" value="KAKAOPAY"> <span data-i18n="payMethodKakao">카카오페이</span></label>
-<label style="display:flex;align-items:center;gap:4px;cursor:pointer;"><input type="radio" name="sjPayMethod" value="NAVERPAY"> <span data-i18n="payMethodNaver">네이버페이</span></label>
+<label style="display:flex;align-items:center;gap:4px;cursor:pointer;"><input type="radio" name="sjPayMethod" value="CARD" checked> 카드</label>
+<label style="display:flex;align-items:center;gap:4px;cursor:pointer;"><input type="radio" name="sjPayMethod" value="KAKAOPAY"> 카카오페이</label>
+<label style="display:flex;align-items:center;gap:4px;cursor:pointer;"><input type="radio" name="sjPayMethod" value="NAVERPAY"> 네이버페이</label>
 </div>
 <!-- 2026-09-21 추가: 웹(포트원) 카드 등록은 결제대행사(KG이니시스 등) 정책상 이름/연락처/이메일이
      필수입니다 -- data-web-only라 iOS 앱(RevenueCat)에서는 자동으로 숨겨집니다. 카카오/네이버
      로그인은 계정에 이메일이 없는 경우가 많아 이메일도 직접 입력받습니다(로그인 계정에
      이메일이 있으면 openPaywall()이 미리 채워줍니다). -->
 <div id="sjPaywallCustomerFields" data-web-only="1" style="display:flex;flex-direction:column;gap:8px;margin:0 0 12px;">
-<input type="text" id="sjPaywallName" placeholder="이름 (카드 등록에 필요)" data-i18n-placeholder="paywallNamePlaceholder" style="padding:9px 10px;border:1px solid #d7d8ec;border-radius:8px;font-size:14px;box-sizing:border-box;">
-<input type="tel" id="sjPaywallPhone" placeholder="연락처 (- 없이 숫자만, 예: 01012345678)" data-i18n-placeholder="paywallPhonePlaceholder" style="padding:9px 10px;border:1px solid #d7d8ec;border-radius:8px;font-size:14px;box-sizing:border-box;">
-<input type="email" id="sjPaywallEmail" placeholder="이메일 (카드 등록/영수증에 필요)" data-i18n-placeholder="paywallEmailPlaceholder" style="padding:9px 10px;border:1px solid #d7d8ec;border-radius:8px;font-size:14px;box-sizing:border-box;">
+<input type="text" id="sjPaywallName" placeholder="이름 (카드 등록에 필요)" style="padding:9px 10px;border:1px solid #d7d8ec;border-radius:8px;font-size:14px;box-sizing:border-box;">
+<input type="tel" id="sjPaywallPhone" placeholder="연락처 (- 없이 숫자만, 예: 01012345678)" style="padding:9px 10px;border:1px solid #d7d8ec;border-radius:8px;font-size:14px;box-sizing:border-box;">
+<input type="email" id="sjPaywallEmail" placeholder="이메일 (카드 등록/영수증에 필요)" style="padding:9px 10px;border:1px solid #d7d8ec;border-radius:8px;font-size:14px;box-sizing:border-box;">
 </div>
-<!-- 가격/이름 텍스트는 js/subscription.js의 applyLanguagePricing()이 언어+통화(원화/달러)에
-     맞춰 아래 id들에 직접 채워 넣습니다(비한국어는 달러 결제: 베이직 $0.9 / 프로 $1.7). -->
 <div id="sjPaywallPlans" style="display:flex;flex-direction:column;gap:10px;margin:12px 0;">
 <div class="sj-paywall-plan" data-plan="basic" style="border:1px solid #e5e7eb;border-radius:10px;padding:12px;">
-<div style="font-weight:700;font-size:15px;"><span id="sjPlanBasicName">베이직</span> · <span id="sjPlanBasicPrice">월 1,100원</span></div>
-<div id="sjPlanBasicFeature" style="font-size:13px;color:#666;margin:4px 0 10px;">매달 6회 스캔 &amp; 저장</div>
-<button type="button" class="sj-primary sj-paywall-buy-btn" data-plan="basic" id="sjPlanBasicBtn" style="margin:0;">베이직 구독하기</button>
+<div style="font-weight:700;font-size:15px;">베이직 · 월 1,100원</div>
+<div style="font-size:13px;color:#666;margin:4px 0 10px;">매달 6회 스캔 &amp; 저장</div>
+<button type="button" class="sj-primary sj-paywall-buy-btn" data-plan="basic" style="margin:0;">베이직 구독하기</button>
 </div>
 <div class="sj-paywall-plan" data-plan="pro" style="border:1px solid #e5e7eb;border-radius:10px;padding:12px;">
-<div style="font-weight:700;font-size:15px;"><span id="sjPlanProName">프로</span> · <span id="sjPlanProPrice">월 1,900원</span></div>
-<div id="sjPlanProFeature" style="font-size:13px;color:#666;margin:4px 0 10px;">무제한 스캔 &amp; 저장</div>
-<button type="button" class="sj-primary sj-paywall-buy-btn" data-plan="pro" id="sjPlanProBtn" style="margin:0;">프로 구독하기</button>
+<div style="font-weight:700;font-size:15px;">프로 · 월 1,900원</div>
+<div style="font-size:13px;color:#666;margin:4px 0 10px;">무제한 스캔 &amp; 저장</div>
+<button type="button" class="sj-primary sj-paywall-buy-btn" data-plan="pro" style="margin:0;">프로 구독하기</button>
 </div>
 </div>
-<button type="button" class="sj-secondary" id="sjPaywallRestoreBtn" data-i18n="restoreBtn" style="display:none;">구매 복원</button>
-<button type="button" class="sj-secondary" id="sjPaywallCancelBtn" data-i18n="cancelSubBtn" style="display:none;">구독 해지</button>
+<button type="button" class="sj-secondary" id="sjPaywallRestoreBtn" style="display:none;">구매 복원</button>
+<button type="button" class="sj-secondary" id="sjPaywallCancelBtn" style="display:none;">구독 해지</button>
 <div class="sj-status" id="sjPaywallStatus"></div>
 </div></div>
 
@@ -474,7 +466,7 @@
 <!-- 아래 js/*.js 의 ?v=... 은 캐시 무효화용 버전 문자열입니다. GitHub Pages/브라우저가
      이 파일들을 한동안 캐시하기 때문에, js 파일을 수정해서 push할 때마다 이 버전 값을
      바꿔줘야 사용자 브라우저가 새 코드를 즉시 받아갑니다 (예: 현재값 뒤에 a->b->c 처럼 알파벳만 하나씩 올려주면 됩니다). -->
-<script src="js/i18n.js?v=20260922a" defer></script>
+<script src="js/i18n.js?v=20260825h" defer></script>
 <script src="js/state.js?v=20260823f" defer></script>
 <script src="js/render-setup.js?v=20260823f" defer></script>
 <script src="js/render-play.js?v=20260823f" defer></script>
@@ -490,7 +482,7 @@
      js/subscription.js가 이 전역(window.PortOne)을 호출한다. -->
 <script src="https://cdn.portone.io/v2/browser-sdk.js" defer></script>
 <script type="module" src="js/auth.js?v=20260922b"></script>
-<script src="js/subscription.js?v=20260922d" defer></script>
+<script src="js/subscription.js?v=20260922c" defer></script>
 <script src="js/ocr.js?v=20260823f" defer></script>
 <script src="js/cloud-save.js?v=20260823f" defer></script>
 <script src="js/cloud-load.js?v=20260823g" defer></script>

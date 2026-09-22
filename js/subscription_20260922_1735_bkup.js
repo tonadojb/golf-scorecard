@@ -52,68 +52,6 @@
   // firebase-backend/functions/subscription.js의 PLAN_DEFS.label과 맞춰둘 것.
   var PLAN_LABELS = { basic: "베이직 월간", pro: "프로 월간" };
 
-  /* 2026-09-22(4차) 추가: 다국어(i18n) + 해외결제(달러) 지원.
-     한국어(ko)를 고르면 원화(KRW), 그 외 언어(en/ja/zh)는 전부 달러(USD)로 결제됩니다.
-     아래 금액은 firebase-backend/functions/subscription.js의 PLAN_DEFS와
-     반드시 정확히 같아야 합니다(실제 청구는 서버가 계산하며, 여기 값은 화면
-     표시용입니다). */
-  var PLAN_PRICES = {
-    basic: { krw: 1100, usd: 0.9 },
-    pro:   { krw: 1900, usd: 1.7 }
-  };
-
-  function currentCurrency(){
-    return (typeof state !== "undefined" && state && state.lang && state.lang !== "ko") ? "USD" : "KRW";
-  }
-
-  // 결제수단 라벨은 언어가 바뀔 수 있으므로 상수로 고정하지 않고 매번 t()로 구한다.
-  function payMethodLabel(payMethod){
-    if(payMethod === "KAKAOPAY") return t("payMethodKakao");
-    if(payMethod === "NAVERPAY") return t("payMethodNaver");
-    return t("payMethodCard");
-  }
-
-  /* 결제창의 요금제 카드 + 하단 푸터 가격표를 현재 언어/통화에 맞게 다시 그린다.
-     i18n.js의 applyStaticTranslations()가 언어를 바꿀 때마다 이 함수를
-     호출하며(window.__sjSubscription.applyLanguagePricing), 이 파일이 처음
-     로드될 때도 한 번 스스로 호출해 최초 화면을 채운다(app.js의 최초
-     renderAll() 시점에는 아직 이 파일이 로드되기 전이라 그때는 아무 효과가
-     없다 -- 그래서 이 파일 스스로도 맨 아래에서 한 번 호출한다). */
-  function applyLanguagePricing(){
-    var basicPrice = t("priceMonthly", PLAN_PRICES.basic.krw, PLAN_PRICES.basic.usd);
-    var proPrice = t("priceMonthly", PLAN_PRICES.pro.krw, PLAN_PRICES.pro.usd);
-
-    var basicNameEl = sj("sjPlanBasicName");
-    var basicPriceEl = sj("sjPlanBasicPrice");
-    var basicFeatureEl = sj("sjPlanBasicFeature");
-    var basicBtnEl = sj("sjPlanBasicBtn");
-    if(basicNameEl) basicNameEl.textContent = t("planBasicName");
-    if(basicPriceEl) basicPriceEl.textContent = basicPrice;
-    if(basicFeatureEl) basicFeatureEl.textContent = t("planBasicFeature");
-    if(basicBtnEl) basicBtnEl.textContent = t("planBasicBtn");
-
-    var proNameEl = sj("sjPlanProName");
-    var proPriceEl = sj("sjPlanProPrice");
-    var proFeatureEl = sj("sjPlanProFeature");
-    var proBtnEl = sj("sjPlanProBtn");
-    if(proNameEl) proNameEl.textContent = t("planProName");
-    if(proPriceEl) proPriceEl.textContent = proPrice;
-    if(proFeatureEl) proFeatureEl.textContent = t("planProFeature");
-    if(proBtnEl) proBtnEl.textContent = t("planProBtn");
-
-    var footerBasicLabel = sj("sjFooterPriceBasicLabel");
-    var footerBasicAmount = sj("sjFooterPriceBasicAmount");
-    var footerProLabel = sj("sjFooterPriceProLabel");
-    var footerProAmount = sj("sjFooterPriceProAmount");
-    if(footerBasicLabel) footerBasicLabel.textContent = t("planBasicName") + " · " + t("planBasicFeature");
-    if(footerBasicAmount) footerBasicAmount.textContent = basicPrice;
-    if(footerProLabel) footerProLabel.textContent = t("planProName") + " · " + t("planProFeature");
-    if(footerProAmount) footerProAmount.textContent = proPrice;
-
-    var quotaEl = sj("sjQuotaBanner");
-    if(quotaEl && quotaEl.style.display !== "none" && lastStatus){ renderQuotaBanner(lastStatus); }
-  }
-
   var isNative = !!(window.Capacitor && typeof window.Capacitor.isNativePlatform === "function" && window.Capacitor.isNativePlatform());
   var rcConfiguredForUid = null; // 마지막으로 configure()에 성공한 uid -- 로그인 계정이 바뀌면 다시 설정
   var lastStatus = null;
@@ -123,7 +61,7 @@
 
   function withIdToken(){
     var u = getCurrentUser();
-    if(!u) return Promise.reject(new Error(t("paywallLoginRequired")));
+    if(!u) return Promise.reject(new Error("먼저 로그인해주세요."));
     return u.getIdToken();
   }
 
@@ -141,18 +79,18 @@
     if(!status){ el.style.display = "none"; return; }
     var text;
     if(status.unlimited){
-      text = (status.plan === "pro") ? t("quotaProActive") : t("quotaAdminActive");
+      text = (status.plan === "pro") ? "✅ 프로 구독 중 · 무제한 스캔" : "✅ 관리자 계정 · 무제한";
     } else if(status.plan === "basic"){
       var left = Math.max(0, (status.periodScansLimit || 0) - (status.periodScansUsed || 0));
-      text = t("quotaBasicActive", (status.periodScansUsed || 0), status.periodScansLimit, left);
+      text = "💳 베이직 구독 중 · 이번 달 스캔 " + (status.periodScansUsed || 0) + "/" + status.periodScansLimit + "회 (남음 " + left + "회)";
     } else {
       var freeLeft = Math.max(0, (status.freeScansLimit || 0) - (status.freeScansUsed || 0));
-      text = t("quotaFreeLeft", (status.freeScansUsed || 0), status.freeScansLimit, freeLeft);
+      text = "🆓 무료 스캔 " + (status.freeScansUsed || 0) + "/" + status.freeScansLimit + "회 사용 (남음 " + freeLeft + "회)";
     }
     if(status.cancelAtPeriodEnd && status.expiresAt){
-      text += t("quotaCancelNote", status.expiresAt.slice(0, 10));
+      text += " · 해지 예약됨 (" + status.expiresAt.slice(0, 10) + "까지 이용 가능)";
     }
-    el.innerHTML = text + ' &nbsp;<button type="button" id="sjQuotaManageBtn" style="border:none;background:none;color:#2563eb;text-decoration:underline;cursor:pointer;font-size:inherit;padding:0;">' + escapeHtml(t("quotaManageBtn")) + '</button>';
+    el.innerHTML = text + ' &nbsp;<button type="button" id="sjQuotaManageBtn" style="border:none;background:none;color:#2563eb;text-decoration:underline;cursor:pointer;font-size:inherit;padding:0;">구독 관리</button>';
     el.style.display = "";
     var manageBtn = sj("sjQuotaManageBtn");
     if(manageBtn){ manageBtn.addEventListener("click", function(){ openPaywall(""); }); }
@@ -222,8 +160,7 @@
     var modal = sj("sjPaywallModal");
     var reasonEl = sj("sjPaywallReason");
     var statusEl = sj("sjPaywallStatus");
-    if(reasonEl) reasonEl.textContent = pendingReasonMessage || t("paywallDefaultReason");
-    applyLanguagePricing();
+    if(reasonEl) reasonEl.textContent = pendingReasonMessage || "구독하면 계속 스캔할 수 있어요.";
     setStatus(statusEl, "");
     if(!modal) return;
     // 로그인 계정에 이름/이메일이 있으면 미리 채워준다 (카카오/네이버 로그인은
@@ -282,44 +219,44 @@
 
   function purchaseIOS(plan, statusEl){
     var u = getCurrentUser();
-    if(!u){ setStatus(statusEl, t("paywallLoginRequired"), true); return; }
-    setStatus(statusEl, t("iosPreparing2"));
+    if(!u){ setStatus(statusEl, "먼저 로그인해주세요.", true); return; }
+    setStatus(statusEl, "처리 중...");
     ensureRevenueCatConfigured(u.uid).then(function(Purchases){
       if(!Purchases){
-        setStatus(statusEl, t("iosPreparing"), true);
+        setStatus(statusEl, "구독 기능 준비 중입니다. 잠시 후 다시 시도해주세요.", true);
         return;
       }
       Purchases.getOfferings().then(function(offerings){
         var pkg = findIOSPackage(offerings, plan);
         if(!pkg){
-          setStatus(statusEl, t("iosProductFail"), true);
+          setStatus(statusEl, "상품 정보를 불러오지 못했습니다. 앱스토어 연결을 확인해주세요.", true);
           return;
         }
         return Purchases.purchasePackage({ aPackage: pkg }).then(function(){
-          setStatus(statusEl, t("paywallSuccess"));
+          setStatus(statusEl, "구독이 완료되었습니다!");
           return refreshStatus();
         }).then(function(){ setTimeout(closePaywall, 900); });
       }).catch(function(e){
         if(e && e.userCancelled){ setStatus(statusEl, ""); return; }
         console.error("iOS 구독 실패", e);
-        setStatus(statusEl, t("iosPurchaseFail", (e && e.message) || e), true);
+        setStatus(statusEl, "구독에 실패했습니다: " + ((e && e.message) || e), true);
       });
     });
   }
 
   function restoreIOS(statusEl){
     var u = getCurrentUser();
-    if(!u){ setStatus(statusEl, t("paywallLoginRequired"), true); return; }
-    setStatus(statusEl, t("iosRestoreProgress"));
+    if(!u){ setStatus(statusEl, "먼저 로그인해주세요.", true); return; }
+    setStatus(statusEl, "복원 중...");
     ensureRevenueCatConfigured(u.uid).then(function(Purchases){
-      if(!Purchases){ setStatus(statusEl, t("iosPreparing2"), true); return; }
+      if(!Purchases){ setStatus(statusEl, "구독 기능 준비 중입니다.", true); return; }
       return Purchases.restorePurchases().then(function(){
-        setStatus(statusEl, t("iosRestoreSuccess"));
+        setStatus(statusEl, "구매 내역을 복원했습니다.");
         return refreshStatus();
       });
     }).catch(function(e){
       console.error("구매 복원 실패", e);
-      setStatus(statusEl, t("iosRestoreFail", (e && e.message) || e), true);
+      setStatus(statusEl, "복원에 실패했습니다: " + ((e && e.message) || e), true);
     });
   }
 
@@ -327,9 +264,9 @@
 
   function purchaseWeb(plan, statusEl){
     var u = getCurrentUser();
-    if(!u){ setStatus(statusEl, t("paywallLoginRequired"), true); return; }
+    if(!u){ setStatus(statusEl, "먼저 로그인해주세요.", true); return; }
     if(!window.PortOne || typeof window.PortOne.requestIssueBillingKey !== "function"){
-      setStatus(statusEl, t("paywallModuleFail"), true);
+      setStatus(statusEl, "결제 모듈을 불러오지 못했습니다. 새로고침 후 다시 시도해주세요.", true);
       return;
     }
     // 2026-09-21: KG이니시스(카드 등록/PC)는 이름·연락처·이메일을 필수로 요구합니다
@@ -343,9 +280,9 @@
     var fullName = nameEl && nameEl.value ? nameEl.value.trim() : "";
     var phoneNumber = phoneEl && phoneEl.value ? phoneEl.value.trim() : "";
     var email = emailEl && emailEl.value ? emailEl.value.trim() : (u.email || "");
-    if(!fullName){ setStatus(statusEl, t("paywallNameRequired"), true); return; }
-    if(!phoneNumber){ setStatus(statusEl, t("paywallPhoneRequired"), true); return; }
-    if(!email){ setStatus(statusEl, t("paywallEmailRequired"), true); return; }
+    if(!fullName){ setStatus(statusEl, "이름을 입력해주세요.", true); return; }
+    if(!phoneNumber){ setStatus(statusEl, "연락처를 입력해주세요.", true); return; }
+    if(!email){ setStatus(statusEl, "이메일을 입력해주세요.", true); return; }
 
     // 2026-09-22(2차) 추가: 결제창의 결제수단 라디오 버튼(name="sjPayMethod")에서
     // 선택된 값을 읽는다. 라디오가 아직 안 그려졌거나(구버전 캐시 등) 선택된 값이
@@ -353,17 +290,11 @@
     var payMethodEl = document.querySelector('input[name="sjPayMethod"]:checked');
     var payMethod = (payMethodEl && PAY_METHOD_CHANNELS[payMethodEl.value]) ? payMethodEl.value : "CARD";
     var channelConf = PAY_METHOD_CHANNELS[payMethod];
-    var label = payMethodLabel(payMethod);
     if(/PLACEHOLDER/.test(channelConf.channelKey)){
-      setStatus(statusEl, t("paywallChannelPending", label), true);
+      setStatus(statusEl, channelConf.label + " 결제는 아직 채널 심사가 끝나지 않아 준비 중입니다. 카드로 결제해주세요.", true);
       return;
     }
-    // 2026-09-22(4차) 추가: 화면 언어가 한국어가 아니면 달러(USD)로, 한국어면
-    // 원화(KRW)로 결제한다. 서버(webBillingSubscribe)가 이 값을 검증하고
-    // 실제 청구 금액을 계산하며, 이후 정기결제(cron)도 가입 시점에 저장된
-    // 이 통화를 그대로 재사용한다(가입 후 사용자가 언어를 바꿔도 통화는 안 바뀜).
-    var currency = currentCurrency();
-    setStatus(statusEl, t("paywallOpeningChannel", label));
+    setStatus(statusEl, channelConf.label + " 등록 창을 여는 중...");
     window.PortOne.requestIssueBillingKey({
       storeId: PORTONE_STORE_ID,
       channelKey: channelConf.channelKey,
@@ -373,40 +304,40 @@
       customer: { customerId: u.uid, fullName: fullName, phoneNumber: phoneNumber, email: email }
     }).then(function(result){
       if(!result || result.code){
-        setStatus(statusEl, t("paywallRegisterFail", label, (result && result.message) || t("unknownError")), true);
+        setStatus(statusEl, channelConf.label + " 등록에 실패했습니다: " + ((result && result.message) || "알 수 없는 오류"), true);
         return;
       }
-      setStatus(statusEl, t("paywallChargeProgress"));
+      setStatus(statusEl, "결제를 진행하는 중...");
       return withIdToken().then(function(idToken){
         return fetch(WEB_SUBSCRIBE_URL, {
           method: "POST",
           headers: { "Content-Type": "application/json", "Authorization": "Bearer " + idToken },
-          body: JSON.stringify({ plan: plan, billingKey: result.billingKey, payMethod: payMethod, currency: currency })
+          body: JSON.stringify({ plan: plan, billingKey: result.billingKey, payMethod: payMethod })
         });
       }).then(function(res){ return res.json(); })
         .then(function(data){
           if(data && data.error){ throw new Error(data.error); }
-          setStatus(statusEl, t("paywallSuccess"));
+          setStatus(statusEl, "구독이 완료되었습니다!");
           return refreshStatus();
         }).then(function(){ setTimeout(closePaywall, 900); });
     }).catch(function(e){
       console.error("웹 구독 실패", e);
-      setStatus(statusEl, t("paywallFail", (e && e.message) || e), true);
+      setStatus(statusEl, "구독에 실패했습니다: " + ((e && e.message) || e), true);
     });
   }
 
   function cancelWeb(statusEl){
-    setStatus(statusEl, t("paywallCancelProgress"));
+    setStatus(statusEl, "해지 처리 중...");
     withIdToken().then(function(idToken){
       return fetch(WEB_CANCEL_URL, { method: "POST", headers: { "Authorization": "Bearer " + idToken } });
     }).then(function(res){ return res.json(); })
       .then(function(){
-        setStatus(statusEl, t("paywallCancelSuccess"));
+        setStatus(statusEl, "해지가 예약되었습니다. 남은 기간까지는 계속 이용할 수 있습니다.");
         return refreshStatus();
       })
       .catch(function(e){
         console.error("구독 해지 실패", e);
-        setStatus(statusEl, t("paywallCancelFail", (e && e.message) || e), true);
+        setStatus(statusEl, "해지에 실패했습니다: " + ((e && e.message) || e), true);
       });
   }
 
@@ -426,7 +357,7 @@
     var cancelBtn = sj("sjPaywallCancelBtn");
     if(cancelBtn){ cancelBtn.addEventListener("click", function(){
       if(isNative){
-        setStatus(sj("sjPaywallStatus"), t("iosCancelNotice"), false);
+        setStatus(sj("sjPaywallStatus"), "iOS 구독 해지는 iPhone의 설정 > Apple ID > 구독 화면에서 해주세요.", false);
         return;
       }
       cancelWeb(sj("sjPaywallStatus"));
@@ -434,12 +365,6 @@
   }
 
   bindPaywallButtons();
-
-  // 2026-09-22(4차) 추가: 이 파일은 i18n.js보다 늦게 로드되므로(script 순서),
-  // i18n.js가 이미 다 실행된 뒤인 지금 시점에 한 번 스스로 호출해 최초 화면의
-  // 요금제 카드/푸터 가격을 채운다. 이후 언어를 바꿀 때는 i18n.js가
-  // window.__sjSubscription.applyLanguagePricing()을 직접 불러준다.
-  applyLanguagePricing();
 
   window.__sjSubscription = {
     openPaywall: openPaywall,
@@ -452,9 +377,6 @@
     // refreshStatus를 그대로 노출한다.
     preloadStatus: refreshStatus,
     hydrateFromCache: hydrateFromCache,
-    getLastStatus: function(){ return lastStatus; },
-    // 2026-09-22(4차) 추가: i18n.js의 applyStaticTranslations()가 언어 전환
-    // 시마다 호출해서 요금제 카드/푸터 가격을 새 언어+통화로 다시 그린다.
-    applyLanguagePricing: applyLanguagePricing
+    getLastStatus: function(){ return lastStatus; }
   };
 })();
