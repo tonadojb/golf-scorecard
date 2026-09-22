@@ -269,18 +269,20 @@
 <div style="font-size:13px;color:#666;margin:4px 0 10px;">무제한 스캔 &amp; 저장</div>
 <button type="button" class="sj-primary sj-paywall-buy-btn" data-plan="pro" style="margin:0;">프로 구독하기</button>
 </div>
-<!-- 2026-09-21 수정: 프로 장기구독(선불 할인). 애플은 자동갱신 구독을 최대 1년까지만
-     허용해서 1년 옵션은 iOS(RevenueCat)에서도 제공 가능하지만(App Store Connect에
-     실제 상품을 만들기 전까지는 "구독 준비 중" 메시지만 뜸), 2년은 자동갱신으로
-     만들 수 없어 웹(포트원) 결제 전용이다 -- 그 버튼에만 data-web-only를 달아
-     js/subscription.js의 openPaywall()이 iOS 앱에서 자동으로 숨긴다. 3년 옵션은
-     2년 대비 할인폭이 미미해(월 환산 12원 차이) 매력이 없다고 판단, 제거했다. -->
-<div class="sj-paywall-plan" style="border:1px solid #e5e7eb;border-radius:10px;padding:12px;">
-<div style="font-weight:700;font-size:15px;">프로 장기구독 · 미리 내면 더 저렴해요</div>
-<div style="font-size:13px;color:#666;margin:4px 0 10px;">무제한 스캔 &amp; 저장 (2년은 웹 결제 전용)</div>
+<!-- 2026-09-22 수정: 기존 프로 장기구독(1년/2년 자동재청구)이 NHN KCP 전자결제
+     등록 심사에서 반려됐다("장기서비스(~2년 구독) 입점 불가 -- 단건결제는 최대
+     3개월, 자동결제는 월간단위만 가능"). 그래서 1년/2년을 전부 없애고, 대신
+     프로를 1~3개월치 미리 한 번만 결제하는 "단건결제(비갱신)"로 교체했다.
+     iOS는 이 상품 자체가 없어서(애초에 KCP 심사와 무관, 애플은 basic/pro 월간
+     자동갱신만 사용) 이 블록 전체에 data-web-only를 달아 iOS 앱에서는 자동으로
+     숨긴다. -->
+<div class="sj-paywall-plan" data-web-only="1" style="border:1px solid #e5e7eb;border-radius:10px;padding:12px;">
+<div style="font-weight:700;font-size:15px;">프로 단건결제 · 자동갱신 없이 원하는 기간만</div>
+<div style="font-size:13px;color:#666;margin:4px 0 10px;">무제한 스캔 &amp; 저장 (결제 후 자동으로 다시 청구되지 않고, 기간이 끝나면 무료로 전환됩니다)</div>
 <div style="display:flex;flex-direction:column;gap:6px;">
-<button type="button" class="sj-paywall-longterm-btn sj-paywall-buy-btn" data-plan="pro_year1">1년 9,900원 (월 825원 상당)</button>
-<button type="button" class="sj-paywall-longterm-btn sj-paywall-buy-btn" data-plan="pro_year2" data-web-only="1">2년 16,900원 (월 704원 상당)</button>
+<button type="button" class="sj-paywall-longterm-btn sj-paywall-buy-btn" data-plan="pro_1mo">1개월 1,900원</button>
+<button type="button" class="sj-paywall-longterm-btn sj-paywall-buy-btn" data-plan="pro_2mo">2개월 3,600원 (월 1,800원 상당)</button>
+<button type="button" class="sj-paywall-longterm-btn sj-paywall-buy-btn" data-plan="pro_3mo">3개월 4,900원 (월 1,633원 상당)</button>
 </div>
 </div>
 </div>
