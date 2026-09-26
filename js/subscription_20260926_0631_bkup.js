@@ -369,7 +369,7 @@
       channelKey: channelConf.channelKey,
       billingKeyMethod: channelConf.billingKeyMethod,
       issueId: "issue-" + u.uid + "-" + Date.now(),
-      issueName: "Tonado_GolfScoreCard " + (PLAN_LABELS[plan] || "구독") + " 구독",
+      issueName: "골프 스코어카드 " + (PLAN_LABELS[plan] || "구독") + " 구독",
       customer: { customerId: u.uid, fullName: fullName, phoneNumber: phoneNumber, email: email }
     }).then(function(result){
       if(!result || result.code){

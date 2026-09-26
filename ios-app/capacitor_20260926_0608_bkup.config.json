@@ -1,6 +1,6 @@
 {
   "appId": "com.skyjang.golfscorecard",
-  "appName": "Tonado_GolfScoreCard",
+  "appName": "골프 스코어카드",
   "webDir": "www",
   "ios": {
     "contentInset": "automatic"
