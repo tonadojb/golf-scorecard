@@ -12,10 +12,6 @@
   var STATUS_URL = BASE + "/getReferralStatus";
   var APPLY_URL = BASE + "/applyReferral";
   var SPIN_URL = BASE + "/spinRoulette";
-  // 2026-09-26(5차) 추가: 로그인 여부와 상관없이 "지금 이벤트가 열려있는지"만
-  // 물어보는 공개 엔드포인트 -- 우측 하단 선물상자 FAB를 이벤트가 실제로
-  // 열려있을 때만 보여주기 위해 쓴다.
-  var LIVE_FLAG_URL = BASE + "/getReferralEventLiveFlag";
 
   var REF_STORAGE_KEY = "sj_referral_pending_ref_v1";
 
@@ -40,25 +36,6 @@
       if(ref){ sessionStorage.setItem(REF_STORAGE_KEY, ref); }
     } catch(e) { /* 무시 -- 세션스토리지를 못 쓰는 환경이면 그냥 추천 등록을 건너뜀 */ }
   })();
-
-  /* ---------------- 선물상자 FAB 표시/숨김 ---------------- */
-
-  // index.html에서 #sjRouletteFab는 기본값이 style="display:none"이다. 관리자가
-  // 이벤트를 열어두지 않았는데도 무조건 보이던 문제를 고치기 위해, 실제로
-  // live인 게 확인됐을 때만 여기서 보이게 바꿔준다.
-  function setFabVisible(live){
-    var fab = sj("sjRouletteFab");
-    if(fab) fab.style.display = live ? "" : "none";
-  }
-
-  // 페이지가 로드되는 즉시(로그인 여부와 무관하게) 한 번 조회해서 FAB 표시
-  // 여부를 정한다. 실패하면 안전하게 숨김 상태를 유지한다.
-  function refreshFabVisibility(){
-    fetch(LIVE_FLAG_URL).then(function(res){ return res.json(); })
-      .then(function(data){ setFabVisible(!!(data && data.live)); })
-      .catch(function(e){ console.error("이벤트 오픈 여부 조회 실패", e); });
-  }
-  refreshFabVisibility();
 
   function getPendingRef(){
     try { return sessionStorage.getItem(REF_STORAGE_KEY) || null; } catch(e) { return null; }
@@ -160,11 +137,6 @@
   function renderStatus(data){
     var noEventEl = sj("sjReferralNoEvent");
     var bodyEl = sj("sjReferralBody");
-    // 로그인 후 조회되는 이 값이 가장 정확한 최신 상태이므로, 최초 페이지
-    // 로드 때 refreshFabVisibility()가 판단해둔 FAB 표시 여부를 여기서 다시
-    // 한번 확정된 값으로 맞춰준다(예: 모달이 열려있는 사이 관리자가 이벤트를
-    // 껐다면 즉시 반영).
-    setFabVisible(!!(data && data.event && data.event.live));
     if(!data || !data.event || !data.event.live){
       if(noEventEl) noEventEl.style.display = "";
       if(bodyEl) bodyEl.style.display = "none";
