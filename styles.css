@@ -328,3 +328,31 @@ footer.credit{text-align:center;color:var(--muted);font-size:11px;padding:14px;}
 .sj-block-icon{font-size:36px;margin-bottom:10px;}
 .sj-block-box p{margin:0;font-size:15px;font-weight:600;color:#1f2b24;line-height:1.5;overflow-wrap:anywhere;}
 
+/* ---------------- 관리자: 무료 기간 부여 미니 폼 (2026-09-26 추가) ----------------
+   주의: .sj-modal input,.sj-modal select{width:100%} 전역 규칙(styles.css 상단)이
+   특이도(0,1,1)로 단일 클래스 선택자(0,1,0)보다 우선하기 때문에, 아래처럼 부모
+   클래스까지 포함한 2클래스 선택자(0,2,0)로 덮어써야 폭 지정이 실제로 먹는다
+   (이 앱 헤더 타이틀 overflow 버그와 동일한 원인). */
+.sj-admin-grant-free{display:flex;align-items:center;gap:6px;flex-wrap:wrap;background:#eef2ff;border:1px solid #c7d2fe;border-radius:8px;padding:7px 8px;}
+.sj-admin-grant-free span{font-size:11.5px;font-weight:700;color:#3730a3;flex:0 0 auto;}
+.sj-admin-grant-free .sj-admin-grant-plan{width:auto;flex:0 0 auto;padding:6px 7px;border:1px solid #ccc;border-radius:7px;font-size:13px;box-sizing:border-box;font-family:inherit;}
+.sj-admin-grant-free .sj-admin-grant-days{width:60px;flex:0 0 auto;padding:6px 7px;border:1px solid #ccc;border-radius:7px;font-size:16px;box-sizing:border-box;font-family:inherit;}
+.sj-admin-grant-btn{flex:0 0 auto;border:none;border-radius:7px;padding:6px 12px;font-size:11.5px;font-weight:700;cursor:pointer;background:#4338ca;color:#fff;margin-left:auto;}
+
+/* ---------------- 관리자: 친구추천 이벤트 경품표 편집 (2026-09-26 추가) ---------------- */
+.sj-admin-prize-row{display:flex;align-items:center;gap:6px;flex-wrap:wrap;background:#fff;border:1px solid #e5e7eb;border-radius:8px;padding:7px 8px;margin-bottom:6px;}
+.sj-admin-prize-row .sj-admin-prize-label{width:auto;flex:1 1 140px;min-width:120px;padding:7px 8px;border:1px solid #ccc;border-radius:7px;font-size:13px;box-sizing:border-box;font-family:inherit;}
+.sj-admin-prize-row .sj-admin-prize-plan{width:auto;flex:0 0 auto;padding:7px 6px;border:1px solid #ccc;border-radius:7px;font-size:13px;box-sizing:border-box;font-family:inherit;}
+.sj-admin-prize-row .sj-admin-prize-days,.sj-admin-prize-row .sj-admin-prize-weight{width:64px;flex:0 0 auto;padding:7px 6px;border:1px solid #ccc;border-radius:7px;font-size:16px;box-sizing:border-box;font-family:inherit;}
+.sj-admin-prize-remove-btn{flex:0 0 auto;border:none;border-radius:7px;padding:6px 9px;font-size:12px;font-weight:700;cursor:pointer;background:#fee2e2;color:#b91c1c;margin-left:auto;}
+
+/* ---------------- 친구추천 이벤트 룰렛 (사용자용, 2026-09-26 추가) ---------------- */
+.sj-roulette-host{position:relative;width:220px;max-width:100%;margin:0 auto;display:flex;align-items:center;justify-content:center;}
+.sj-roulette-wheel{width:220px;height:220px;border-radius:50%;border:6px solid #fff;box-shadow:0 0 0 3px #d7d8ec,0 8px 20px rgba(0,0,0,0.15);will-change:transform;}
+.sj-roulette-pointer{position:absolute;top:-6px;left:50%;transform:translateX(-50%);font-size:22px;color:#1f2b24;z-index:2;filter:drop-shadow(0 2px 2px rgba(0,0,0,0.25));}
+.sj-referral-prize-list{margin-top:14px;display:flex;flex-direction:column;gap:6px;}
+.sj-referral-prize-title{font-weight:700;font-size:12.5px;color:var(--primary-dark);margin-bottom:2px;}
+.sj-referral-prize-row{display:flex;align-items:center;gap:7px;font-size:12.5px;color:#374151;}
+.sj-referral-prize-swatch{width:11px;height:11px;border-radius:3px;flex:0 0 auto;}
+.sj-referral-prize-pct{margin-left:auto;color:#6b7a72;font-weight:700;}
+

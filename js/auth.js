@@ -706,6 +706,13 @@ function renderAuthUI(user){
     if(window.__sjFriends && window.__sjFriends.preload){
       window.__sjFriends.preload();
     }
+    // 2026-09-26 추가: 이 계정이 추천 링크(?ref=)로 들어온 신규(또는 아직
+    // 추천인이 등록 안 된) 사용자라면, 로그인이 확인되는 즉시 서버에
+    // 추천인을 등록해둔다(실제 카운트는 이 사용자가 나중에 라운드를 처음
+    // 저장할 때 서버가 확정 처리함 -- js/referral.js 참고).
+    if(window.__sjReferral && window.__sjReferral.onLogin){
+      window.__sjReferral.onLogin(user);
+    }
   } else {
     if(loggedOut) loggedOut.style.display = "block";
     if(loggedIn) loggedIn.style.display = "none";

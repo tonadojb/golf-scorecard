@@ -53,6 +53,19 @@
       sjOpen("sjFriendsModal");
     });
   }
+  var sjRouletteFabEl = sj("sjRouletteFab");
+  if(sjRouletteFabEl){
+    sjRouletteFabEl.addEventListener("click", function(){
+      var currentUser = window.__sjAuth && window.__sjAuth.getCurrentUser();
+      if(!currentUser){
+        alert("먼저 로그인해주세요.");
+        sjOpen("sjAuthModal");
+        return;
+      }
+      if(window.__sjReferral && window.__sjReferral.onOpen){ window.__sjReferral.onOpen(); }
+      sjOpen("sjReferralModal");
+    });
+  }
   var sjAdminFabEl = sj("sjAdminFab");
   if(sjAdminFabEl){
     sjAdminFabEl.addEventListener("click", function(){
