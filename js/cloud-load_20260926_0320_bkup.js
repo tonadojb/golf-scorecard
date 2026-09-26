@@ -3,7 +3,6 @@
   var LIST_URL = "https://asia-northeast3-skyjang-golfscore.cloudfunctions.net/listRounds";
   var DELETE_URL = "https://asia-northeast3-skyjang-golfscore.cloudfunctions.net/deleteRound";
   var UPDATE_URL = "https://asia-northeast3-skyjang-golfscore.cloudfunctions.net/updateRound";
-  var GET_ROUND_URL = "https://asia-northeast3-skyjang-golfscore.cloudfunctions.net/getRound";
   var cachedRounds = [];
   var editState = null;
 
@@ -97,30 +96,6 @@
     }).join("");
   }
 
-  /* listRounds는 목록/통계 화면에 필요 없는 홀별 스코어(holeScores/entered)와
-     홀 구성(holes)을 빼고 가벼운 요약만 내려준다(속도 개선 -- rounds.js의
-     주석 참고). 그래서 실제로 라운드를 "불러오기"하거나 ✏ 수정 화면을 열 때는
-     이 함수로 그 라운드 하나의 전체 데이터를 따로 받아와야 한다. */
-  function fetchRoundDetail(id){
-    var currentUser = window.__sjAuth && window.__sjAuth.getCurrentUser();
-    if(!currentUser){
-      return Promise.reject(new Error(tt("loginRequired", "로그인이 필요합니다.")));
-    }
-    return currentUser.getIdToken().then(function(idToken){
-      return fetch(GET_ROUND_URL + "?id=" + encodeURIComponent(id), {
-        method: "GET",
-        headers: { "Authorization": "Bearer " + idToken }
-      });
-    }).then(function(res){ return res.json(); }).then(function(data){
-      if(data && data.blocked){
-        if(window.__sjAuth && window.__sjAuth.handleBlocked){ window.__sjAuth.handleBlocked(data.error); }
-        throw new Error(data.error || "접속이 제한되었습니다.");
-      }
-      if(data && data.error){ throw new Error(data.error); }
-      return data.round;
-    });
-  }
-
   /* Restores a saved round's FULL data (course/hole setup + every
      player's name and complete hole-by-hole scores) back onto team 0,
      exactly as it was at save time -- not a partial/summary merge.
@@ -169,11 +144,6 @@
     var selfIdx = playersIn.findIndex(function(p){ return p && p.isSelf; });
     team.selfIndex = (selfIdx !== -1) ? selfIdx : 0;
 
-    /* 이 라운드를 "불러왔다"는 것을 기억해둔다 -- 이후 팀설정에서 이름/스코어를
-       고쳐서 다시 "☁ 저장"을 누르면, 새 라운드를 추가하는 대신 바로 이 문서를
-       수정하도록 cloud-save.js가 이 값을 사용한다. */
-    state.cloudRoundId = r.id || null;
-
     if(typeof save === "function") save();
     if(typeof renderAll === "function") renderAll();
     /* 정산 탭에 남아있던 이전 계산 결과는 이번에 불러온 라운드와 무관하므로
@@ -205,13 +175,13 @@
       (editState.courseSub ? " (" + escapeHtml(editState.courseSub) + ")" : "");
     var dateLine = editState.roundDate || tt("loadNoDate", "날짜 미입력");
     var html = '<div class="sj-edit-meta">' + escapeHtml(courseLine) + " · " + escapeHtml(dateLine) + "</div>";
-    html += '<p class="sj-edit-hint">My를 눌러 본인 스코어를 지정하고, 이름을 눌러 동반자 이름을 수정하거나 홀별 +/- 버튼으로 스코어를 수정한 뒤 아래 "수정 저장"을 눌러주세요.</p>';
+    html += '<p class="sj-edit-hint">My를 눌러 본인 스코어를 지정하고, 홀별 +/- 버튼으로 스코어를 수정한 뒤 아래 "수정 저장"을 눌러주세요.</p>';
     editState.players.forEach(function(p, pi){
       var totals = computeEditTotals(pi);
       html += '<div class="sj-edit-player">';
       html += '<div class="sj-edit-player-head">';
       html += '<label class="sj-edit-my-label"><input type="radio" name="sjEditSelf" class="sj-edit-self-radio" data-player="' + pi + '"' + (p.isSelf ? " checked" : "") + '> <span>My</span></label>';
-      html += '<input type="text" class="sj-edit-player-name sj-edit-name-input" data-player="' + pi + '" value="' + escapeHtml(p.name || ("Player" + (pi + 1))) + '" maxlength="50" placeholder="이름">';
+      html += '<span class="sj-edit-player-name">' + escapeHtml(p.name || ("Player" + (pi + 1))) + '</span>';
       html += '<span class="sj-edit-player-total" id="sjEditTotal_' + pi + '">' + totals.total + " (" + signedLabel(totals.toPar) + ")</span>";
       html += '</div>';
       html += '<div class="sj-edit-holes-wrap"><div class="sj-edit-holes">';
@@ -235,44 +205,34 @@
   function openEditModal(idx){
     var r = cachedRounds[idx];
     if(!r) return;
+    editState = {
+      idx: idx,
+      roundId: r.id,
+      courseName: r.courseName || "",
+      courseSub: r.courseSub || "",
+      teeOffTime: r.teeOffTime || "",
+      roundDate: r.roundDate || "",
+      teamName: r.teamName || "",
+      holeCount: (r.holeCount === 9 || r.holeCount === 18) ? r.holeCount : 18,
+      holes: (r.holes || []).map(function(h){ return { par: h.par, note: h.note || "" }; }),
+      players: (r.players || []).map(function(p){
+        return {
+          name: p.name || "",
+          isSelf: !!p.isSelf,
+          holeScores: (p.holeScores || []).slice(),
+          entered: (p.entered || []).slice()
+        };
+      })
+    };
+    /* 레거시 데이터(모두 isSelf 없음) 보정: 첫 번째 플레이어를 기본 My로 */
+    if(editState.players.length && !editState.players.some(function(p){ return p.isSelf; })){
+      editState.players[0].isSelf = true;
+    }
     var status = sj("sjEditRoundStatus");
-    var container = sj("sjEditRoundBody");
-    var modal = sj("sjEditRoundModal");
     if(status){ status.className = "sj-status"; status.textContent = ""; }
-    // cachedRounds의 항목은 목록용 요약본이라 홀별 스코어가 없다 -- 모달을 먼저
-    // 열어 "불러오는 중" 표시를 보여주고, fetchRoundDetail로 이 라운드 하나의
-    // 전체 데이터를 받아온 뒤에 실제 수정 화면을 채운다.
-    if(container){ container.innerHTML = '<p class="sj-edit-hint">' + escapeHtml(tt("loadLoading", "불러오는 중...")) + '</p>'; }
+    renderEditBody();
+    var modal = sj("sjEditRoundModal");
     if(modal) modal.classList.add("open");
-    fetchRoundDetail(r.id).then(function(full){
-      editState = {
-        idx: idx,
-        roundId: full.id || r.id,
-        courseName: full.courseName || "",
-        courseSub: full.courseSub || "",
-        teeOffTime: full.teeOffTime || "",
-        roundDate: full.roundDate || "",
-        teamName: full.teamName || "",
-        holeCount: (full.holeCount === 9 || full.holeCount === 18) ? full.holeCount : 18,
-        holes: (full.holes || []).map(function(h){ return { par: h.par, note: h.note || "" }; }),
-        players: (full.players || []).map(function(p){
-          return {
-            name: p.name || "",
-            isSelf: !!p.isSelf,
-            holeScores: (p.holeScores || []).slice(),
-            entered: (p.entered || []).slice()
-          };
-        })
-      };
-      /* 레거시 데이터(모두 isSelf 없음) 보정: 첫 번째 플레이어를 기본 My로 */
-      if(editState.players.length && !editState.players.some(function(p){ return p.isSelf; })){
-        editState.players[0].isSelf = true;
-      }
-      renderEditBody();
-    }).catch(function(e){
-      if(container){ container.innerHTML = ""; }
-      if(status){ status.className = "sj-status error"; status.textContent = tt("loadFetchFail", "불러오기 실패") + ": " + (e && e.message ? e.message : e); }
-    });
   }
 
   function bindEditBodyEvents(){
@@ -303,16 +263,6 @@
         editState.players.forEach(function(p, i){ p.isSelf = (i === pi); });
       }
     });
-    /* 이름 입력칸: 타이핑 즉시 editState에 반영 (blur를 기다리는 change 대신
-       input 이벤트를 써야, 수정 후 바로 "수정 저장"을 눌러도 값이 누락되지 않는다) */
-    container.addEventListener("input", function(e){
-      var el = e.target;
-      if(el.classList.contains("sj-edit-name-input") && editState){
-        var pi = parseInt(el.dataset.player, 10);
-        var p = editState.players[pi];
-        if(p) p.name = el.value;
-      }
-    });
   }
 
   function bindEditSave(){
@@ -326,20 +276,13 @@
         if(status){ status.className = "sj-status error"; status.textContent = tt("loginRequired", "로그인이 필요합니다."); }
         return;
       }
-      /* 이름이 빈 채로 저장되면 서버가 그 플레이어를 통째로 라운드에서
-         빼버리므로(=사라짐), 저장 전에 미리 막는다. */
-      var hasBlankName = editState.players.some(function(p){ return !(p.name || "").trim(); });
-      if(hasBlankName){
-        if(status){ status.className = "sj-status error"; status.textContent = "이름을 비워둘 수 없습니다."; }
-        return;
-      }
       if(status){ status.className = "sj-status"; status.textContent = "저장 중..."; }
       var holes = editState.holes.slice(0, editState.holeCount).map(function(h){
         return { par: h.par, note: h.note || "" };
       });
       var players = editState.players.map(function(p){
         return {
-          name: (p.name || "").trim(),
+          name: p.name,
           isSelf: !!p.isSelf,
           holeScores: (p.holeScores || []).slice(0, editState.holeCount),
           entered: (p.entered || []).slice(0, editState.holeCount)
@@ -754,25 +697,12 @@
       var idx = parseInt(item.dataset.idx, 10);
       var r = cachedRounds[idx];
       if(!r) return;
-      // cachedRounds의 항목은 목록용 요약본이라 홀별 스코어가 빠져있다 --
-      // 실제로 스코어카드에 적용하려면 이 라운드 하나의 전체 데이터를
-      // fetchRoundDetail로 먼저 받아와야 한다.
-      var statusEl = sj("sjLoadStatus");
-      if(statusEl){ statusEl.className = "sj-status"; statusEl.textContent = tt("loadLoading", "불러오는 중..."); }
-      fetchRoundDetail(r.id).then(function(full){
-        if(statusEl){ statusEl.textContent = ""; }
-        applyRoundToState(full);
-        var resultTabBtn = sj("tabResultBtn");
-        if(resultTabBtn) resultTabBtn.click();
-        var modal = sj("sjLoadModal");
-        if(modal) modal.classList.remove("open");
-        if(typeof toast === "function"){ toast(tt("loadApplied", "라운드를 불러왔습니다")); }
-      }).catch(function(e2){
-        if(statusEl){
-          statusEl.className = "sj-status error";
-          statusEl.textContent = tt("loadFetchFail", "불러오기 실패") + ": " + (e2 && e2.message ? e2.message : e2);
-        }
-      });
+      applyRoundToState(r);
+      var resultTabBtn = sj("tabResultBtn");
+      if(resultTabBtn) resultTabBtn.click();
+      var modal = sj("sjLoadModal");
+      if(modal) modal.classList.remove("open");
+      if(typeof toast === "function"){ toast(tt("loadApplied", "라운드를 불러왔습니다")); }
     });
   }
 

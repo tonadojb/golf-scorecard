@@ -11,7 +11,7 @@
      있었을 가능성이 있습니다(정산하기 이후 화면이 확대된 채 안 풀리는
      문제). js 파일들처럼 styles.css를 고칠 때마다 이 버전 값도 반드시
      함께 올려주세요. -->
-<link rel="stylesheet" href="styles.css?v=20260926f">
+<link rel="stylesheet" href="styles.css?v=20260921b">
 
 </head>
 <body>
@@ -238,7 +238,6 @@
 <button class="sj-fab" id="sjOcrFab" title="사진으로 입력">📷</button>
 <button class="sj-fab" id="sjSaveFab" title="클라우드 저장">☁</button>
 <button class="sj-fab" id="sjLoadFab" title="불러오기">📂</button>
-<button class="sj-fab" id="sjFriendsFab" title="친구 관리">👥</button>
 <button class="sj-fab sj-admin-fab" id="sjAdminFab" title="관리자 페이지" style="display:none;">🛠</button>
 </div>
 
@@ -326,10 +325,6 @@
 <button class="sj-close" data-close>×</button>
 <h3 data-i18n="saveModalTitle">클라우드에 라운드 저장</h3>
 <p style="font-size:12px;color:#666;margin:0 0 8px;" data-i18n="saveIntroP">선택한 팀의 전체 스코어(본인 + 동반자 포함)가 그대로 저장됩니다.</p>
-<div class="sj-status" id="sjSaveUpdateNote" style="display:none;margin-bottom:8px;"></div>
-<label id="sjSaveAsNewWrap" style="display:none;align-items:center;gap:6px;font-size:12px;color:#666;margin-bottom:8px;">
-  <input type="checkbox" id="sjSaveAsNewCheckbox"> <span>새 라운드로 별도 저장 (불러온 라운드는 그대로 두기)</span>
-</label>
 <label data-i18n="saveTeamSelectLabel">저장할 팀 선택</label>
 <select id="sjSaveTeamSelect"></select>
 <button class="sj-primary" id="sjConfirmSave" data-i18n="saveConfirmBtn">저장하기</button>
@@ -348,27 +343,6 @@
 </div>
 <div id="sjLoadList"></div>
 <div class="sj-status" id="sjLoadStatus"></div>
-</div></div>
-
-<!-- 2026-09-26 추가: 친구 관리(이름/연락처/은행/계좌번호/메모). 정산(내기 결과)
-     화면에서 등록된 친구 이름이 나오면 저장해둔 계좌번호를 바로 복사할 수 있다. -->
-<div class="sj-modal-overlay" id="sjFriendsModal"><div class="sj-modal">
-<button class="sj-close" data-close>×</button>
-<h3 data-i18n="friendsModalTitle">👥 친구 관리</h3>
-<p style="font-size:12px;color:#666;margin:0 0 10px;" data-i18n="friendsIntroP">이름/연락처/은행/계좌번호/메모를 저장해두면, 내기 정산 결과에서 같은 이름이 나올 때 계좌번호를 바로 복사할 수 있어요.</p>
-<!-- 2026-09-26 추가: 스마트폰(iOS) 기본 연락처 앱에서 이름/전화번호를 바로 불러와
-     아래 입력칸에 채워준다. PC 브라우저 미리보기 등 네이티브 앱이 아닌 곳에서는
-     버튼을 눌러도 "스마트폰 앱에서만 사용할 수 있어요" 안내만 뜬다. -->
-<button type="button" class="sj-secondary" id="sjFriendsImportBtn" data-i18n="friendsImportBtn" style="margin-bottom:10px;">📱 연락처에서 가져오기</button>
-<input type="text" id="sjFriendName" placeholder="이름 (필수)" data-i18n-placeholder="friendsNamePlaceholder" style="padding:9px 10px;border:1px solid #d7d8ec;border-radius:8px;font-size:14px;box-sizing:border-box;margin-bottom:8px;">
-<input type="tel" id="sjFriendPhone" placeholder="연락처 (선택)" data-i18n-placeholder="friendsPhonePlaceholder" style="padding:9px 10px;border:1px solid #d7d8ec;border-radius:8px;font-size:14px;box-sizing:border-box;margin-bottom:8px;">
-<input type="text" id="sjFriendBank" placeholder="은행명 (선택, 예: 카카오뱅크)" data-i18n-placeholder="friendsBankPlaceholder" style="padding:9px 10px;border:1px solid #d7d8ec;border-radius:8px;font-size:14px;box-sizing:border-box;margin-bottom:8px;">
-<input type="text" id="sjFriendAccount" placeholder="계좌번호 (선택)" data-i18n-placeholder="friendsAccountPlaceholder" style="padding:9px 10px;border:1px solid #d7d8ec;border-radius:8px;font-size:14px;box-sizing:border-box;margin-bottom:8px;">
-<input type="text" id="sjFriendMemo" placeholder="메모 (선택)" data-i18n-placeholder="friendsMemoPlaceholder" style="padding:9px 10px;border:1px solid #d7d8ec;border-radius:8px;font-size:14px;box-sizing:border-box;margin-bottom:0;">
-<button type="button" class="sj-primary" id="sjFriendsSubmitBtn" data-i18n="friendsAddBtn">추가하기</button>
-<button type="button" class="sj-secondary" id="sjFriendsCancelEditBtn" data-i18n="friendsCancelEditBtn" style="display:none;">취소</button>
-<div class="sj-status" id="sjFriendsStatus"></div>
-<div id="sjFriendsList" style="margin-top:14px;"></div>
 </div></div>
 
 <div class="sj-modal-overlay" id="sjAdminModal"><div class="sj-modal sj-admin-modal">
@@ -450,12 +424,6 @@
 <p class="sj-manual-desc" data-i18n-html="manualWarningDesc">스코어카드가 아닌 사진(인물, 풍경 등 관계없는 사진)을 올리면 <b>경고 팝업</b>이 뜨고, 경고가 <b>2회</b> 누적된 뒤 <b>3번째</b>로 다시 올리면 자동으로 <b>접속이 차단</b>돼요. 반드시 실제 스코어카드 사진만 올려주세요.</p>
 </div>
 
-<!-- 2026-09-26 추가: 무료 20회 + 베이직/프로 구독 안내가 사용설명서에 빠져있어서 추가. -->
-<div class="sj-manual-section">
-<div class="sj-manual-head"><span class="sj-manual-icon">💳</span><span class="sj-manual-title" data-i18n="manualSubTitle">스캔 이용권 (무료 · 베이직 · 프로)</span></div>
-<p class="sj-manual-desc" data-i18n-html="manualSubDesc">로그인 계정당 평생 <b>20회</b>까지 사진 스캔을 무료로 쓸 수 있어요. 다 쓰면 <b>베이직</b>(매달 6회 스캔) 또는 <b>프로</b>(무제한 스캔) 중 골라 구독할 수 있고, 스마트폰 앱은 앱스토어 결제, PC·웹은 카드·카카오페이·네이버페이로 결제해요. 구독 안내 창에서 <b>구매 복원</b>·<b>구독 해지</b>도 언제든 가능해요.</p>
-</div>
-
 <div class="sj-manual-section">
 <div class="sj-manual-head"><span class="sj-manual-icon">📋</span><span class="sj-manual-title" data-i18n="manualResultTitle">결과 확인 &amp; 공유</span></div>
 <p class="sj-manual-desc" data-i18n-html="manualResultDesc"><b>결과</b> 탭에서 팀별 · 순위별로 전체 스코어를 확인할 수 있고, 표를 옆으로 밀면 18홀까지 모두 볼 수 있어요. <b>결과 복사하기</b>를 누르면 이미지로 만들어져 카카오톡이나 SNS에 바로 붙여넣을 수 있어요.</p>
@@ -467,12 +435,6 @@
 <ul class="sj-manual-steps">
 <li data-i18n-html="manualSettlementTip"><b>이름이 겹쳐 보일 때</b>: "김**"처럼 같은 성으로 겹쳐 보이면 <b>팀 설정</b> 탭에서 정확한 이름을 입력한 뒤 <b>정산하기</b>를 다시 눌러주세요. 새 이름 기준으로 다시 계산돼요.</li>
 </ul>
-</div>
-
-<!-- 2026-09-26 추가: 친구 관리(계좌 바로 복사 + 연락처 가져오기)가 사용설명서에 빠져있어서 추가. -->
-<div class="sj-manual-section">
-<div class="sj-manual-head"><span class="sj-manual-icon">📇</span><span class="sj-manual-title" data-i18n="manualFriendsTitle">친구 관리 &amp; 계좌 바로 복사</span></div>
-<p class="sj-manual-desc" data-i18n-html="manualFriendsDesc">오른쪽 아래 <b>👥 친구 관리</b> 버튼으로 자주 같이 치는 사람의 이름·연락처·은행·계좌번호·메모를 저장해두세요. 내기 정산 결과에 저장된 이름과 같은 이름이 나오면 <b>📋 계좌복사</b> 버튼이 함께 떠서 계좌번호만 바로 복사할 수 있어요. 동명이인이 여러 명 등록돼 있으면 메모·연락처로 구분해서 고를 수 있고, 스마트폰 앱에서는 <b>📱 연락처에서 가져오기</b> 버튼으로 아이폰 연락처의 이름·전화번호를 바로 불러올 수도 있어요.</p>
 </div>
 
 <div class="sj-manual-section">
@@ -512,27 +474,26 @@
 <!-- 아래 js/*.js 의 ?v=... 은 캐시 무효화용 버전 문자열입니다. GitHub Pages/브라우저가
      이 파일들을 한동안 캐시하기 때문에, js 파일을 수정해서 push할 때마다 이 버전 값을
      바꿔줘야 사용자 브라우저가 새 코드를 즉시 받아갑니다 (예: 현재값 뒤에 a->b->c 처럼 알파벳만 하나씩 올려주면 됩니다). -->
-<script src="js/i18n.js?v=20260926g" defer></script>
-<script src="js/state.js?v=20260926a" defer></script>
+<script src="js/i18n.js?v=20260922a" defer></script>
+<script src="js/state.js?v=20260823f" defer></script>
 <script src="js/render-setup.js?v=20260823f" defer></script>
 <script src="js/render-play.js?v=20260823f" defer></script>
 <script src="js/render-result.js?v=20260823f" defer></script>
-<script src="js/settlement.js?v=20260926d" defer></script>
+<script src="js/settlement.js?v=20260920b" defer></script>
 <script src="js/share.js?v=20260823f" defer></script>
 <script src="js/app.js?v=20260823g" defer></script>
-<script src="js/friends.js?v=20260926c" defer></script>
-<script src="js/ui-modals.js?v=20260926c" defer></script>
+<script src="js/ui-modals.js?v=20260920a" defer></script>
 <script src="https://developers.kakao.com/sdk/js/kakao.js" defer></script>
 <script src="https://static.nid.naver.com/js/naveridlogin_js_sdk_2.0.2.js" defer></script>
 <!-- 2026-09 추가: 웹(브라우저) 구독 결제용 포트원(PortOne) V2 브라우저 SDK. iOS 앱
      안에서는 사용하지 않고(대신 RevenueCat/StoreKit), 웹에서 "구독하기"를 누를 때만
      js/subscription.js가 이 전역(window.PortOne)을 호출한다. -->
 <script src="https://cdn.portone.io/v2/browser-sdk.js" defer></script>
-<script type="module" src="js/auth.js?v=20260926d"></script>
+<script type="module" src="js/auth.js?v=20260922b"></script>
 <script src="js/subscription.js?v=20260922d" defer></script>
 <script src="js/ocr.js?v=20260823f" defer></script>
-<script src="js/cloud-save.js?v=20260926a" defer></script>
-<script src="js/cloud-load.js?v=20260926d" defer></script>
+<script src="js/cloud-save.js?v=20260823f" defer></script>
+<script src="js/cloud-load.js?v=20260823g" defer></script>
 <script src="js/admin.js?v=20260921a" defer></script>
 
 </body>
