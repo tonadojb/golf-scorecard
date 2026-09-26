@@ -352,6 +352,10 @@
 <button class="sj-close" data-close>×</button>
 <h3 data-i18n="friendsModalTitle">👥 친구 관리</h3>
 <p style="font-size:12px;color:#666;margin:0 0 10px;" data-i18n="friendsIntroP">이름/연락처/은행/계좌번호/메모를 저장해두면, 내기 정산 결과에서 같은 이름이 나올 때 계좌번호를 바로 복사할 수 있어요.</p>
+<!-- 2026-09-26 추가: 스마트폰(iOS) 기본 연락처 앱에서 이름/전화번호를 바로 불러와
+     아래 입력칸에 채워준다. PC 브라우저 미리보기 등 네이티브 앱이 아닌 곳에서는
+     버튼을 눌러도 "스마트폰 앱에서만 사용할 수 있어요" 안내만 뜬다. -->
+<button type="button" class="sj-secondary" id="sjFriendsImportBtn" data-i18n="friendsImportBtn" style="margin-bottom:10px;">📱 연락처에서 가져오기</button>
 <input type="text" id="sjFriendName" placeholder="이름 (필수)" data-i18n-placeholder="friendsNamePlaceholder" style="padding:9px 10px;border:1px solid #d7d8ec;border-radius:8px;font-size:14px;box-sizing:border-box;margin-bottom:8px;">
 <input type="tel" id="sjFriendPhone" placeholder="연락처 (선택)" data-i18n-placeholder="friendsPhonePlaceholder" style="padding:9px 10px;border:1px solid #d7d8ec;border-radius:8px;font-size:14px;box-sizing:border-box;margin-bottom:8px;">
 <input type="text" id="sjFriendBank" placeholder="은행명 (선택, 예: 카카오뱅크)" data-i18n-placeholder="friendsBankPlaceholder" style="padding:9px 10px;border:1px solid #d7d8ec;border-radius:8px;font-size:14px;box-sizing:border-box;margin-bottom:8px;">
@@ -492,7 +496,7 @@
 <!-- 아래 js/*.js 의 ?v=... 은 캐시 무효화용 버전 문자열입니다. GitHub Pages/브라우저가
      이 파일들을 한동안 캐시하기 때문에, js 파일을 수정해서 push할 때마다 이 버전 값을
      바꿔줘야 사용자 브라우저가 새 코드를 즉시 받아갑니다 (예: 현재값 뒤에 a->b->c 처럼 알파벳만 하나씩 올려주면 됩니다). -->
-<script src="js/i18n.js?v=20260926c" defer></script>
+<script src="js/i18n.js?v=20260926d" defer></script>
 <script src="js/state.js?v=20260823f" defer></script>
 <script src="js/render-setup.js?v=20260823f" defer></script>
 <script src="js/render-play.js?v=20260823f" defer></script>
@@ -500,7 +504,7 @@
 <script src="js/settlement.js?v=20260926d" defer></script>
 <script src="js/share.js?v=20260823f" defer></script>
 <script src="js/app.js?v=20260823g" defer></script>
-<script src="js/friends.js?v=20260926b" defer></script>
+<script src="js/friends.js?v=20260926c" defer></script>
 <script src="js/ui-modals.js?v=20260926c" defer></script>
 <script src="https://developers.kakao.com/sdk/js/kakao.js" defer></script>
 <script src="https://static.nid.naver.com/js/naveridlogin_js_sdk_2.0.2.js" defer></script>

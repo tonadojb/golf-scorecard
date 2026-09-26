@@ -30,6 +30,7 @@
   var memoInput = sj("sjFriendMemo");
   var submitBtn = sj("sjFriendsSubmitBtn");
   var cancelEditBtn = sj("sjFriendsCancelEditBtn");
+  var importBtn = sj("sjFriendsImportBtn");
 
   function setStatus(text, isError){
     if(!statusEl) return;
@@ -158,11 +159,75 @@
       });
   }
 
+  /* ---------------- 스마트폰 연락처에서 이름/전화번호 가져오기 ----------------
+     @capacitor-community/contacts 플러그인. iOS 네이티브 앱에서만 동작하고
+     (Info.plist에 NSContactsUsageDescription 권한 문구 필요), PC 브라우저나
+     앱을 새로 빌드하기 전에는 window.Capacitor.Plugins.Contacts 자체가 없으므로
+     이때는 "스마트폰 앱에서만 사용할 수 있어요" 안내만 보여준다. */
+  function isNativeApp(){
+    return !!(window.Capacitor && typeof window.Capacitor.isNativePlatform === "function" && window.Capacitor.isNativePlatform());
+  }
+  function getContactsPlugin(){
+    return window.Capacitor && window.Capacitor.Plugins && window.Capacitor.Plugins.Contacts;
+  }
+
+  /* 연락처 앱에 저장된 전화번호는 "010 1234 5678", "+82 10-1234-5678",
+     "01012345678" 등 사람마다 형식이 제각각이라, 숫자만 뽑아서 국내 휴대폰
+     번호(010/011 등, 총 10~11자리) 형태면 보기 좋게 하이픈을 넣어준다.
+     패턴에 안 맞으면(국제전화 등) 원래 값을 그대로 둔다. */
+  function normalizeImportedPhone(raw){
+    var s = (raw || "").trim();
+    if(!s) return "";
+    var digits = s.replace(/[^0-9+]/g, "");
+    if(digits.indexOf("+82") === 0){ digits = "0" + digits.slice(3); }
+    digits = digits.replace(/\+/g, "");
+    if(/^0\d{9,10}$/.test(digits)){
+      if(digits.length === 11) return digits.replace(/(\d{3})(\d{4})(\d{4})/, "$1-$2-$3");
+      if(digits.length === 10) return digits.replace(/(\d{2,3})(\d{3,4})(\d{4})/, "$1-$2-$3");
+    }
+    return s;
+  }
+
+  function importFromDeviceContacts(){
+    if(!isNativeApp()){
+      setStatus(t("friendsImportNativeOnly"), true);
+      return;
+    }
+    var Contacts = getContactsPlugin();
+    if(!Contacts){
+      setStatus(t("friendsImportNativeOnly"), true);
+      return;
+    }
+    setStatus("...");
+    Contacts.pickContact({ projection: { name: true, phones: true } }).then(function(result){
+      var contact = result && result.contact;
+      if(!contact) return;
+      var name = contact.name && contact.name.display;
+      if(!name && contact.name){
+        name = [contact.name.family, contact.name.given].filter(Boolean).join(" ").trim();
+      }
+      var phone = (contact.phones && contact.phones.length) ? contact.phones[0].number : "";
+      if(name && nameInput) nameInput.value = name;
+      if(phone && phoneInput) phoneInput.value = normalizeImportedPhone(phone);
+      setStatus(t("toastContactImported"));
+    }).catch(function(e){
+      // 사용자가 연락처 선택을 취소한 경우에도 이 catch로 오는데, 이때는 에러
+      // 안내를 띄우지 않는다(취소는 실패가 아니므로).
+      var msg = (e && e.message) || String(e || "");
+      if(/cancel/i.test(msg)) { setStatus(""); return; }
+      console.error("연락처 가져오기 실패", e);
+      setStatus(t("friendsImportFail", msg), true);
+    });
+  }
+
   if(submitBtn){
     submitBtn.addEventListener("click", submitFriendForm);
   }
   if(cancelEditBtn){
     cancelEditBtn.addEventListener("click", clearForm);
+  }
+  if(importBtn){
+    importBtn.addEventListener("click", importFromDeviceContacts);
   }
   if(listEl){
     listEl.addEventListener("click", function(e){

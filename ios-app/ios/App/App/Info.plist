@@ -49,6 +49,11 @@
 	<string>스코어카드 사진을 촬영해서 자동으로 스코어를 인식하기 위해 카메라를 사용합니다.</string>
 	<key>NSPhotoLibraryUsageDescription</key>
 	<string>저장된 스코어카드 사진을 선택해서 스코어를 자동으로 인식하기 위해 사진 보관함에 접근합니다.</string>
+	<!-- 2026-09-26 추가: 친구 등록 화면에서 "연락처에서 가져오기" 버튼으로 이름/전화번호를
+	     자동 입력하기 위해 사용합니다 (@capacitor-community/contacts). 이 키가 없으면
+	     연락처 접근 시 앱이 즉시 크래시합니다. -->
+	<key>NSContactsUsageDescription</key>
+	<string>친구 등록 시 연락처에서 이름과 전화번호를 빠르게 가져오기 위해 사용합니다.</string>
 	<key>ITSAppUsesNonExemptEncryption</key>
 	<false/>
 	<!-- 구글 로그인 완료 후 앱으로 되돌아오기 위한 URL Scheme.
