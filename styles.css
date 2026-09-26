@@ -396,8 +396,13 @@ footer.credit{text-align:center;color:var(--muted);font-size:11px;padding:14px;}
 
 /* ---------------- 친구추천 이벤트 룰렛 (사용자용, 2026-09-26 추가) ---------------- */
 .sj-roulette-host{position:relative;width:220px;max-width:100%;margin:0 auto;display:flex;align-items:center;justify-content:center;}
-.sj-roulette-wheel{width:220px;height:220px;border-radius:50%;border:6px solid #fff;box-shadow:0 0 0 3px #d7d8ec,0 8px 20px rgba(0,0,0,0.15);will-change:transform;}
+.sj-roulette-wheel{position:relative;width:220px;height:220px;border-radius:50%;border:6px solid #fff;box-shadow:0 0 0 3px #d7d8ec,0 8px 20px rgba(0,0,0,0.15);will-change:transform;}
 .sj-roulette-pointer{position:absolute;top:-6px;left:50%;transform:translateX(-50%);font-size:22px;color:#1f2b24;z-index:2;filter:drop-shadow(0 2px 2px rgba(0,0,0,0.25));}
+/* 2026-09-26(3차) 추가: 원판 조각 안에 표시하는 짧은 글자. js/referral.js가
+   조각마다 rotate(각도) translate(반지름) translate(-50%,-50%)를 인라인으로
+   넣어서 정확한 위치/각도를 잡아준다 -- #sjRouletteWheelDisc의 자식이라
+   스핀 애니메이션(disc 자체의 rotate) 때 색칠된 조각과 함께 그대로 돌아간다. */
+.sj-roulette-label{position:absolute;top:50%;left:50%;transform-origin:0 0;font-size:10.5px;font-weight:800;line-height:1.15;color:#fff;text-shadow:0 1px 3px rgba(0,0,0,0.45);white-space:nowrap;text-align:center;pointer-events:none;}
 .sj-referral-prize-list{margin-top:14px;display:flex;flex-direction:column;gap:6px;}
 .sj-referral-prize-title{font-weight:700;font-size:12.5px;color:var(--primary-dark);margin-bottom:2px;}
 .sj-referral-prize-row{display:flex;align-items:center;gap:7px;font-size:12.5px;color:#374151;}

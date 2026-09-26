@@ -834,10 +834,7 @@
         '<option value="none"' + (isNoWin ? " selected" : "") + '>꽝(당첨없음)</option>' +
       '</select>' +
       '<input type="number" class="sj-admin-prize-days" min="1" max="3650" placeholder="일수" value="' + (p.days || 30) + '"' + (isNoWin ? " disabled" : "") + '> 일' +
-      // 2026-09-26(3차) 추가: "꽝"은 실제 추첨 대상에서 항상 제외되도록
-      // 서버(referral.js의 pickWeightedPrize)에서 걸러버리므로 확률 값
-      // 자체가 무의미하다 -- 헷갈리지 않게 입력칸을 비활성화해둔다.
-      '<input type="number" class="sj-admin-prize-weight" min="0.01" max="100000" step="0.01" placeholder="확률 가중치" value="' + (p.weight != null ? p.weight : 10) + '"' + (isNoWin ? ' disabled title="꽝은 실제로 당첨되지 않아 확률 값이 쓰이지 않습니다."' : "") + '> %' +
+      '<input type="number" class="sj-admin-prize-weight" min="0.01" max="100000" step="0.01" placeholder="확률 가중치" value="' + (p.weight != null ? p.weight : 10) + '"> %' +
       '<button type="button" class="sj-admin-prize-remove-btn">✕</button>' +
     '</div>';
   }
@@ -845,15 +842,11 @@
   function renderPrizeRows(prizes){
     var host = sj("sjAdminRefPrizeRows");
     if(!host) return;
-    // 2026-09-26(3차) 추가: 새 이벤트를 처음 만들 때 기본으로 "꽝"도 5번째
-    // 칸으로 같이 보여준다(원판은 5등분되지만, 꽝은 서버에서 실제 추첨
-    // 대상에서 항상 제외됨).
     var list = (prizes && prizes.length) ? prizes : [
       { label: "베이직 무료 1개월", planKey: "basic", days: 30, weight: 80 },
       { label: "베이직 무료 2개월", planKey: "basic", days: 60, weight: 10 },
       { label: "베이직 무료 3개월", planKey: "basic", days: 90, weight: 9 },
-      { label: "프로 무료 3개월", planKey: "pro", days: 90, weight: 1 },
-      { label: "꽝", planKey: "none", days: 0, weight: 1 }
+      { label: "프로 무료 3개월", planKey: "pro", days: 90, weight: 1 }
     ];
     host.innerHTML = list.map(prizeRowHtml).join("");
   }
@@ -875,10 +868,7 @@
       if(!sel) return;
       var row = sel.closest(".sj-admin-prize-row");
       var daysInput = row && row.querySelector(".sj-admin-prize-days");
-      var weightInput = row && row.querySelector(".sj-admin-prize-weight");
-      var isNoWin = sel.value === "none";
-      if(daysInput) daysInput.disabled = isNoWin;
-      if(weightInput) weightInput.disabled = isNoWin;
+      if(daysInput) daysInput.disabled = (sel.value === "none");
     });
     var addBtn = sj("sjAdminRefAddPrizeBtn");
     if(addBtn){

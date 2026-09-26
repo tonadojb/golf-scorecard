@@ -78,15 +78,6 @@
     } catch(e){ return iso; }
   }
 
-  // 2026-09-26(3차) 추가: 원판 안에 넣을 짧은 표시용 글자. "무료"를 빼서
-  // "베이직 무료 1개월" -> "베이직 1개월"처럼 줄인다 -- 원판이 작아서 원래
-  // 라벨을 그대로 넣으면 겹치거나 잘리기 쉽다. 관리자가 입력한 라벨 자체를
-  // 바꾸는 게 아니라(범례/서버 응답은 원래 라벨 그대로), 원판 안 표시에만 쓴다.
-  function shortWheelLabel(label){
-    var s = String(label == null ? "" : label).replace(/\s*무료\s*/g, " ").replace(/\s+/g, " ").trim();
-    return s || String(label == null ? "" : label);
-  }
-
   // 2026-09-26 수정: 당첨 확률(weight)은 관리자만 알아야 하므로, 원판/범례
   // 어디에도 확률을 드러내지 않는다. 서버도 이제 사용자용 응답에서 weight
   // 필드 자체를 빼서 내려주지 않으므로(referral.js의 eventPublicView
@@ -98,30 +89,16 @@
     var n = prizes.length;
     var colors = ["#4338ca", "#2a78d6", "#0d9488", "#eb6834", "#c026d3", "#ca8a04"];
     var gradientParts = [];
-    // 2026-09-26(3차) 추가: 원판 자체에도 짧은 글자를 넣어달라는 요청 --
-    // 각 조각의 정가운데 각도(mid)에 라벨을 두고, 조각 색과 함께 같은
-    // #sjRouletteWheelDisc의 자식으로 넣어서 스핀 애니메이션(disc 자체의
-    // rotate)에 자동으로 같이 돌아가게 한다(별도 보정 계산 불필요).
-    var labelParts = [];
-    var labelRadius = 70; // 원판 반지름(110px)의 약 64% 지점 -- 중심(조각이 좁아지는 곳)과 테두리 사이
     prizes.forEach(function(p, i){
       var start = (i / n) * 360;
       var end = ((i + 1) / n) * 360;
       gradientParts.push(colors[i % colors.length] + " " + start.toFixed(2) + "deg " + end.toFixed(2) + "deg");
-      var mid = (start + end) / 2;
-      labelParts.push(
-        '<span class="sj-roulette-label" style="transform:rotate(' + mid.toFixed(2) + 'deg) translate(0,-' + labelRadius + 'px) translate(-50%,-50%);">' +
-          escapeHtml(shortWheelLabel(p.label)) +
-        '</span>'
-      );
     });
     host.innerHTML =
       '<div class="sj-roulette-pointer">▼</div>' +
-      '<div class="sj-roulette-wheel" id="sjRouletteWheelDisc" style="background:conic-gradient(' + gradientParts.join(",") + ');">' +
-        labelParts.join("") +
-      '</div>';
-    // 경품 이름은 원판 안에는 짧게만, 정확한 전체 이름은 아래 범례 목록으로
-    // 보여준다. 확률(%)은 절대 표시하지 않는다.
+      '<div class="sj-roulette-wheel" id="sjRouletteWheelDisc" style="background:conic-gradient(' + gradientParts.join(",") + ');"></div>';
+    // 경품 이름은 원판 안에 다 넣기보다(작은 화면에서 깨지기 쉬움) 아래 범례 목록으로 보여준다.
+    // 확률(%)은 절대 표시하지 않는다.
     var legend = sj("sjReferralPrizeList");
     if(legend){
       legend.innerHTML = '<div class="sj-referral-prize-title">' + escapeHtml(t("referralPrizeListTitle")) + '</div>' +
