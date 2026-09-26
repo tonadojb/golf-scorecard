@@ -188,6 +188,9 @@ footer.credit{text-align:center;color:var(--muted);font-size:11px;padding:14px;}
 .sj-stats-legend-row{display:flex;align-items:center;gap:6px;}
 .sj-stats-legend-dot{width:10px;height:10px;border-radius:50%;flex:0 0 auto;}
 .sj-stats-empty{font-size:13px;color:#888;text-align:center;padding:16px 0;}
+.sj-stats-vs-wrap{margin-top:16px;padding-top:14px;border-top:1px solid #e5e7eb;}
+.sj-stats-vs-head{font-size:13px;font-weight:700;color:#1f2b24;margin-bottom:8px;}
+.sj-stats-vs-record{font-size:14px;font-weight:700;color:#4338ca;text-align:center;background:#f5f6ff;border-radius:8px;padding:8px;margin-bottom:8px;}
 
 /* ---------------- User manual ---------------- */
 .sj-manual-modal{max-width:440px;}

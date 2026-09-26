@@ -371,6 +371,97 @@
   }
 
   var currentStatsRange = 10;
+  var currentVsName = "";
+
+  /* ---------------- 동반자(상대) 비교 ----------------
+     저장된 라운드는 "내 팀"(team 0) 한 팀만 담고 있으므로, 한 라운드 안에서
+     나(getMyPlayer)를 뺀 나머지 참가자는 전부 그 라운드를 같이 친 동반자다.
+     탭(최근10/20/전체)과 무관하게 저장된 라운드 전체를 기준으로 모은다 --
+     특정 동반자와 함께한 라운드가 마침 "최근 10회" 밖에 있으면 상대전적이
+     텅 비어 보이는 걸 막기 위함. 이름은 공백을 뺀 문자열이 완전히 같을 때만
+     같은 사람으로 취급한다(OCR/수동입력 특성상 오타가 있으면 별도 인물로 잡힘 --
+     사용설명서의 "이름이 겹쳐 보일 때" 안내와 같은 한계). */
+  function buildCompanionRecords(){
+    var map = {};
+    cachedRounds.forEach(function(r){
+      var me = getMyPlayer(r);
+      if(!me || typeof me.totalScore !== "number") return;
+      var meName = (me.name || "").trim();
+      (r.players || []).forEach(function(p){
+        if(!p || p === me) return;
+        var name = (p.name || "").trim();
+        if(!name || name === meName) return;
+        if(typeof p.totalScore !== "number") return;
+        if(!map[name]) map[name] = [];
+        map[name].push({ myScore: me.totalScore, oppScore: p.totalScore });
+      });
+    });
+    return map;
+  }
+
+  function summarizeCompanion(records){
+    var n = records.length;
+    var wins = 0, losses = 0, ties = 0, mySum = 0, oppSum = 0, myBest = null, oppBest = null;
+    records.forEach(function(rec){
+      if(rec.myScore < rec.oppScore) wins++;
+      else if(rec.myScore > rec.oppScore) losses++;
+      else ties++;
+      mySum += rec.myScore;
+      oppSum += rec.oppScore;
+      if(myBest === null || rec.myScore < myBest) myBest = rec.myScore;
+      if(oppBest === null || rec.oppScore < oppBest) oppBest = rec.oppScore;
+    });
+    return { rounds: n, wins: wins, losses: losses, ties: ties, myAvg: mySum / n, oppAvg: oppSum / n, myBest: myBest, oppBest: oppBest };
+  }
+
+  function renderVsResult(map){
+    var resultEl = sj("sjStatsVsResult");
+    if(!resultEl) return;
+    if(!currentVsName || !map[currentVsName]){
+      resultEl.innerHTML = "";
+      return;
+    }
+    var s = summarizeCompanion(map[currentVsName]);
+    resultEl.innerHTML =
+      '<div class="sj-stats-vs-record">' + escapeHtml(tt("vsRecordLine", currentVsName + "님과 " + s.rounds + "전 " + s.wins + "승 " + s.losses + "패 " + s.ties + "무", currentVsName, s.rounds, s.wins, s.losses, s.ties)) + '</div>' +
+      '<div class="sj-stats-tiles">' +
+        '<div class="sj-stat-tile"><div class="sj-stat-label">' + escapeHtml(tt("vsMyAvg", "내 평균")) + '</div><div class="sj-stat-value">' + s.myAvg.toFixed(1) + '</div></div>' +
+        '<div class="sj-stat-tile"><div class="sj-stat-label">' + escapeHtml(tt("vsOppAvg", "상대 평균")) + '</div><div class="sj-stat-value">' + s.oppAvg.toFixed(1) + '</div></div>' +
+        '<div class="sj-stat-tile"><div class="sj-stat-label">' + escapeHtml(tt("vsMyBest", "내 베스트")) + '</div><div class="sj-stat-value">' + s.myBest + '</div></div>' +
+        '<div class="sj-stat-tile"><div class="sj-stat-label">' + escapeHtml(tt("vsOppBest", "상대 베스트")) + '</div><div class="sj-stat-value">' + s.oppBest + '</div></div>' +
+      '</div>';
+  }
+
+  function bindVsSelect(map){
+    var sel = sj("sjStatsVsSelect");
+    if(!sel) return;
+    sel.addEventListener("change", function(){
+      currentVsName = sel.value || "";
+      renderVsResult(map);
+    });
+  }
+
+  function renderVsSection(){
+    var map = buildCompanionRecords();
+    var names = Object.keys(map).sort(function(a, b){ return map[b].length - map[a].length; });
+    if(names.indexOf(currentVsName) === -1){ currentVsName = ""; }
+    var placeholder = '<option value="">' + escapeHtml(tt("vsSelectPlaceholder", "동반자를 선택하세요")) + '</option>';
+    var options = names.map(function(name){
+      var cnt = map[name].length;
+      var suffix = tt("vsRoundsSuffix", "회");
+      return '<option value="' + escapeHtml(name) + '"' + (name === currentVsName ? " selected" : "") + '>' + escapeHtml(name) + ' (' + cnt + suffix + ')</option>';
+    }).join("");
+    var html = '<div class="sj-stats-vs-wrap">' +
+      '<div class="sj-stats-vs-head">' + escapeHtml(tt("vsSectionTitle", "🆚 동반자 비교")) + '</div>';
+    if(!names.length){
+      html += '<div class="sj-stats-empty">' + escapeHtml(tt("vsNoCompanions", "함께 라운드한 동반자 기록이 없습니다.")) + '</div>';
+    } else {
+      html += '<select id="sjStatsVsSelect" style="width:100%;padding:9px 10px;border:1px solid #d7d8ec;border-radius:8px;font-size:14px;box-sizing:border-box;">' + placeholder + options + '</select>' +
+        '<div id="sjStatsVsResult" style="margin-top:10px;"></div>';
+    }
+    html += '</div>';
+    return html;
+  }
 
   function renderStatsPanel(range){
     if(range !== undefined) currentStatsRange = range;
@@ -426,7 +517,8 @@
               seg.label + " " + seg.pct + "% (" + seg.count + ")</div>";
           }).join("") +
         "</div>" +
-      "</div>";
+      "</div>" +
+      renderVsSection();
 
     Array.prototype.forEach.call(panel.querySelectorAll(".sj-stats-tabs button"), function(btn){
       btn.addEventListener("click", function(){
@@ -434,6 +526,10 @@
         renderStatsPanel(r);
       });
     });
+
+    var vsMap = buildCompanionRecords();
+    bindVsSelect(vsMap);
+    renderVsResult(vsMap);
   }
 
   function bindStatsBtn(){
