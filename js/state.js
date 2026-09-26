@@ -34,7 +34,13 @@ function defaultState(){
     ],
     nextTeamId:2,
     currentHole:1,
-    resultSortMode:'team'
+    resultSortMode:'team',
+    /* 불러온 뒤 이어서 저장할 때, "새 라운드로 추가 저장"이 아니라 그 라운드
+       자체를 수정하도록 하기 위해 기억해두는 클라우드 문서 id.
+       cloud-load.js의 applyRoundToState()가 불러올 때 채우고, 이 resetBtn
+       핸들러(새 라운드 시작)가 defaultState()를 다시 호출할 때 자동으로
+       비워진다. */
+    cloudRoundId:null
   };
 }
 
@@ -51,6 +57,7 @@ function normalize(){
   if(state.courseSub === undefined) state.courseSub = '';
   if(state.teeOffTime === undefined) state.teeOffTime = '';
   if(state.resultSortMode !== 'team' && state.resultSortMode !== 'rank') state.resultSortMode = 'team';
+  if(state.cloudRoundId === undefined) state.cloudRoundId = null;
   if(!state.holeCount) state.holeCount = 18;
   if(!state.holes) state.holes = defaultHoles(state.holeCount);
   while(state.holes.length < state.holeCount) state.holes.push({par:4, note:''});

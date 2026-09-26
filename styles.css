@@ -221,6 +221,8 @@ footer.credit{text-align:center;color:var(--muted);font-size:11px;padding:14px;}
 .sj-edit-player-head{display:flex;align-items:center;gap:8px;margin-bottom:8px;}
 .sj-edit-my-label{display:flex;align-items:center;gap:3px;flex:0 0 auto;font-size:11px;color:#4338ca;font-weight:700;cursor:pointer;}
 .sj-edit-player-name{flex:1;min-width:0;font-size:13px;font-weight:700;color:#1f2b24;overflow-wrap:anywhere;}
+.sj-edit-name-input{border:1px solid #d7d8ec;border-radius:6px;padding:5px 7px;background:#fff;font-family:inherit;}
+.sj-edit-name-input:focus{outline:none;border-color:#4338ca;}
 .sj-edit-player-total{flex:0 0 auto;font-size:12px;font-weight:700;color:#4338ca;white-space:nowrap;}
 .sj-edit-holes-wrap{overflow-x:auto;-webkit-overflow-scrolling:touch;touch-action:pan-x pan-y;overscroll-behavior-x:contain;}
 .sj-edit-holes{display:flex;gap:6px;width:max-content;}

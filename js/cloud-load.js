@@ -144,6 +144,11 @@
     var selfIdx = playersIn.findIndex(function(p){ return p && p.isSelf; });
     team.selfIndex = (selfIdx !== -1) ? selfIdx : 0;
 
+    /* 이 라운드를 "불러왔다"는 것을 기억해둔다 -- 이후 팀설정에서 이름/스코어를
+       고쳐서 다시 "☁ 저장"을 누르면, 새 라운드를 추가하는 대신 바로 이 문서를
+       수정하도록 cloud-save.js가 이 값을 사용한다. */
+    state.cloudRoundId = r.id || null;
+
     if(typeof save === "function") save();
     if(typeof renderAll === "function") renderAll();
     /* 정산 탭에 남아있던 이전 계산 결과는 이번에 불러온 라운드와 무관하므로
@@ -175,13 +180,13 @@
       (editState.courseSub ? " (" + escapeHtml(editState.courseSub) + ")" : "");
     var dateLine = editState.roundDate || tt("loadNoDate", "날짜 미입력");
     var html = '<div class="sj-edit-meta">' + escapeHtml(courseLine) + " · " + escapeHtml(dateLine) + "</div>";
-    html += '<p class="sj-edit-hint">My를 눌러 본인 스코어를 지정하고, 홀별 +/- 버튼으로 스코어를 수정한 뒤 아래 "수정 저장"을 눌러주세요.</p>';
+    html += '<p class="sj-edit-hint">My를 눌러 본인 스코어를 지정하고, 이름을 눌러 동반자 이름을 수정하거나 홀별 +/- 버튼으로 스코어를 수정한 뒤 아래 "수정 저장"을 눌러주세요.</p>';
     editState.players.forEach(function(p, pi){
       var totals = computeEditTotals(pi);
       html += '<div class="sj-edit-player">';
       html += '<div class="sj-edit-player-head">';
       html += '<label class="sj-edit-my-label"><input type="radio" name="sjEditSelf" class="sj-edit-self-radio" data-player="' + pi + '"' + (p.isSelf ? " checked" : "") + '> <span>My</span></label>';
-      html += '<span class="sj-edit-player-name">' + escapeHtml(p.name || ("Player" + (pi + 1))) + '</span>';
+      html += '<input type="text" class="sj-edit-player-name sj-edit-name-input" data-player="' + pi + '" value="' + escapeHtml(p.name || ("Player" + (pi + 1))) + '" maxlength="50" placeholder="이름">';
       html += '<span class="sj-edit-player-total" id="sjEditTotal_' + pi + '">' + totals.total + " (" + signedLabel(totals.toPar) + ")</span>";
       html += '</div>';
       html += '<div class="sj-edit-holes-wrap"><div class="sj-edit-holes">';
@@ -263,6 +268,16 @@
         editState.players.forEach(function(p, i){ p.isSelf = (i === pi); });
       }
     });
+    /* 이름 입력칸: 타이핑 즉시 editState에 반영 (blur를 기다리는 change 대신
+       input 이벤트를 써야, 수정 후 바로 "수정 저장"을 눌러도 값이 누락되지 않는다) */
+    container.addEventListener("input", function(e){
+      var el = e.target;
+      if(el.classList.contains("sj-edit-name-input") && editState){
+        var pi = parseInt(el.dataset.player, 10);
+        var p = editState.players[pi];
+        if(p) p.name = el.value;
+      }
+    });
   }
 
   function bindEditSave(){
@@ -276,13 +291,20 @@
         if(status){ status.className = "sj-status error"; status.textContent = tt("loginRequired", "로그인이 필요합니다."); }
         return;
       }
+      /* 이름이 빈 채로 저장되면 서버가 그 플레이어를 통째로 라운드에서
+         빼버리므로(=사라짐), 저장 전에 미리 막는다. */
+      var hasBlankName = editState.players.some(function(p){ return !(p.name || "").trim(); });
+      if(hasBlankName){
+        if(status){ status.className = "sj-status error"; status.textContent = "이름을 비워둘 수 없습니다."; }
+        return;
+      }
       if(status){ status.className = "sj-status"; status.textContent = "저장 중..."; }
       var holes = editState.holes.slice(0, editState.holeCount).map(function(h){
         return { par: h.par, note: h.note || "" };
       });
       var players = editState.players.map(function(p){
         return {
-          name: p.name,
+          name: (p.name || "").trim(),
           isSelf: !!p.isSelf,
           holeScores: (p.holeScores || []).slice(0, editState.holeCount),
           entered: (p.entered || []).slice(0, editState.holeCount)
