@@ -176,18 +176,38 @@ function settlementPlayerLabel(team, pi){
   return escapeHtml(team.players[pi] || t('playerPlaceholder', pi + 1));
 }
 
+/* 친구 목록에서 동명이인을 구분하기 위한 짧은 표시 문구. 메모가 있으면
+   메모를, 없으면 연락처를, 그것도 없으면 계좌번호 뒤 4자리를 보여준다. */
+function settlementFriendDisambiguator(f){
+  if(f.memo) return f.memo;
+  if(f.phone) return f.phone;
+  if(f.account) return '…' + f.account.slice(-4);
+  return '';
+}
+
+function settlementCopyBtnHtml(f, withLabel){
+  var display = [f.bank, f.account].filter(Boolean).join(' ');
+  var label = t('friendsAccountCopyBtn');
+  if(withLabel){
+    var dis = settlementFriendDisambiguator(f);
+    if(dis) label += '(' + dis + ')';
+  }
+  return '<button type="button" class="settlement-copy-account-btn" data-account="' + escapeHtml(f.account) + '" title="' + escapeHtml(display) + '">' + escapeHtml(label) + '</button>';
+}
+
 /* 정산 결과의 이름이 js/friends.js에 등록해둔 친구 이름과 정확히 같고(공백
    제거, 대소문자 무시) 계좌번호가 저장돼 있으면, 그 계좌번호를 바로 복사할
    수 있는 작은 버튼을 만들어 반환한다. 매칭되는 친구가 없거나 계좌번호가
-   비어있으면 빈 문자열을 반환한다(버튼 없음). */
+   비어있으면 빈 문자열을 반환한다(버튼 없음). 동명이인이 여러 명이면 각자의
+   메모/연락처를 라벨로 붙인 버튼을 각각 만들어서 사용자가 직접 고르게 한다. */
 function settlementAccountCopyButtonHtml(team, pi){
-  if(!window.__sjFriends || !window.__sjFriends.findByName) return '';
+  if(!window.__sjFriends || !window.__sjFriends.findAllByName) return '';
   var rawName = (team.players[pi] || '').trim();
   if(!rawName) return '';
-  var friend = window.__sjFriends.findByName(rawName);
-  if(!friend || !friend.account) return '';
-  var display = [friend.bank, friend.account].filter(Boolean).join(' ');
-  return '<button type="button" class="settlement-copy-account-btn" data-account="' + escapeHtml(friend.account) + '" data-display="' + escapeHtml(display) + '" title="' + escapeHtml(display) + '">' + escapeHtml(t('friendsAccountCopyBtn')) + '</button>';
+  var matches = window.__sjFriends.findAllByName(rawName).filter(function(f){ return f.account; });
+  if(!matches.length) return '';
+  if(matches.length === 1) return settlementCopyBtnHtml(matches[0], false);
+  return matches.map(function(f){ return settlementCopyBtnHtml(f, true); }).join('');
 }
 
 /* 화면에 보여줄 배수 프리셋 버튼 (연속 더블/따당 관행까지 고려해서 ×8까지) */
@@ -290,7 +310,7 @@ if(settlementCalcBtn){
 settlementResultEl.addEventListener('click', function(e){
   var copyBtn = e.target.closest('.settlement-copy-account-btn');
   if(copyBtn){
-    var text = copyBtn.dataset.display || copyBtn.dataset.account || '';
+    var text = copyBtn.dataset.account || '';
     var done = function(){ toast(t('toastAccountCopied')); };
     var fail = function(){ toast(t('toastAccountCopyFail')); };
     if(navigator.clipboard && navigator.clipboard.writeText){

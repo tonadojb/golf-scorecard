@@ -177,13 +177,20 @@
      정산 결과의 선수 이름은 자유 입력/OCR 인식 텍스트라 완전히 같은 문자열일
      때만 매칭됩니다. */
   function findFriendByName(name){
-    if(!name) return null;
+    var all = findAllFriendsByName(name);
+    return all.length ? all[0] : null;
+  }
+
+  /* 동명이인이 여러 명 등록돼 있을 수 있으므로, 이름이 같은 친구를 전부(등록
+     순서 그대로) 배열로 반환한다. 어떤 계좌를 쓸지는 호출하는 쪽(정산 화면)이
+     메모/연락처 등으로 구분해서 사용자가 고르게 한다. */
+  function findAllFriendsByName(name){
+    if(!name) return [];
     var key = String(name).trim().toLowerCase();
-    if(!key) return null;
-    for(var i = 0; i < friendsCache.length; i++){
-      if((friendsCache[i].name || "").trim().toLowerCase() === key) return friendsCache[i];
-    }
-    return null;
+    if(!key) return [];
+    return friendsCache.filter(function(f){
+      return (f.name || "").trim().toLowerCase() === key;
+    });
   }
 
   window.__sjFriends = {
@@ -194,6 +201,7 @@
       refreshFriendsList();
     },
     findByName: findFriendByName,
+    findAllByName: findAllFriendsByName,
     getCached: function(){ return friendsCache; },
     /* 로그인 직후(또는 앱 시작 시 이미 로그인 상태) 정산 화면에서 바로 매칭될
        수 있도록, 모달을 열지 않아도 백그라운드로 한 번 불러와 캐시를 채운다. */
