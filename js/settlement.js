@@ -176,6 +176,20 @@ function settlementPlayerLabel(team, pi){
   return escapeHtml(team.players[pi] || t('playerPlaceholder', pi + 1));
 }
 
+/* 정산 결과의 이름이 js/friends.js에 등록해둔 친구 이름과 정확히 같고(공백
+   제거, 대소문자 무시) 계좌번호가 저장돼 있으면, 그 계좌번호를 바로 복사할
+   수 있는 작은 버튼을 만들어 반환한다. 매칭되는 친구가 없거나 계좌번호가
+   비어있으면 빈 문자열을 반환한다(버튼 없음). */
+function settlementAccountCopyButtonHtml(team, pi){
+  if(!window.__sjFriends || !window.__sjFriends.findByName) return '';
+  var rawName = (team.players[pi] || '').trim();
+  if(!rawName) return '';
+  var friend = window.__sjFriends.findByName(rawName);
+  if(!friend || !friend.account) return '';
+  var display = [friend.bank, friend.account].filter(Boolean).join(' ');
+  return '<button type="button" class="settlement-copy-account-btn" data-account="' + escapeHtml(friend.account) + '" data-display="' + escapeHtml(display) + '" title="' + escapeHtml(display) + '">' + escapeHtml(t('friendsAccountCopyBtn')) + '</button>';
+}
+
 /* 화면에 보여줄 배수 프리셋 버튼 (연속 더블/따당 관행까지 고려해서 ×8까지) */
 var SETTLEMENT_MULT_PRESETS = [1, 2, 4, 8];
 
@@ -224,7 +238,7 @@ function renderSettlementResult(team, data){
 
   var finalPairsHtml = data.finalPairs.length ?
     '<ul class="settlement-final-list">' + data.finalPairs.map(function(fp){
-      return '<li><span class="settlement-payer">' + settlementPlayerLabel(team, fp.payer) + '</span> → <span class="settlement-payee">' + settlementPlayerLabel(team, fp.payee) + '</span> : <strong>' + settlementFormatPlain(fp.amount) + '</strong></li>';
+      return '<li><span class="settlement-payer">' + settlementPlayerLabel(team, fp.payer) + '</span> → <span class="settlement-payee">' + settlementPlayerLabel(team, fp.payee) + '</span> : <strong>' + settlementFormatPlain(fp.amount) + '</strong>' + settlementAccountCopyButtonHtml(team, fp.payee) + '</li>';
     }).join('') + '</ul>' :
     '<p class="settlement-empty">' + escapeHtml(t('settlementAllEven')) + '</p>';
 
@@ -274,6 +288,18 @@ if(settlementCalcBtn){
 
 /* 홀별 배수 프리셋 버튼 클릭 / 초기화 버튼 클릭 */
 settlementResultEl.addEventListener('click', function(e){
+  var copyBtn = e.target.closest('.settlement-copy-account-btn');
+  if(copyBtn){
+    var text = copyBtn.dataset.display || copyBtn.dataset.account || '';
+    var done = function(){ toast(t('toastAccountCopied')); };
+    var fail = function(){ toast(t('toastAccountCopyFail')); };
+    if(navigator.clipboard && navigator.clipboard.writeText){
+      navigator.clipboard.writeText(text).then(done).catch(fail);
+    } else {
+      fail();
+    }
+    return;
+  }
   var multBtn = e.target.closest('.settlement-mult-btn');
   if(multBtn){
     var h = parseInt(multBtn.dataset.hole, 10);
@@ -352,23 +378,12 @@ function buildSettlementCaptureHtml(team, data, globalStake){
     }).join('') :
     '<div style="color:#6b6f8a;font-size:12px;">' + escapeHtml(t('settlementAllEven')) + '</div>';
 
-  /* 2026-09 수정: 예전에는 홀 하나의 모든 거래를 쉼표로 이어붙인 한 줄로
-     압축해서 보여줬는데("9(P4 ×2) 장경진→정용호 4,000, 장경진→이경석 6,000, ..."),
-     실제 화면(홀별 상세 내역 카드)처럼 홀마다 카드로 나누고 거래 내역을 한
-     줄씩 보여줘서 공유 이미지도 한눈에 읽기 쉽게 만듭니다. */
-  var holesHtml = data.holeResults.map(function(hr){
-    var amountsHtml = hr.amounts.length ?
-      hr.amounts.map(function(am){
-        return '<div style="padding:2px 0;">' + settlementPlayerLabel(team, am.payer) + ' → ' + settlementPlayerLabel(team, am.payee) + ' : <strong>' + settlementFormatPlain(am.amount) + '</strong></div>';
-      }).join('') :
-      '<div style="color:#9295ac;">' + escapeHtml(t('settlementHoleEven')) + '</div>';
-    var multBadge = hr.effectiveMultiplier > 1 ?
-      ' <span style="background:#eef0ff;color:#4338ca;border-radius:6px;padding:1px 6px;font-size:10px;font-weight:700;">×' + hr.effectiveMultiplier + '</span>' : '';
-    return '<div style="border:1px solid #e5e7eb;border-radius:10px;padding:8px 10px;margin-bottom:6px;">' +
-      '<div style="font-size:12px;font-weight:700;color:#232336;margin-bottom:4px;">' + hr.hole + escapeHtml(t('holesSuffix')) + ' <span style="color:#9295ac;font-weight:500;">P' + hr.par + '</span>' + multBadge + '</div>' +
-      '<div style="font-size:12px;color:#232336;">' + amountsHtml + '</div>' +
-    '</div>';
-  }).join('');
+  /* 2026-09 수정(2차): "카드처럼 보이게" 새로 만든 버전도 실제 화면(정산하기
+     후 나오는 홀별 상세 내역 카드 - 배율 ×1/×2/×4/×8 버튼, 타당 금액 입력칸
+     포함)과는 다르다는 피드백이 있어서, 아예 화면과 똑같은 renderSettlementHoleCard()를
+     그대로 재사용합니다. 이러면 화면 쪽 카드 디자인이 나중에 바뀌어도 공유
+     이미지가 자동으로 같이 따라가므로 둘이 어긋날 일이 없습니다. */
+  var holesHtml = data.holeResults.map(function(hr){ return renderSettlementHoleCard(team, hr); }).join('');
 
   return '' +
     '<div style="font-weight:700;font-size:16px;color:#312e81;margin-bottom:2px;">💰 ' + escapeHtml(team.name) + '</div>' +
@@ -379,7 +394,7 @@ function buildSettlementCaptureHtml(team, data, globalStake){
     '<div style="font-weight:700;font-size:13px;color:#312e81;margin-bottom:4px;">' + escapeHtml(t('settlementFinalTitle')) + '</div>' +
     '<div style="margin-bottom:14px;">' + finalHtml + '</div>' +
     '<div style="font-weight:700;font-size:13px;color:#312e81;margin-bottom:4px;">' + escapeHtml(t('settlementHolesTitle')) + '</div>' +
-    '<div>' + holesHtml + '</div>';
+    '<div class="settlement-hole-cards">' + holesHtml + '</div>';
 }
 
 function buildSettlementImageBlob(){

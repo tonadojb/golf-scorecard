@@ -99,6 +99,14 @@ table td.even{color:var(--text);}
 .settlement-payee{color:#1a5fb4;font-weight:700;}
 .settlement-double-badge{display:inline-block;background:var(--accent);color:#fff;font-size:10px;font-weight:700;padding:2px 6px;border-radius:10px;}
 .settlement-empty{color:var(--muted);font-size:12px;margin:6px 0;}
+.settlement-copy-account-btn{display:inline-block;margin-left:8px;padding:3px 8px;border:1px solid #d7d8ec;border-radius:8px;background:#f5f6ff;color:#4338ca;font-size:11px;font-weight:700;cursor:pointer;vertical-align:middle;}
+.sj-friend-row{display:flex;align-items:flex-start;justify-content:space-between;gap:8px;border:1px solid #e5e7eb;border-radius:10px;padding:10px;margin-bottom:8px;background:#fbfbfe;}
+.sj-friend-row-main strong{font-size:14px;color:#232336;}
+.sj-friend-row-sub{font-size:12px;color:#666;margin-top:3px;word-break:break-all;}
+.sj-friend-row-actions{display:flex;gap:6px;flex:0 0 auto;}
+.sj-friend-row-actions button{padding:5px 9px;border:none;border-radius:7px;font-size:12px;cursor:pointer;}
+.sj-friend-edit-btn{background:#eef0ff;color:#4338ca;}
+.sj-friend-delete-btn{background:#fdeceb;color:#c0392b;}
 .settlement-holes-table td{white-space:normal;}
 .settlement-hole-cards{display:flex;flex-direction:column;gap:8px;}
 .settlement-hole-card{background:#ffffff;border:1px solid #e4e5f0;border-radius:10px;padding:10px 12px;}

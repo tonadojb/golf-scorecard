@@ -671,6 +671,12 @@ function renderAuthUI(user){
     if(window.__sjSubscription && window.__sjSubscription.preloadStatus){
       window.__sjSubscription.preloadStatus();
     }
+    // 2026-09-26 추가: 로그인 상태가 확인되는 즉시 친구 목록도 미리 불러와둔다.
+    // 정산(내기 결과) 화면에서 친구 계좌복사 버튼을 보여줄지 판단하려면 이
+    // 캐시가 미리 채워져 있어야 한다(정산 화면을 열 때마다 새로 불러오면 느림).
+    if(window.__sjFriends && window.__sjFriends.preload){
+      window.__sjFriends.preload();
+    }
   } else {
     if(loggedOut) loggedOut.style.display = "block";
     if(loggedIn) loggedIn.style.display = "none";

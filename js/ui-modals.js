@@ -40,6 +40,19 @@
     if(window.__sjCloudLoad){ window.__sjCloudLoad.onOpen(); }
     sjOpen("sjLoadModal");
   });
+  var sjFriendsFabEl = sj("sjFriendsFab");
+  if(sjFriendsFabEl){
+    sjFriendsFabEl.addEventListener("click", function(){
+      var currentUser = window.__sjAuth && window.__sjAuth.getCurrentUser();
+      if(!currentUser){
+        alert("먼저 로그인해주세요.");
+        sjOpen("sjAuthModal");
+        return;
+      }
+      if(window.__sjFriends && window.__sjFriends.onOpen){ window.__sjFriends.onOpen(); }
+      sjOpen("sjFriendsModal");
+    });
+  }
   var sjAdminFabEl = sj("sjAdminFab");
   if(sjAdminFabEl){
     sjAdminFabEl.addEventListener("click", function(){

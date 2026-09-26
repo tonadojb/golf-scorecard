@@ -238,6 +238,7 @@
 <button class="sj-fab" id="sjOcrFab" title="사진으로 입력">📷</button>
 <button class="sj-fab" id="sjSaveFab" title="클라우드 저장">☁</button>
 <button class="sj-fab" id="sjLoadFab" title="불러오기">📂</button>
+<button class="sj-fab" id="sjFriendsFab" title="친구 관리">👥</button>
 <button class="sj-fab sj-admin-fab" id="sjAdminFab" title="관리자 페이지" style="display:none;">🛠</button>
 </div>
 
@@ -343,6 +344,23 @@
 </div>
 <div id="sjLoadList"></div>
 <div class="sj-status" id="sjLoadStatus"></div>
+</div></div>
+
+<!-- 2026-09-26 추가: 친구 관리(이름/연락처/은행/계좌번호/메모). 정산(내기 결과)
+     화면에서 등록된 친구 이름이 나오면 저장해둔 계좌번호를 바로 복사할 수 있다. -->
+<div class="sj-modal-overlay" id="sjFriendsModal"><div class="sj-modal">
+<button class="sj-close" data-close>×</button>
+<h3 data-i18n="friendsModalTitle">👥 친구 관리</h3>
+<p style="font-size:12px;color:#666;margin:0 0 10px;" data-i18n="friendsIntroP">이름/연락처/은행/계좌번호/메모를 저장해두면, 내기 정산 결과에서 같은 이름이 나올 때 계좌번호를 바로 복사할 수 있어요.</p>
+<input type="text" id="sjFriendName" placeholder="이름 (필수)" data-i18n-placeholder="friendsNamePlaceholder" style="padding:9px 10px;border:1px solid #d7d8ec;border-radius:8px;font-size:14px;box-sizing:border-box;margin-bottom:8px;">
+<input type="tel" id="sjFriendPhone" placeholder="연락처 (선택)" data-i18n-placeholder="friendsPhonePlaceholder" style="padding:9px 10px;border:1px solid #d7d8ec;border-radius:8px;font-size:14px;box-sizing:border-box;margin-bottom:8px;">
+<input type="text" id="sjFriendBank" placeholder="은행명 (선택, 예: 카카오뱅크)" data-i18n-placeholder="friendsBankPlaceholder" style="padding:9px 10px;border:1px solid #d7d8ec;border-radius:8px;font-size:14px;box-sizing:border-box;margin-bottom:8px;">
+<input type="text" id="sjFriendAccount" placeholder="계좌번호 (선택)" data-i18n-placeholder="friendsAccountPlaceholder" style="padding:9px 10px;border:1px solid #d7d8ec;border-radius:8px;font-size:14px;box-sizing:border-box;margin-bottom:8px;">
+<input type="text" id="sjFriendMemo" placeholder="메모 (선택)" data-i18n-placeholder="friendsMemoPlaceholder" style="padding:9px 10px;border:1px solid #d7d8ec;border-radius:8px;font-size:14px;box-sizing:border-box;margin-bottom:0;">
+<button type="button" class="sj-primary" id="sjFriendsSubmitBtn" data-i18n="friendsAddBtn">추가하기</button>
+<button type="button" class="sj-secondary" id="sjFriendsCancelEditBtn" data-i18n="friendsCancelEditBtn" style="display:none;">취소</button>
+<div class="sj-status" id="sjFriendsStatus"></div>
+<div id="sjFriendsList" style="margin-top:14px;"></div>
 </div></div>
 
 <div class="sj-modal-overlay" id="sjAdminModal"><div class="sj-modal sj-admin-modal">
@@ -482,6 +500,7 @@
 <script src="js/settlement.js?v=20260920b" defer></script>
 <script src="js/share.js?v=20260823f" defer></script>
 <script src="js/app.js?v=20260823g" defer></script>
+<script src="js/friends.js?v=20260926a" defer></script>
 <script src="js/ui-modals.js?v=20260920a" defer></script>
 <script src="https://developers.kakao.com/sdk/js/kakao.js" defer></script>
 <script src="https://static.nid.naver.com/js/naveridlogin_js_sdk_2.0.2.js" defer></script>
