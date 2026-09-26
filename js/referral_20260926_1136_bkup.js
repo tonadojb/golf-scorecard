@@ -78,34 +78,32 @@
     } catch(e){ return iso; }
   }
 
-  // 2026-09-26 수정: 당첨 확률(weight)은 관리자만 알아야 하므로, 원판/범례
-  // 어디에도 확률을 드러내지 않는다. 서버도 이제 사용자용 응답에서 weight
-  // 필드 자체를 빼서 내려주지 않으므로(referral.js의 eventPublicView
-  // hideWeights), 여기서는 그냥 "경품 개수만큼 똑같은 크기로" 나눈다.
   function renderWheel(prizes){
     var host = sj("sjReferralWheel");
     if(!host) return;
     if(!prizes || !prizes.length){ host.innerHTML = ""; return; }
-    var n = prizes.length;
+    var total = prizes.reduce(function(sum, p){ return sum + p.weight; }, 0) || 1;
     var colors = ["#4338ca", "#2a78d6", "#0d9488", "#eb6834", "#c026d3", "#ca8a04"];
     var gradientParts = [];
+    var acc = 0;
     prizes.forEach(function(p, i){
-      var start = (i / n) * 360;
-      var end = ((i + 1) / n) * 360;
+      var start = (acc / total) * 360;
+      acc += p.weight;
+      var end = (acc / total) * 360;
       gradientParts.push(colors[i % colors.length] + " " + start.toFixed(2) + "deg " + end.toFixed(2) + "deg");
     });
     host.innerHTML =
       '<div class="sj-roulette-pointer">▼</div>' +
       '<div class="sj-roulette-wheel" id="sjRouletteWheelDisc" style="background:conic-gradient(' + gradientParts.join(",") + ');"></div>';
     // 경품 이름은 원판 안에 다 넣기보다(작은 화면에서 깨지기 쉬움) 아래 범례 목록으로 보여준다.
-    // 확률(%)은 절대 표시하지 않는다.
     var legend = sj("sjReferralPrizeList");
     if(legend){
       legend.innerHTML = '<div class="sj-referral-prize-title">' + escapeHtml(t("referralPrizeListTitle")) + '</div>' +
         prizes.map(function(p, i){
+          var pct = Math.round((p.weight / total) * 1000) / 10;
           return '<div class="sj-referral-prize-row">' +
             '<span class="sj-referral-prize-swatch" style="background:' + colors[i % colors.length] + ';"></span>' +
-            '<span>' + escapeHtml(p.label) + '</span>' +
+            '<span>' + escapeHtml(p.label) + '</span><span class="sj-referral-prize-pct">' + pct + '%</span>' +
           '</div>';
         }).join("");
     }
@@ -181,12 +179,7 @@
       .then(function(data){
         if(data && data.error){ throw new Error(data.error); }
         animateWheelTo(data.prize);
-        if(statusEl){
-          statusEl.className = "sj-status";
-          statusEl.textContent = (data.prize.planKey === "none")
-            ? t("referralSpinResultNone")
-            : t("referralSpinResult", data.prize.label);
-        }
+        if(statusEl){ statusEl.className = "sj-status"; statusEl.textContent = t("referralSpinResult", data.prize.label); }
         return refreshStatus();
       })
       .catch(function(e){
@@ -196,21 +189,22 @@
       });
   }
 
-  // 당첨된 경품의 원판 구간(모두 동일 크기) 한가운데로 포인터가 오도록
-  // 회전각을 계산하고, 몇 바퀴 더 돌려서(최소 4바퀴) 회전감을 준다. 실제
-  // 당첨 여부는 이미 서버 응답(data.prize)으로 결정된 뒤이므로, 여기서는
-  // 순수 연출일 뿐이다.
+  // 당첨된 경품의 원판 구간 한가운데로 포인터가 오도록 회전각을 계산하고,
+  // 몇 바퀴 더 돌려서(최소 4바퀴) 회전감을 준다. 실제 확률/당첨 여부는 이미
+  // 서버 응답(data.prize)으로 결정된 뒤이므로, 여기서는 순수 연출일 뿐이다.
   function animateWheelTo(prize){
     var disc = sj("sjRouletteWheelDisc");
     if(!disc || !lastEvent || !lastEvent.prizes || !lastEvent.prizes.length){ return; }
     var prizes = lastEvent.prizes;
-    var n = prizes.length;
-    var idx = 0;
+    var total = prizes.reduce(function(sum, p){ return sum + p.weight; }, 0) || 1;
+    var acc = 0;
+    var targetStart = 0, targetEnd = 0;
     for(var i = 0; i < prizes.length; i++){
-      if(prizes[i].key === prize.key){ idx = i; break; }
+      var start = (acc / total) * 360;
+      acc += prizes[i].weight;
+      var end = (acc / total) * 360;
+      if(prizes[i].key === prize.key){ targetStart = start; targetEnd = end; break; }
     }
-    var targetStart = (idx / n) * 360;
-    var targetEnd = ((idx + 1) / n) * 360;
     var targetMid = (targetStart + targetEnd) / 2;
     // 포인터는 항상 위쪽(0deg, 12시 방향)을 가리키므로, 원판을 (360 - targetMid)만큼
     // 돌려야 그 구간이 포인터 밑으로 온다. 여기에 4바퀴를 더해 회전감을 준다.

@@ -484,9 +484,6 @@
 <button type="button" class="sj-primary" id="sjAdminCouponGenerateBtn" style="margin-top:8px;">쿠폰 발급</button>
 <div class="sj-status" id="sjAdminCouponStatus"></div>
 </div>
-<!-- 2026-09-26 추가: 체크박스 다중선택 + 날짜별 그룹핑으로 여러 쿠폰을 한 번에
-     삭제/비활성화/활성화할 수 있게 하는 툴바 + 목록. -->
-<div id="sjAdminCouponBulkBar" class="sj-admin-coupon-bulkbar"></div>
 <div id="sjAdminCouponList" class="sj-admin-coupon-list"></div>
 
 <div class="sj-admin-users-head">
@@ -595,7 +592,7 @@
 <!-- 아래 js/*.js 의 ?v=... 은 캐시 무효화용 버전 문자열입니다. GitHub Pages/브라우저가
      이 파일들을 한동안 캐시하기 때문에, js 파일을 수정해서 push할 때마다 이 버전 값을
      바꿔줘야 사용자 브라우저가 새 코드를 즉시 받아갑니다 (예: 현재값 뒤에 a->b->c 처럼 알파벳만 하나씩 올려주면 됩니다). -->
-<script src="js/i18n.js?v=20260926j" defer></script>
+<script src="js/i18n.js?v=20260926i" defer></script>
 <script src="js/state.js?v=20260926a" defer></script>
 <script src="js/render-setup.js?v=20260823f" defer></script>
 <script src="js/render-play.js?v=20260823f" defer></script>
@@ -606,7 +603,7 @@
 <script src="js/friends.js?v=20260926c" defer></script>
 <!-- 2026-09-26 추가: 친구추천 이벤트 + 룰렛. auth.js(로그인 직후 추천코드
      등록 훅)보다 먼저 로드해서 window.__sjReferral이 그 시점에 이미 준비돼 있게 한다. -->
-<script src="js/referral.js?v=20260926b" defer></script>
+<script src="js/referral.js?v=20260926a" defer></script>
 <!-- 2026-09-26 추가: 프로모션 쿠폰 등록(사용자용). -->
 <script src="js/coupon.js?v=20260926a" defer></script>
 <script src="js/ui-modals.js?v=20260926e" defer></script>
@@ -621,7 +618,7 @@
 <script src="js/ocr.js?v=20260823f" defer></script>
 <script src="js/cloud-save.js?v=20260926a" defer></script>
 <script src="js/cloud-load.js?v=20260926d" defer></script>
-<script src="js/admin.js?v=20260926d" defer></script>
+<script src="js/admin.js?v=20260926c" defer></script>
 
 </body>
 </html>

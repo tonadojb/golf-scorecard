@@ -19,7 +19,6 @@
   var GENERATE_COUPON_URL = "https://asia-northeast3-skyjang-golfscore.cloudfunctions.net/adminGenerateCoupon";
   var LIST_COUPONS_URL = "https://asia-northeast3-skyjang-golfscore.cloudfunctions.net/adminListCoupons";
   var SET_COUPON_ACTIVE_URL = "https://asia-northeast3-skyjang-golfscore.cloudfunctions.net/adminSetCouponActive";
-  var BULK_COUPON_ACTION_URL = "https://asia-northeast3-skyjang-golfscore.cloudfunctions.net/adminBulkCouponAction";
 
   // 2026-09-21 추가: 구독 현황(요금제별 구독자 수 / 월별 결제 그래프)에 쓰는 고정
   // 팔레트 -- dataviz 스킬의 카테고리 팔레트 1~2번 슬롯을 그대로 썼다(인접 쌍
@@ -34,11 +33,6 @@
   // 됐는지(웹 결제/iOS 결제/관리자 지급/이벤트 당첨) 바로 알 수 있게 라벨링.
   var SUB_SOURCE_LABELS = { web: "웹 결제", ios: "iOS 결제", admin_grant: "관리자 지급", event_roulette: "이벤트 당첨", coupon: "쿠폰 등록" };
   var lastSubStats = null; // { subscriberCounts, currentMRR, monthlyRevenue, planLabels } -- 연도 셀렉트 바뀔 때 재요청 없이 필터링만 새로 하려고 캐싱.
-  // 2026-09-26 추가: 쿠폰 목록 체크박스 다중선택/날짜별 그룹 펼침상태를 다시
-  // 불러오는 동안(re-render)에도 유지하기 위한 모듈 전역 상태.
-  var lastCoupons = [];
-  var couponSelected = {}; // code -> true
-  var couponExpandedDates = {}; // "YYYY-MM-DD" -> true/false (없으면 첫 번째 그룹만 기본 펼침)
 
   function escapeHtmlLocal(s){
     return String(s == null ? "" : s).replace(/[&<>"']/g, function(c){
@@ -505,15 +499,9 @@
     if(!bar) return;
     if(!stats){ bar.innerHTML = ""; return; }
     var totalPaid = PLAN_KEYS_ORDER.reduce(function(sum, k){ return sum + (stats.subscriberCounts[k] || 0); }, 0);
-    // 2026-09-26 추가: 쿠폰 등록/관리자 지급·이벤트 당첨은 결제가 아니므로
-    // "유료 구독자 수"와 절대 섞이지 않게 따로 집계해서 보여준다.
-    var totalCoupon = PLAN_KEYS_ORDER.reduce(function(sum, k){ return sum + ((stats.couponCounts && stats.couponCounts[k]) || 0); }, 0);
-    var totalFreeGrant = PLAN_KEYS_ORDER.reduce(function(sum, k){ return sum + ((stats.freeGrantCounts && stats.freeGrantCounts[k]) || 0); }, 0);
     bar.innerHTML =
       '<div class="sj-admin-stat-tile"><div class="sj-admin-stat-label">유료 구독자 수</div><div class="sj-admin-stat-value">' + totalPaid + '</div></div>' +
-      '<div class="sj-admin-stat-tile"><div class="sj-admin-stat-label">현재 예상 월 정기 수익</div><div class="sj-admin-stat-value">' + fmtKRW(stats.currentMRR) + '</div></div>' +
-      '<div class="sj-admin-stat-tile"><div class="sj-admin-stat-label">쿠폰 등록자 수</div><div class="sj-admin-stat-value">' + totalCoupon + '</div></div>' +
-      '<div class="sj-admin-stat-tile"><div class="sj-admin-stat-label">이벤트/관리자 무료지급 수</div><div class="sj-admin-stat-value">' + totalFreeGrant + '</div></div>';
+      '<div class="sj-admin-stat-tile"><div class="sj-admin-stat-label">현재 예상 월 정기 수익</div><div class="sj-admin-stat-value">' + fmtKRW(stats.currentMRR) + '</div></div>';
   }
 
   // 요금제별 구독자 수 -- 단일 시리즈 막대그래프(카테고리별 색만 다름, 범례는
@@ -731,19 +719,13 @@
 
   function prizeRowHtml(p, idx){
     p = p || {};
-    var planKey = p.planKey === "pro" ? "pro" : (p.planKey === "none" ? "none" : "basic");
-    var isNoWin = planKey === "none";
     return '<div class="sj-admin-prize-row" data-idx="' + idx + '">' +
       '<input type="text" class="sj-admin-prize-label" placeholder="경품명 (예: 베이직 무료 1개월)" value="' + escapeHtmlLocal(p.label || "") + '">' +
       '<select class="sj-admin-prize-plan">' +
-        '<option value="basic"' + (planKey === "basic" ? " selected" : "") + '>베이직</option>' +
-        '<option value="pro"' + (planKey === "pro" ? " selected" : "") + '>프로</option>' +
-        // 2026-09-26 추가: "꽝"(당첨 없음) -- 원판에서 자리만 차지하고 당첨돼도
-        // 아무 것도 지급하지 않는다. 사용자에게 확률은 전혀 보여주지 않으므로
-        // 여기(관리자 화면)에서만 %가 보인다.
-        '<option value="none"' + (isNoWin ? " selected" : "") + '>꽝(당첨없음)</option>' +
+        '<option value="basic"' + (p.planKey === "pro" ? "" : " selected") + '>베이직</option>' +
+        '<option value="pro"' + (p.planKey === "pro" ? " selected" : "") + '>프로</option>' +
       '</select>' +
-      '<input type="number" class="sj-admin-prize-days" min="1" max="3650" placeholder="일수" value="' + (p.days || 30) + '"' + (isNoWin ? " disabled" : "") + '> 일' +
+      '<input type="number" class="sj-admin-prize-days" min="1" max="3650" placeholder="일수" value="' + (p.days || 30) + '"> 일' +
       '<input type="number" class="sj-admin-prize-weight" min="0.01" max="100000" step="0.01" placeholder="확률 가중치" value="' + (p.weight != null ? p.weight : 10) + '"> %' +
       '<button type="button" class="sj-admin-prize-remove-btn">✕</button>' +
     '</div>';
@@ -771,15 +753,6 @@
         if(row) row.remove();
       }
     });
-    // 2026-09-26 추가: "꽝"을 고르면 일수 입력은 의미가 없으니 비활성화하고,
-    // 다시 베이직/프로로 바꾸면 되살린다.
-    host.addEventListener("change", function(e){
-      var sel = e.target.closest(".sj-admin-prize-plan");
-      if(!sel) return;
-      var row = sel.closest(".sj-admin-prize-row");
-      var daysInput = row && row.querySelector(".sj-admin-prize-days");
-      if(daysInput) daysInput.disabled = (sel.value === "none");
-    });
     var addBtn = sj("sjAdminRefAddPrizeBtn");
     if(addBtn){
       addBtn.addEventListener("click", function(){
@@ -794,15 +767,12 @@
     return Array.prototype.map.call(host.querySelectorAll(".sj-admin-prize-row"), function(row){
       var label = row.querySelector(".sj-admin-prize-label").value.trim();
       var planKey = row.querySelector(".sj-admin-prize-plan").value;
-      var isNoWin = planKey === "none";
-      // "꽝"은 일수가 의미 없으므로(입력칸도 비활성화되어 있음) 항상 0으로 보낸다.
-      var days = isNoWin ? 0 : parseInt(row.querySelector(".sj-admin-prize-days").value, 10);
+      var days = parseInt(row.querySelector(".sj-admin-prize-days").value, 10);
       var weight = parseFloat(row.querySelector(".sj-admin-prize-weight").value);
       return { label: label, planKey: planKey, days: days, weight: weight };
     }).filter(function(p){
-      var validPlan = (p.planKey === "basic" || p.planKey === "pro" || p.planKey === "none");
-      var validDays = (p.planKey === "none") ? true : (Number.isFinite(p.days) && p.days > 0);
-      return p.label && validPlan && validDays && Number.isFinite(p.weight) && p.weight > 0;
+      return p.label && (p.planKey === "basic" || p.planKey === "pro") &&
+        Number.isFinite(p.days) && p.days > 0 && Number.isFinite(p.weight) && p.weight > 0;
     });
   }
 
@@ -880,39 +850,13 @@
      골프채널 인플루언서 등에게 보낼 쿠폰 코드를 발급하고(수량 여러 개 한번에
      가능), 발급된 코드의 사용현황을 보고, 필요하면(유출 등) 비활성화한다. */
 
-  // 2026-09-26 추가: 발급일(연-월-일) 단위로 그룹핑하기 위한 키. 시간대는
-  // 기기 로컬 시간 기준(다른 지표 표시와 동일한 기준)이라 큰 상관은 없다.
-  function couponDateKey(iso){
-    if(!iso) return "날짜 미상";
-    var d = new Date(iso);
-    if(isNaN(d.getTime())) return "날짜 미상";
-    var pad = function(n){ return String(n).padStart(2, "0"); };
-    return d.getFullYear() + "-" + pad(d.getMonth() + 1) + "-" + pad(d.getDate());
-  }
-
-  function groupCouponsByDate(coupons){
-    var groups = [];
-    var byKey = {};
-    coupons.forEach(function(c){
-      var key = couponDateKey(c.createdAt);
-      if(!byKey[key]){
-        byKey[key] = { date: key, items: [] };
-        groups.push(byKey[key]);
-      }
-      byKey[key].items.push(c);
-    });
-    return groups;
-  }
-
   function couponRowHtml(c){
     c = c || {};
     var planLabel = c.planLabel || PLAN_SHORT_LABELS[c.planKey] || c.planKey;
     var usesText = c.maxUses > 0 ? ((c.usedCount || 0) + "/" + c.maxUses + "명") : ((c.usedCount || 0) + "명/무제한");
     var expiresText = c.expiresAt ? ("~" + fmtTime(c.expiresAt) + "까지 등록 가능") : "등록 기한 없음";
-    var checked = couponSelected[c.code] ? " checked" : "";
     return '<div class="sj-admin-coupon-row" data-code="' + escapeHtmlLocal(c.code) + '">' +
       '<div class="sj-admin-coupon-top">' +
-        '<input type="checkbox" class="sj-admin-coupon-checkbox" data-code="' + escapeHtmlLocal(c.code) + '"' + checked + '>' +
         '<span class="sj-admin-coupon-code">' + escapeHtmlLocal(c.code) + '</span>' +
         '<span class="sj-admin-badge plan-' + c.planKey + '">' + escapeHtmlLocal(planLabel) + ' ' + (c.days || 0) + '일</span>' +
         (c.active === false ? '<span class="sj-admin-badge banned">비활성</span>' : "") +
@@ -929,55 +873,14 @@
     '</div>';
   }
 
-  // 2026-09-26 추가: 발급 날짜별 그룹 헤더 -- 체크박스 하나로 "이 날짜에 발급된
-  // 쿠폰 전체"를 선택할 수 있고, 옆의 버튼을 누르면 펼치기/접기가 된다.
-  function couponGroupHtml(group, idx){
-    var expanded = couponExpandedDates.hasOwnProperty(group.date) ? couponExpandedDates[group.date] : (idx === 0);
-    var allSelected = group.items.length > 0 && group.items.every(function(c){ return !!couponSelected[c.code]; });
-    return '<div class="sj-admin-coupon-group" data-date="' + escapeHtmlLocal(group.date) + '">' +
-      '<div class="sj-admin-coupon-group-header">' +
-        '<input type="checkbox" class="sj-admin-coupon-group-check" data-date="' + escapeHtmlLocal(group.date) + '"' + (allSelected ? " checked" : "") + '>' +
-        '<button type="button" class="sj-admin-coupon-group-toggle" data-date="' + escapeHtmlLocal(group.date) + '">' +
-          escapeHtmlLocal(group.date) + ' (' + group.items.length + '개) ' + (expanded ? "▾" : "▸") +
-        '</button>' +
-      '</div>' +
-      '<div class="sj-admin-coupon-group-items" data-date="' + escapeHtmlLocal(group.date) + '"' + (expanded ? "" : ' style="display:none;"') + '>' +
-        group.items.map(couponRowHtml).join("") +
-      '</div>' +
-    '</div>';
-  }
-
-  function renderCouponBulkBar(coupons){
-    var bar = sj("sjAdminCouponBulkBar");
-    if(!bar) return;
-    var total = coupons.length;
-    var selectedCount = coupons.filter(function(c){ return !!couponSelected[c.code]; }).length;
-    var allSelected = total > 0 && selectedCount === total;
-    if(!total){ bar.innerHTML = ""; return; }
-    bar.innerHTML =
-      '<label class="sj-admin-coupon-check-label"><input type="checkbox" id="sjAdminCouponSelectAll"' + (allSelected ? " checked" : "") + '> 전체 선택</label>' +
-      '<span class="sj-admin-coupon-selected-count">' + selectedCount + '개 선택됨</span>' +
-      '<button type="button" id="sjAdminCouponBulkActivateBtn" class="sj-admin-unban-btn"' + (selectedCount ? "" : " disabled") + '>선택 활성화</button>' +
-      '<button type="button" id="sjAdminCouponBulkDeactivateBtn" class="sj-admin-ban-btn"' + (selectedCount ? "" : " disabled") + '>선택 비활성화</button>' +
-      '<button type="button" id="sjAdminCouponBulkDeleteBtn" class="sj-admin-coupon-bulk-delete-btn"' + (selectedCount ? "" : " disabled") + '>선택 삭제</button>';
-  }
-
   function renderCouponList(coupons){
-    lastCoupons = coupons || [];
     var container = sj("sjAdminCouponList");
     if(!container) return;
-    // 다시 불러온 목록에 더 이상 없는 코드(삭제됨 등)는 선택 상태에서 정리.
-    var validCodes = {};
-    lastCoupons.forEach(function(c){ validCodes[c.code] = true; });
-    Object.keys(couponSelected).forEach(function(code){ if(!validCodes[code]) delete couponSelected[code]; });
-
-    renderCouponBulkBar(lastCoupons);
-    if(!lastCoupons.length){
+    if(!coupons || !coupons.length){
       container.innerHTML = '<div class="sj-admin-empty">발급된 쿠폰이 없습니다.</div>';
       return;
     }
-    var groups = groupCouponsByDate(lastCoupons);
-    container.innerHTML = groups.map(couponGroupHtml).join("");
+    container.innerHTML = coupons.map(couponRowHtml).join("");
   }
 
   function loadCoupons(){
@@ -1042,38 +945,8 @@
 
   function bindCouponListEvents(){
     var container = sj("sjAdminCouponList");
-    var bulkBar = sj("sjAdminCouponBulkBar");
     if(!container) return;
-
-    container.addEventListener("change", function(e){
-      var cb = e.target.closest(".sj-admin-coupon-checkbox");
-      if(cb){
-        if(cb.checked) couponSelected[cb.dataset.code] = true; else delete couponSelected[cb.dataset.code];
-        renderCouponList(lastCoupons);
-        return;
-      }
-      var groupCb = e.target.closest(".sj-admin-coupon-group-check");
-      if(groupCb){
-        var date = groupCb.dataset.date;
-        var groupItems = lastCoupons.filter(function(c){ return couponDateKey(c.createdAt) === date; });
-        groupItems.forEach(function(c){
-          if(groupCb.checked) couponSelected[c.code] = true; else delete couponSelected[c.code];
-        });
-        renderCouponList(lastCoupons);
-        return;
-      }
-    });
-
     container.addEventListener("click", function(e){
-      // 날짜 그룹 헤더 클릭 -- 선택이 아니라 펼치기/접기만 토글.
-      var toggleGroupBtn = e.target.closest(".sj-admin-coupon-group-toggle");
-      if(toggleGroupBtn){
-        var gDate = toggleGroupBtn.dataset.date;
-        var currentlyExpanded = couponExpandedDates.hasOwnProperty(gDate) ? couponExpandedDates[gDate] : false;
-        couponExpandedDates[gDate] = !currentlyExpanded;
-        renderCouponList(lastCoupons);
-        return;
-      }
       var copyBtn = e.target.closest(".sj-admin-coupon-copy-btn");
       if(copyBtn){
         var code = copyBtn.dataset.code;
@@ -1102,44 +975,6 @@
         });
         return;
       }
-    });
-
-    // 2026-09-26 추가: 체크박스로 고른 쿠폰들을 한 번에 삭제/비활성화/다시
-    // 활성화. bulkBar는 매번 innerHTML만 새로 그려지고 이 div 자체는 그대로라
-    // 이벤트 위임(delegation)이 재바인딩 없이 계속 동작한다.
-    if(!bulkBar) return;
-    bulkBar.addEventListener("change", function(e){
-      var selAll = e.target.closest("#sjAdminCouponSelectAll");
-      if(!selAll) return;
-      lastCoupons.forEach(function(c){
-        if(selAll.checked) couponSelected[c.code] = true; else delete couponSelected[c.code];
-      });
-      renderCouponList(lastCoupons);
-    });
-    bulkBar.addEventListener("click", function(e){
-      var actBtn = e.target.closest("#sjAdminCouponBulkActivateBtn");
-      var deactBtn = e.target.closest("#sjAdminCouponBulkDeactivateBtn");
-      var delBtn = e.target.closest("#sjAdminCouponBulkDeleteBtn");
-      if(!actBtn && !deactBtn && !delBtn) return;
-      var codes = Object.keys(couponSelected);
-      if(!codes.length) return;
-      var action = actBtn ? "activate" : (deactBtn ? "deactivate" : "delete");
-      var confirmMsg = (action === "delete")
-        ? (codes.length + "개의 쿠폰을 삭제하시겠습니까? 삭제 후에는 복구할 수 없습니다 (이미 등록해서 받은 사용자 혜택에는 영향 없음).")
-        : (codes.length + "개의 쿠폰을 " + (action === "activate" ? "활성화" : "비활성화") + "하시겠습니까?");
-      if(!confirm(confirmMsg)) return;
-      var btns = [actBtn, deactBtn, delBtn].filter(Boolean);
-      btns.forEach(function(b){ b.disabled = true; });
-      withIdToken(function(idToken){
-        return authedFetch(BULK_COUPON_ACTION_URL, idToken, { codes: codes, action: action });
-      }).then(function(){
-        if(typeof toast === "function"){ toast(codes.length + "개의 쿠폰을 처리했습니다"); }
-        couponSelected = {};
-        return loadCoupons();
-      }).catch(function(err){
-        alert("실패: " + (err && err.message ? err.message : err));
-        btns.forEach(function(b){ b.disabled = false; });
-      });
     });
   }
 
