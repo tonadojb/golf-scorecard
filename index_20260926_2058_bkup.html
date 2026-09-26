@@ -11,7 +11,7 @@
      있었을 가능성이 있습니다(정산하기 이후 화면이 확대된 채 안 풀리는
      문제). js 파일들처럼 styles.css를 고칠 때마다 이 버전 값도 반드시
      함께 올려주세요. -->
-<link rel="stylesheet" href="styles.css?v=20260926g">
+<link rel="stylesheet" href="styles.css?v=20260926f">
 
 </head>
 <body>
@@ -493,13 +493,6 @@
 <span data-i18n="adminUsersHeadLabel">로그인 사용자 목록</span>
 <button type="button" id="sjAdminRefreshBtn" class="sj-secondary sj-admin-refresh-btn" data-i18n="adminRefreshBtn">↻ 새로고침</button>
 </div>
-<!-- 2026-09-26(2차) 추가: 이름/이메일 검색 + 로그인 방식별(네이버/카카오/Gmail) 탭 필터.
-     검색창은 타이핑 중 포커스가 날아가면 안 되므로 여기 고정 배치하고, js/admin.js가
-     input 이벤트만 바인딩한다. 탭 버튼들(개수 포함)은 js가 자유롭게 다시 그린다. -->
-<div class="sj-admin-user-filterbar">
-<input type="text" id="sjAdminUserSearchInput" class="sj-admin-user-search" placeholder="이름 또는 이메일로 검색">
-<div id="sjAdminUserProviderTabs" class="sj-admin-user-provider-tabs"></div>
-</div>
 <div id="sjAdminUserList"></div>
 <div class="sj-status" id="sjAdminStatus"></div>
 </div></div>
@@ -628,7 +621,7 @@
 <script src="js/ocr.js?v=20260823f" defer></script>
 <script src="js/cloud-save.js?v=20260926a" defer></script>
 <script src="js/cloud-load.js?v=20260926d" defer></script>
-<script src="js/admin.js?v=20260926e" defer></script>
+<script src="js/admin.js?v=20260926d" defer></script>
 
 </body>
 </html>

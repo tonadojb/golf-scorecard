@@ -40,16 +40,6 @@
   var couponSelected = {}; // code -> true
   var couponExpandedDates = {}; // "YYYY-MM-DD" -> true/false (없으면 첫 번째 그룹만 기본 펼침)
 
-  // 2026-09-26(2차) 추가: 사용자 목록 검색(이름/이메일) + 로그인 방식별 필터.
-  // 서버에 매번 다시 요청하지 않고, 한 번 불러온 전체 목록(lastUsers)을
-  // 클라이언트에서 걸러서 보여준다 -- 검색창은 매 타이핑마다 다시 그리면
-  // 포커스/커서 위치가 날아가버리므로 index.html에 고정 배치해두고, 여기서는
-  // 그 값(userSearchText)과 탭 상태(userProviderFilter)만 들고 있다가 필터링
-  // 결과(리스트 + 탭 카운트)만 다시 그린다.
-  var lastUsers = [];
-  var userSearchText = "";
-  var userProviderFilter = "all"; // all | naver | kakao | google | phone | other
-
   function escapeHtmlLocal(s){
     return String(s == null ? "" : s).replace(/[&<>"']/g, function(c){
       return { "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c];
@@ -139,19 +129,13 @@
       grantForm +
       violationEdit +
       '</div>';
-    // 2026-09-26 추가: 구독 중이면 "베이직 · 웹 결제 · 09.01. 오전 10:00 ~
-    // 09.26. 오후 08:26 만료(해지예약)"처럼 어떤 경로로, 언제부터 언제까지인지
-    // 한 줄로. 구독 중이 아니면 "무료"가 아니라 "비구독자"라고 명확히 보여준다
-    // (2026-09-26 2차 수정: "무료"라는 표현이 쿠폰/이벤트로 무료 이용 중인
-    // 사람과 헷갈린다는 피드백이 있어서, 정말 구독이 없는 사람만 이렇게 표시).
-    var subMetaText = "비구독자";
+    // 2026-09-26 추가: 구독 중이면 "베이직 · 웹 결제 · ~09/26 만료(해지예약)"처럼
+    // 어떤 경로로 언제까지인지 한 줄로. 무료면 그냥 "무료"만 보여준다.
+    var subMetaText = "무료";
     if(u.plan === "basic" || u.plan === "pro"){
       var parts = [u.planLabel || PLAN_SHORT_LABELS[u.plan]];
       if(u.subSource && SUB_SOURCE_LABELS[u.subSource]) parts.push(SUB_SOURCE_LABELS[u.subSource]);
-      var periodText = (u.subStartAt ? fmtTime(u.subStartAt) : "시작일 미상") + " ~ " +
-        (u.subExpiresAt ? fmtTime(u.subExpiresAt) + " 만료" : "만료일 미상") +
-        (u.subCancelAtPeriodEnd ? " (해지예약)" : "");
-      parts.push(periodText);
+      if(u.subExpiresAt) parts.push((u.subCancelAtPeriodEnd ? "해지예약 · " : "") + "~" + fmtTime(u.subExpiresAt) + " 만료");
       subMetaText = parts.join(" · ");
     }
     return '<div class="sj-admin-user-row" data-uid="' + escapeHtmlLocal(u.uid) + '">' +
@@ -199,83 +183,10 @@
     var container = sj("sjAdminUserList");
     if(!container) return;
     if(!users || !users.length){
-      container.innerHTML = '<div class="sj-admin-empty">' +
-        (lastUsers.length ? "검색/필터 조건에 맞는 사용자가 없습니다." : "로그인한 사용자가 없습니다.") +
-        '</div>';
+      container.innerHTML = '<div class="sj-admin-empty">로그인한 사용자가 없습니다.</div>';
       return;
     }
     container.innerHTML = users.map(userRowHtml).join("");
-  }
-
-  // 2026-09-26(2차) 추가: naver/kakao/google(gmail)/phone 중 어디에도 정확히
-  // 안 맞는 값(예: Firebase 기본 providerId "google.com", 과거 레코드의 빈 값
-  // 등)도 최대한 알맞은 그룹으로 묶어서 탭 필터가 항상 의미 있게 동작하도록.
-  function normalizeProvider(p){
-    var s = (p || "").toLowerCase();
-    if(s.indexOf("kakao") !== -1) return "kakao";
-    if(s.indexOf("naver") !== -1) return "naver";
-    if(s.indexOf("google") !== -1) return "google";
-    if(s.indexOf("phone") !== -1) return "phone";
-    return "other";
-  }
-
-  // 검색창(이름 또는 이메일 일치)과 로그인 방식 탭을 함께 적용해서 목록을
-  // 다시 그린다. 탭 카운트도 매번 새로 계산해서 같이 갱신한다.
-  function applyUserFilters(){
-    var q = userSearchText.trim().toLowerCase();
-    var filtered = lastUsers.filter(function(u){
-      if(userProviderFilter !== "all" && normalizeProvider(u.provider) !== userProviderFilter) return false;
-      if(!q) return true;
-      var name = (u.displayName || "").toLowerCase();
-      var email = (u.email || "").toLowerCase();
-      return name.indexOf(q) !== -1 || email.indexOf(q) !== -1;
-    });
-    renderUserList(filtered);
-    renderUserProviderTabs();
-  }
-
-  function renderUserProviderTabs(){
-    var tabsEl = sj("sjAdminUserProviderTabs");
-    if(!tabsEl) return;
-    var counts = { all: lastUsers.length, naver: 0, kakao: 0, google: 0, phone: 0, other: 0 };
-    lastUsers.forEach(function(u){
-      var g = normalizeProvider(u.provider);
-      counts[g] = (counts[g] || 0) + 1;
-    });
-    var tabs = [
-      { key: "all", label: "전체" },
-      { key: "naver", label: "네이버" },
-      { key: "kakao", label: "카카오" },
-      { key: "google", label: "Gmail" }
-    ];
-    tabsEl.innerHTML = tabs.map(function(t){
-      var cnt = counts[t.key] || 0;
-      return '<button type="button" class="sj-admin-user-provider-tab' + (userProviderFilter === t.key ? " active" : "") + '" data-provider="' + t.key + '">' +
-        escapeHtmlLocal(t.label) + ' (' + cnt + ')</button>';
-    }).join("");
-  }
-
-  // 검색 입력창은 index.html에 고정 배치돼있다(값을 입력하는 도중에 매번
-  // innerHTML로 다시 그리면 포커스/커서 위치가 날아가버리기 때문에, 탭
-  // 버튼들처럼 자유롭게 다시 그리면 안 되는 요소). 여기서는 딱 한 번만
-  // 이벤트를 바인딩한다.
-  function bindUserFilterEvents(){
-    var searchInput = sj("sjAdminUserSearchInput");
-    if(searchInput){
-      searchInput.addEventListener("input", function(e){
-        userSearchText = e.target.value || "";
-        applyUserFilters();
-      });
-    }
-    var tabsEl = sj("sjAdminUserProviderTabs");
-    if(tabsEl){
-      tabsEl.addEventListener("click", function(e){
-        var btn = e.target.closest(".sj-admin-user-provider-tab");
-        if(!btn) return;
-        userProviderFilter = btn.dataset.provider;
-        applyUserFilters();
-      });
-    }
   }
 
   function loadUsers(){
@@ -285,8 +196,7 @@
       return authedFetch(LIST_URL, idToken);
     }).then(function(data){
       renderStatsBar(data && data.stats);
-      lastUsers = (data && data.users) || [];
-      applyUserFilters();
+      renderUserList((data && data.users) || []);
       if(status){ status.textContent = ""; }
     }).catch(function(e){
       if(status){ status.className = "sj-status error"; status.textContent = "불러오기 실패: " + (e && e.message ? e.message : e); }
@@ -1242,7 +1152,6 @@
   }
 
   bindUserListEvents();
-  bindUserFilterEvents();
   bindGlobalBlockSave();
   bindRefresh();
   bindRevenueControls();
