@@ -201,6 +201,8 @@ var I18N = {
     vsMyBest:"내 베스트",
     vsOppBest:"상대 베스트",
     vsRoundsSuffix:"회",
+    vsCaptureTitle:"⛳ 상대전적",
+    vsShareBtn:"🏆 상대전적 자랑하기",
     loadLoading:"불러오는 중...",
     loginRequired:"로그인이 필요합니다.",
 
@@ -466,6 +468,8 @@ var I18N = {
     vsMyBest:"My Best",
     vsOppBest:"Their Best",
     vsRoundsSuffix:" rounds",
+    vsCaptureTitle:"⛳ Head-to-Head",
+    vsShareBtn:"🏆 Share This Record",
     loadLoading:"Loading...",
     loginRequired:"Login required.",
 
@@ -726,6 +730,8 @@ var I18N = {
     vsMyBest:"自分のベスト",
     vsOppBest:"相手のベスト",
     vsRoundsSuffix:"回",
+    vsCaptureTitle:"⛳ 対戦成績",
+    vsShareBtn:"🏆 対戦成績をシェア",
     loadLoading:"読み込み中...",
     loginRequired:"ログインが必要です。",
 
@@ -986,6 +992,8 @@ var I18N = {
     vsMyBest:"我的最佳",
     vsOppBest:"对方最佳",
     vsRoundsSuffix:"次",
+    vsCaptureTitle:"⛳ 对战战绩",
+    vsShareBtn:"🏆 分享战绩",
     loadLoading:"加载中...",
     loginRequired:"需要登录。",
 

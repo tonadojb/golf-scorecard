@@ -191,6 +191,9 @@ footer.credit{text-align:center;color:var(--muted);font-size:11px;padding:14px;}
 .sj-stats-vs-wrap{margin-top:16px;padding-top:14px;border-top:1px solid #e5e7eb;}
 .sj-stats-vs-head{font-size:13px;font-weight:700;color:#1f2b24;margin-bottom:8px;}
 .sj-stats-vs-record{font-size:14px;font-weight:700;color:#4338ca;text-align:center;background:#f5f6ff;border-radius:8px;padding:8px;margin-bottom:8px;}
+.sj-stats-vs-capture{background:#fff;border:1px solid #e5e7eb;border-radius:12px;padding:12px;}
+.sj-stats-vs-capture-title{font-size:13px;font-weight:700;color:#1f2b24;text-align:center;margin-bottom:8px;}
+.sj-stats-vs-capture-footer{font-size:11px;color:#9aa39c;text-align:center;margin-top:10px;}
 
 /* ---------------- User manual ---------------- */
 .sj-manual-modal{max-width:440px;}

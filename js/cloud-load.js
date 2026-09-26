@@ -422,14 +422,111 @@
       return;
     }
     var s = summarizeCompanion(map[currentVsName]);
+    /* sjStatsVsCaptureArea 안쪽(제목~하단 문구)만 캡쳐 대상이라, 공유 버튼은
+       일부러 그 바깥에 둔다 -- 버튼까지 스크린샷에 찍히면 안 되니까. */
     resultEl.innerHTML =
-      '<div class="sj-stats-vs-record">' + escapeHtml(tt("vsRecordLine", currentVsName + "님과 " + s.rounds + "전 " + s.wins + "승 " + s.losses + "패 " + s.ties + "무", currentVsName, s.rounds, s.wins, s.losses, s.ties)) + '</div>' +
-      '<div class="sj-stats-tiles">' +
-        '<div class="sj-stat-tile"><div class="sj-stat-label">' + escapeHtml(tt("vsMyAvg", "내 평균")) + '</div><div class="sj-stat-value">' + s.myAvg.toFixed(1) + '</div></div>' +
-        '<div class="sj-stat-tile"><div class="sj-stat-label">' + escapeHtml(tt("vsOppAvg", "상대 평균")) + '</div><div class="sj-stat-value">' + s.oppAvg.toFixed(1) + '</div></div>' +
-        '<div class="sj-stat-tile"><div class="sj-stat-label">' + escapeHtml(tt("vsMyBest", "내 베스트")) + '</div><div class="sj-stat-value">' + s.myBest + '</div></div>' +
-        '<div class="sj-stat-tile"><div class="sj-stat-label">' + escapeHtml(tt("vsOppBest", "상대 베스트")) + '</div><div class="sj-stat-value">' + s.oppBest + '</div></div>' +
-      '</div>';
+      '<div id="sjStatsVsCaptureArea" class="sj-stats-vs-capture">' +
+        '<div class="sj-stats-vs-capture-title">' + escapeHtml(tt("vsCaptureTitle", "⛳ 상대전적")) + '</div>' +
+        '<div class="sj-stats-vs-record">' + escapeHtml(tt("vsRecordLine", currentVsName + "님과 " + s.rounds + "전 " + s.wins + "승 " + s.losses + "패 " + s.ties + "무", currentVsName, s.rounds, s.wins, s.losses, s.ties)) + '</div>' +
+        '<div class="sj-stats-tiles">' +
+          '<div class="sj-stat-tile"><div class="sj-stat-label">' + escapeHtml(tt("vsMyAvg", "내 평균")) + '</div><div class="sj-stat-value">' + s.myAvg.toFixed(1) + '</div></div>' +
+          '<div class="sj-stat-tile"><div class="sj-stat-label">' + escapeHtml(tt("vsOppAvg", "상대 평균")) + '</div><div class="sj-stat-value">' + s.oppAvg.toFixed(1) + '</div></div>' +
+          '<div class="sj-stat-tile"><div class="sj-stat-label">' + escapeHtml(tt("vsMyBest", "내 베스트")) + '</div><div class="sj-stat-value">' + s.myBest + '</div></div>' +
+          '<div class="sj-stat-tile"><div class="sj-stat-label">' + escapeHtml(tt("vsOppBest", "상대 베스트")) + '</div><div class="sj-stat-value">' + s.oppBest + '</div></div>' +
+        '</div>' +
+        '<div class="sj-stats-vs-capture-footer">' + escapeHtml(tt("copyFooter", "- Field Golf Scorecard -")) + '</div>' +
+      '</div>' +
+      '<button type="button" class="sj-secondary" id="sjStatsVsShareBtn">' + escapeHtml(tt("vsShareBtn", "🏆 상대전적 자랑하기")) + '</button>' +
+      '<div class="sj-status" id="sjStatsVsShareStatus"></div>';
+    var shareBtn = sj("sjStatsVsShareBtn");
+    if(shareBtn){ shareBtn.addEventListener("click", shareVsCardAsImage); }
+  }
+
+  /* ---------------- 상대전적 카드 이미지로 캡쳐 & 공유 ----------------
+     js/share.js의 결과표 캡쳐(copyResultAsImage) 방식을 그대로 따른다:
+     캡쳐 대상을 화면 밖(-99999px)에 복제해 html2canvas로 그린 뒤 캔버스를
+     PNG Blob으로 만들고, 클립보드에 이미지로 복사한다(카카오톡 채팅창에
+     붙여넣기하면 바로 전송됨). 클립보드 이미지 복사를 지원하지 않는 구형
+     브라우저/웹뷰에서는 파일 다운로드로 대체한다. */
+  function buildVsImageBlob(){
+    var original = sj("sjStatsVsCaptureArea");
+    if(!original) return Promise.reject(new Error("capture area not found"));
+    var clone = original.cloneNode(true);
+    clone.style.position = "fixed";
+    clone.style.left = "-99999px";
+    clone.style.top = "0";
+    clone.style.width = "max-content";
+    clone.style.background = "#ffffff";
+    clone.style.padding = "16px";
+    document.body.appendChild(clone);
+    return html2canvas(clone, { backgroundColor: "#ffffff", scale: 2 }).then(function(canvas){
+      document.body.removeChild(clone);
+      return new Promise(function(resolve, reject){
+        canvas.toBlob(function(blob){
+          if(blob) resolve(blob); else reject(new Error("toBlob returned null"));
+        }, "image/png");
+      });
+    }).catch(function(err){
+      if(clone.parentNode) document.body.removeChild(clone);
+      throw err;
+    });
+  }
+
+  function downloadVsImageBlob(blob){
+    var url = URL.createObjectURL(blob);
+    var a = document.createElement("a");
+    a.href = url;
+    var fname = ("vs_" + currentVsName).replace(/[^a-zA-Z0-9가-힣_-]/g, "_");
+    a.download = fname + ".png";
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+    URL.revokeObjectURL(url);
+    if(typeof toast === "function"){ toast(tt("toastImageSaved", "이미지가 저장되었습니다. 갤러리에서 공유해보세요")); }
+  }
+
+  function shareVsCardAsImage(){
+    var statusEl = sj("sjStatsVsShareStatus");
+    if(statusEl){ statusEl.textContent = ""; }
+    if(typeof html2canvas !== "function"){
+      if(typeof toast === "function"){ toast(tt("toastImageFail", "이미지 생성에 실패했습니다")); }
+      return;
+    }
+    var blobPromise = buildVsImageBlob();
+
+    /* Android Chrome는 클릭의 "user activation"이 살아있는 동안에만
+       navigator.clipboard.write()를 허용하는데, html2canvas 렌더링이 그
+       시간을 넘기기 쉽다. share.js와 동일하게 아직 완료되지 않은
+       blobPromise를 ClipboardItem에 바로 넘겨서, write() 호출 자체는
+       클릭과 동시에(활성 상태가 살아있을 때) 일어나게 한다. */
+    if(navigator.clipboard && window.ClipboardItem){
+      var writePromise = null;
+      try{
+        writePromise = navigator.clipboard.write([
+          new ClipboardItem({ "image/png": blobPromise })
+        ]);
+      } catch(e){ writePromise = null; }
+      if(writePromise){
+        writePromise.then(function(){
+          if(typeof toast === "function"){ toast(tt("toastImageCopied", "이미지가 복사되었습니다! SNS에 붙여넣기 하세요")); }
+        }).catch(function(){
+          blobPromise.then(function(blob){
+            navigator.clipboard.write([new ClipboardItem({ "image/png": blob })]).then(function(){
+              if(typeof toast === "function"){ toast(tt("toastImageCopied", "이미지가 복사되었습니다! SNS에 붙여넣기 하세요")); }
+            }).catch(function(){ downloadVsImageBlob(blob); });
+          }).catch(function(){
+            if(typeof toast === "function"){ toast(tt("toastImageFail", "이미지 생성에 실패했습니다")); }
+          });
+        });
+        return;
+      }
+    }
+
+    blobPromise.then(function(blob){
+      downloadVsImageBlob(blob);
+    }).catch(function(){
+      if(typeof toast === "function"){ toast(tt("toastImageFail", "이미지 생성에 실패했습니다")); }
+    });
   }
 
   function bindVsSelect(map){
