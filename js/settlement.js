@@ -185,13 +185,20 @@ function settlementFriendDisambiguator(f){
   return '';
 }
 
-function settlementCopyBtnHtml(f, withLabel){
+/* 은행명은 예전엔 title(마우스 호버 툴팁)에만 넣었는데, 스마트폰(터치
+   화면)에서는 호버가 없어서 title이 아예 보이지 않는다. 그래서 은행명은
+   버튼 글자에 항상 같이 보이게 하고, 동명이인 구분용 메모/연락처도 마찬가지로
+   버튼 글자에 붙인다(호버에 의존하지 않음). title은 보조 정보로만 남겨둔다. */
+function settlementCopyBtnHtml(f, withDisambiguator){
   var display = [f.bank, f.account].filter(Boolean).join(' ');
   var label = t('friendsAccountCopyBtn');
-  if(withLabel){
+  var parts = [];
+  if(f.bank) parts.push(f.bank);
+  if(withDisambiguator){
     var dis = settlementFriendDisambiguator(f);
-    if(dis) label += '(' + dis + ')';
+    if(dis) parts.push(dis);
   }
+  if(parts.length) label += ' (' + parts.join(' · ') + ')';
   return '<button type="button" class="settlement-copy-account-btn" data-account="' + escapeHtml(f.account) + '" title="' + escapeHtml(display) + '">' + escapeHtml(label) + '</button>';
 }
 
