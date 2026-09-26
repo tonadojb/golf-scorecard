@@ -334,7 +334,27 @@ if(isNativeApp()){
 // 이 페이지가 (일반 방문이 아니라) 위 openNativeProviderLogin()에 의해 시스템
 // 브라우저로 열린 것인지 확인합니다 -- 이 경우 로그인 완료 후 화면에 결과를
 // 보여주는 대신 커스텀 스킴으로 앱에 토큰을 넘기고 돌아갑니다.
+//
+// *** 2026-09-26 버그 수정 ***: 카카오/네이버 로그인은 이 페이지를 완전히
+// 떠났다가(kauth.kakao.com / nid.naver.com) 다시 돌아오는 "전체 페이지 이동"
+// 방식이라, 돌아왔을 때는 완전히 새로운 페이지 로드입니다. 그런데 카카오/
+// 네이버에 등록해둔 콜백 주소 자체가 "?nativeLogin=kakao" 없이 등록되어 있어서
+// (kakaoRedirectUri() 참고), 로그인 후 돌아오는 주소에는 이 쿼리가 없습니다.
+// 그래서 이 값을 주소창에서만 읽으면 로그인 후 돌아왔을 때 항상 빈 값이 되어,
+// 네이티브 앱으로 결과를 넘기는 redirectTokenToApp()이 한 번도 호출되지 않고
+// 이 브라우저 탭 안에서 그냥 로그인이 끝나버리는 문제가 있었습니다 -- 그
+// 결과 사용자는 (겉보기엔 앱과 똑같이 생긴) 로그인용 인앱 브라우저 안에
+// "갇힌" 상태가 되고, 진짜 네이티브 앱은 로그인 결과를 영영 못 받아 연락처
+// 가져오기 등 네이티브 기능이 전혀 동작하지 않았습니다.
+// sessionStorage는 이 브라우저 탭이 카카오/네이버로 이동했다가 같은 탭으로
+// 돌아와도 그대로 남아있으므로, 여기에 저장해뒀다가 돌아온 뒤 주소에 값이
+// 없으면 여기서 복원합니다(redirectTokenToApp에서 다 쓰고 나면 지웁니다).
 var __sjNativeLoginTarget = new URLSearchParams(window.location.search).get("nativeLogin");
+if(__sjNativeLoginTarget){
+  try{ sessionStorage.setItem("sjNativeLoginTarget", __sjNativeLoginTarget); }catch(e){ /* 무시 */ }
+} else {
+  try{ __sjNativeLoginTarget = sessionStorage.getItem("sjNativeLoginTarget") || ""; }catch(e){ __sjNativeLoginTarget = ""; }
+}
 
 if(__sjNativeLoginTarget){
   // 이 페이지는 네이티브 앱이 로그인 중계용으로 잠깐 연 것뿐인데, 이 브라우저가
@@ -356,6 +376,9 @@ if(__sjNativeLoginTarget){
 // 커스텀 스킴으로도 code/redirect_uri를 그대로 넘겨서, 앱이 받은 뒤 다시
 // finishProviderLogin에서 서버(kakaoAuth)로 보내 액세스 토큰과 교환합니다.
 function redirectTokenToApp(provider, payload){
+  // 이 탭에서 네이티브 중계 역할은 여기서 끝나므로, 남겨두면 나중에 이
+  // 브라우저 탭이 재사용될 때(드묾) 혼란을 줄 수 있는 플래그를 지운다.
+  try{ sessionStorage.removeItem("sjNativeLoginTarget"); }catch(e){ /* 무시 */ }
   setStatus((provider === "kakao" ? "카카오" : "네이버") + " 로그인 성공! 앱으로 돌아가는 중...");
   var qs = provider === "kakao"
     ? ("code=" + encodeURIComponent(payload.code) + "&redirect_uri=" + encodeURIComponent(payload.redirectUri))
@@ -554,8 +577,14 @@ if(naverBtn){
 }
 
 // 네이티브 앱이 열어준 시스템 브라우저 탭이면, 사용자가 버튼을 다시 누르지 않아도
-// 바로 네이버 로그인을 시작합니다.
-if(__sjNativeLoginTarget === "naver" && naverLoginInstance){
+// 바로 네이버 로그인을 시작합니다. 단, 이미 네이버에서 돌아온 직후(주소에
+// #access_token=...이 있는 경우)라면 다시 시작하면 안 됩니다 -- __sjNativeLoginTarget이
+// 이제 sessionStorage로 복원되어 돌아온 뒤에도 계속 "naver"로 남아있기 때문에,
+// 이 가드가 없으면 handleNaverLoginSuccess()가 redirectTokenToApp()으로 앱에
+// 돌아가려는 도중에 여기서 또 새 로그인을 시작해버리는 이중 리다이렉트가 생깁니다
+// (카카오 쪽은 !extractKakaoCode()로 이미 같은 문제를 막고 있던 것과 동일한 이유).
+if(__sjNativeLoginTarget === "naver" && naverLoginInstance &&
+   !(window.location.hash && window.location.hash.indexOf("access_token=") !== -1)){
   naverLoginInstance.authorize();
 }
 
