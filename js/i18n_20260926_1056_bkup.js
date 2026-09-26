@@ -284,17 +284,7 @@ var I18N = {
     referralEventEndsAt:function(date){ return "이벤트 종료: "+date; },
     referralPrizeListTitle:"경품 안내",
     referralLoginRequired:"먼저 로그인해주세요.",
-    referralConfirmedNote:"* 추천받은 친구가 실제로 라운드를 1회 이상 저장하면 확정 추천으로 카운트돼요.",
-    couponModalTitle:"🎟️ 쿠폰 등록",
-    couponDesc:"이벤트에서 받은 쿠폰 코드를 입력하면 혜택을 받을 수 있어요",
-    couponInputLabel:"쿠폰 코드",
-    couponInputPlaceholder:"쿠폰 코드 입력",
-    couponSubmitBtn:"등록하기",
-    couponEmptyCode:"쿠폰 코드를 입력해주세요.",
-    couponLoginRequired:"먼저 로그인해주세요.",
-    couponRedeeming:"등록 중...",
-    couponSuccess:function(planLabel, date){ return "🎉 " + planLabel + " 혜택이 적용되었습니다! (" + date + "까지)"; },
-    couponFail:function(msg){ return "쿠폰 등록에 실패했습니다: " + msg; }
+    referralConfirmedNote:"* 추천받은 친구가 실제로 라운드를 1회 이상 저장하면 확정 추천으로 카운트돼요."
   },
   en:{
     title:"⛳ Tonado_GolfScoreCard",
@@ -576,17 +566,7 @@ var I18N = {
     referralEventEndsAt:function(date){ return "Event ends: "+date; },
     referralPrizeListTitle:"Prizes",
     referralLoginRequired:"Please log in first.",
-    referralConfirmedNote:"* A referral counts once your friend saves at least one round.",
-    couponModalTitle:"🎟️ Redeem Coupon",
-    couponDesc:"Enter a coupon code you received to claim the reward",
-    couponInputLabel:"Coupon code",
-    couponInputPlaceholder:"Enter coupon code",
-    couponSubmitBtn:"Redeem",
-    couponEmptyCode:"Please enter a coupon code.",
-    couponLoginRequired:"Please log in first.",
-    couponRedeeming:"Redeeming...",
-    couponSuccess:function(planLabel, date){ return "🎉 " + planLabel + " has been applied! (until " + date + ")"; },
-    couponFail:function(msg){ return "Failed to redeem coupon: " + msg; }
+    referralConfirmedNote:"* A referral counts once your friend saves at least one round."
   },
   ja:{
     title:"⛳ Tonado_GolfScoreCard",
@@ -868,17 +848,7 @@ var I18N = {
     referralEventEndsAt:function(date){ return "イベント終了: "+date; },
     referralPrizeListTitle:"景品案内",
     referralLoginRequired:"先にログインしてください。",
-    referralConfirmedNote:"※ 紹介された友達が実際にラウンドを1回以上保存すると確定紹介としてカウントされます。",
-    couponModalTitle:"🎟️ クーポン登録",
-    couponDesc:"イベントで受け取ったクーポンコードを入力すると特典が適用されます",
-    couponInputLabel:"クーポンコード",
-    couponInputPlaceholder:"クーポンコードを入力",
-    couponSubmitBtn:"登録する",
-    couponEmptyCode:"クーポンコードを入力してください。",
-    couponLoginRequired:"先にログインしてください。",
-    couponRedeeming:"登録中...",
-    couponSuccess:function(planLabel, date){ return "🎉 " + planLabel + "特典が適用されました!(" + date + "まで)"; },
-    couponFail:function(msg){ return "クーポン登録に失敗しました: " + msg; }
+    referralConfirmedNote:"※ 紹介された友達が実際にラウンドを1回以上保存すると確定紹介としてカウントされます。"
   },
   zh:{
     title:"⛳ Tonado_GolfScoreCard",
@@ -1160,17 +1130,7 @@ var I18N = {
     referralEventEndsAt:function(date){ return "活动结束: "+date; },
     referralPrizeListTitle:"奖品说明",
     referralLoginRequired:"请先登录。",
-    referralConfirmedNote:"* 被推荐的好友实际保存1次以上球局记录后才计为确认推荐。",
-    couponModalTitle:"🎟️ 兑换优惠券",
-    couponDesc:"输入活动获得的优惠券代码即可获得福利",
-    couponInputLabel:"优惠券代码",
-    couponInputPlaceholder:"请输入优惠券代码",
-    couponSubmitBtn:"兑换",
-    couponEmptyCode:"请输入优惠券代码。",
-    couponLoginRequired:"请先登录。",
-    couponRedeeming:"兑换中...",
-    couponSuccess:function(planLabel, date){ return "🎉 已应用" + planLabel + "福利!(至" + date + ")"; },
-    couponFail:function(msg){ return "兑换优惠券失败: " + msg; }
+    referralConfirmedNote:"* 被推荐的好友实际保存1次以上球局记录后才计为确认推荐。"
   }
 };
 

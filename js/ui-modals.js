@@ -66,6 +66,19 @@
       sjOpen("sjReferralModal");
     });
   }
+  var sjCouponFabEl = sj("sjCouponFab");
+  if(sjCouponFabEl){
+    sjCouponFabEl.addEventListener("click", function(){
+      var currentUser = window.__sjAuth && window.__sjAuth.getCurrentUser();
+      if(!currentUser){
+        alert("먼저 로그인해주세요.");
+        sjOpen("sjAuthModal");
+        return;
+      }
+      if(window.__sjCoupon && window.__sjCoupon.onOpen){ window.__sjCoupon.onOpen(); }
+      sjOpen("sjCouponModal");
+    });
+  }
   var sjAdminFabEl = sj("sjAdminFab");
   if(sjAdminFabEl){
     sjAdminFabEl.addEventListener("click", function(){

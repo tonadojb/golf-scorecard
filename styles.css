@@ -254,7 +254,11 @@ footer.credit{text-align:center;color:var(--muted);font-size:11px;padding:14px;}
 .sj-admin-badge{font-size:10px;font-weight:700;padding:2px 7px;border-radius:20px;background:var(--primary-light);color:var(--primary-dark);}
 .sj-admin-badge.admin{background:#e0f2fe;color:#0e7490;}
 .sj-admin-badge.banned{background:#fee2e2;color:#b91c1c;}
+/* 2026-09-26 추가: 사용자 목록에서 유료 구독자(베이직/프로)를 한눈에 구분 */
+.sj-admin-badge.plan-basic{background:#e5f0fb;color:#2a78d6;}
+.sj-admin-badge.plan-pro{background:#fdeadf;color:#eb6834;}
 .sj-admin-user-meta{font-size:11.5px;color:#6b7a72;margin-top:4px;}
+.sj-admin-user-sub-meta{color:#4b5a52;font-weight:600;}
 .sj-admin-user-actions{display:flex;gap:6px;margin-top:8px;}
 .sj-admin-logout-btn,.sj-admin-ban-btn,.sj-admin-unban-btn{flex:1;border:none;border-radius:8px;padding:7px 6px;font-size:11.5px;font-weight:700;cursor:pointer;}
 .sj-admin-logout-btn{background:#eef0fb;color:#4338ca;}
@@ -345,6 +349,27 @@ footer.credit{text-align:center;color:var(--muted);font-size:11px;padding:14px;}
 .sj-admin-prize-row .sj-admin-prize-plan{width:auto;flex:0 0 auto;padding:7px 6px;border:1px solid #ccc;border-radius:7px;font-size:13px;box-sizing:border-box;font-family:inherit;}
 .sj-admin-prize-row .sj-admin-prize-days,.sj-admin-prize-row .sj-admin-prize-weight{width:64px;flex:0 0 auto;padding:7px 6px;border:1px solid #ccc;border-radius:7px;font-size:16px;box-sizing:border-box;font-family:inherit;}
 .sj-admin-prize-remove-btn{flex:0 0 auto;border:none;border-radius:7px;padding:6px 9px;font-size:12px;font-weight:700;cursor:pointer;background:#fee2e2;color:#b91c1c;margin-left:auto;}
+
+/* ---------------- 관리자: 프로모션 쿠폰 발급/목록 (2026-09-26 추가) ----------------
+   위 무료 기간 부여 폼과 동일한 이유로, .sj-modal input,.sj-modal select{width:100%}
+   전역 규칙보다 우선하도록 부모 클래스를 포함한 2클래스 선택자로 폭을 지정한다. */
+.sj-admin-coupon-generate{display:flex;align-items:center;gap:6px;flex-wrap:wrap;}
+.sj-admin-coupon-generate span{font-size:11.5px;font-weight:700;color:#374151;flex:0 0 auto;}
+.sj-admin-coupon-generate #sjAdminCouponPlan{width:auto;flex:0 0 auto;padding:6px 7px;border:1px solid #ccc;border-radius:7px;font-size:13px;box-sizing:border-box;font-family:inherit;}
+.sj-admin-coupon-generate .sj-admin-coupon-days{width:56px;flex:0 0 auto;padding:6px 7px;border:1px solid #ccc;border-radius:7px;font-size:16px;box-sizing:border-box;font-family:inherit;}
+.sj-admin-coupon-generate .sj-admin-coupon-qty{width:56px;flex:0 0 auto;padding:6px 7px;border:1px solid #ccc;border-radius:7px;font-size:16px;box-sizing:border-box;font-family:inherit;}
+.sj-admin-coupon-generate .sj-admin-coupon-maxuses{width:64px;flex:0 0 auto;padding:6px 7px;border:1px solid #ccc;border-radius:7px;font-size:16px;box-sizing:border-box;font-family:inherit;}
+.sj-admin-coupon-generate .sj-admin-coupon-note{width:auto;flex:1 1 160px;min-width:140px;padding:6px 8px;border:1px solid #ccc;border-radius:7px;font-size:13px;box-sizing:border-box;font-family:inherit;}
+.sj-admin-coupon-generate label{flex:0 0 100%;font-size:11.5px;color:#6b7a72;margin-top:2px;}
+.sj-admin-coupon-generate #sjAdminCouponExpires{flex:0 0 auto;}
+.sj-admin-coupon-generate .sj-primary{flex:0 0 100%;}
+.sj-admin-coupon-list{margin-top:10px;}
+.sj-admin-coupon-row{background:#fff;border:1px solid #e5e7eb;border-radius:8px;padding:9px 10px;margin-bottom:8px;}
+.sj-admin-coupon-top{display:flex;align-items:center;gap:6px;flex-wrap:wrap;}
+.sj-admin-coupon-code{font-weight:700;font-size:13px;letter-spacing:.03em;color:#1f2b24;font-family:monospace;}
+.sj-admin-coupon-actions{display:flex;gap:6px;margin-top:8px;}
+.sj-admin-coupon-actions button{flex:0 0 auto;border:none;border-radius:7px;padding:6px 10px;font-size:11.5px;font-weight:700;cursor:pointer;}
+.sj-admin-coupon-copy-btn{background:#eef0fb;color:#4338ca;}
 
 /* ---------------- 친구추천 이벤트 룰렛 (사용자용, 2026-09-26 추가) ---------------- */
 .sj-roulette-host{position:relative;width:220px;max-width:100%;margin:0 auto;display:flex;align-items:center;justify-content:center;}

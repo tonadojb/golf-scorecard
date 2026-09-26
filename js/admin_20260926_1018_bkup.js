@@ -11,14 +11,6 @@
   var GET_VIOLATION_PHOTO_URL = "https://asia-northeast3-skyjang-golfscore.cloudfunctions.net/adminGetViolationPhoto";
   var DELETE_VIOLATION_PHOTO_URL = "https://asia-northeast3-skyjang-golfscore.cloudfunctions.net/adminDeleteViolationPhoto";
   var SUB_STATS_URL = "https://asia-northeast3-skyjang-golfscore.cloudfunctions.net/adminGetSubscriptionStats";
-  // 2026-09-26 추가: 관리자 무료 기간 부여 + 친구추천 이벤트 관리.
-  var GRANT_FREE_URL = "https://asia-northeast3-skyjang-golfscore.cloudfunctions.net/adminGrantFreeSubscription";
-  var GET_REF_EVENT_URL = "https://asia-northeast3-skyjang-golfscore.cloudfunctions.net/adminGetReferralEvent";
-  var SET_REF_EVENT_URL = "https://asia-northeast3-skyjang-golfscore.cloudfunctions.net/adminSetReferralEvent";
-  // 2026-09-26 추가: 프로모션 쿠폰(관리자 발급/조회/비활성화).
-  var GENERATE_COUPON_URL = "https://asia-northeast3-skyjang-golfscore.cloudfunctions.net/adminGenerateCoupon";
-  var LIST_COUPONS_URL = "https://asia-northeast3-skyjang-golfscore.cloudfunctions.net/adminListCoupons";
-  var SET_COUPON_ACTIVE_URL = "https://asia-northeast3-skyjang-golfscore.cloudfunctions.net/adminSetCouponActive";
 
   // 2026-09-21 추가: 구독 현황(요금제별 구독자 수 / 월별 결제 그래프)에 쓰는 고정
   // 팔레트 -- dataviz 스킬의 카테고리 팔레트 1~2번 슬롯을 그대로 썼다(인접 쌍
@@ -29,9 +21,6 @@
   var PLAN_KEYS_ORDER = ["basic", "pro"];
   var PLAN_COLORS = { basic: "#2a78d6", pro: "#eb6834" };
   var PLAN_SHORT_LABELS = { basic: "베이직", pro: "프로 월간" };
-  // 2026-09-26 추가: 사용자 목록에서 유료 구독자가 어떤 경로로 그 구독을 갖게
-  // 됐는지(웹 결제/iOS 결제/관리자 지급/이벤트 당첨) 바로 알 수 있게 라벨링.
-  var SUB_SOURCE_LABELS = { web: "웹 결제", ios: "iOS 결제", admin_grant: "관리자 지급", event_roulette: "이벤트 당첨", coupon: "쿠폰 등록" };
   var lastSubStats = null; // { subscriberCounts, currentMRR, monthlyRevenue, planLabels } -- 연도 셀렉트 바뀔 때 재요청 없이 필터링만 새로 하려고 캐싱.
 
   function escapeHtmlLocal(s){
@@ -74,10 +63,6 @@
     var onlineDot = '<span class="sj-admin-dot ' + (u.online ? "on" : "off") + '" title="' + (u.online ? "접속중" : "오프라인") + '"></span>';
     var badge = u.isAdmin ? '<span class="sj-admin-badge admin">관리자</span>' : "";
     var bannedBadge = u.banned ? '<span class="sj-admin-badge banned">접속금지됨</span>' : "";
-    // 2026-09-26 추가: 지금 유료 구독 중이면 어떤 요금제인지 이름 옆에 바로 보이게.
-    var planBadge = (u.plan === "basic" || u.plan === "pro")
-      ? '<span class="sj-admin-badge plan-' + u.plan + '">' + escapeHtmlLocal(u.planLabel || PLAN_SHORT_LABELS[u.plan]) + '</span>'
-      : "";
     var actions = u.isAdmin ? "" :
       '<div class="sj-admin-user-actions">' +
         '<button type="button" class="sj-admin-logout-btn" data-uid="' + escapeHtmlLocal(u.uid) + '">강제 로그아웃</button>' +
@@ -103,43 +88,21 @@
         '<button type="button" class="sj-admin-violation-photos-btn" data-uid="' + escapeHtmlLocal(u.uid) + '">위반 사진 보기</button>' +
       '</div>' +
       '<div class="sj-admin-violation-photos" data-uid="' + escapeHtmlLocal(u.uid) + '" style="display:none;"></div>';
-    // 2026-09-26 추가: 결제 없이 베이직/프로를 지정 기간만큼 무료로 부여하는
-    // 미니 폼. 관리자 본인 계정에는 의미가 없으므로 숨긴다.
-    var grantForm = u.isAdmin ? "" : '<div class="sj-admin-grant-free">' +
-        '<span>무료 기간 부여</span>' +
-        '<select class="sj-admin-grant-plan" data-uid="' + escapeHtmlLocal(u.uid) + '">' +
-          '<option value="basic">베이직</option>' +
-          '<option value="pro">프로</option>' +
-        '</select>' +
-        '<input type="number" class="sj-admin-grant-days" min="1" max="3650" value="30" data-uid="' + escapeHtmlLocal(u.uid) + '"> 일' +
-        '<button type="button" class="sj-admin-grant-btn" data-uid="' + escapeHtmlLocal(u.uid) + '">부여</button>' +
-      '</div>';
     var detail = '<div class="sj-admin-user-detail">' +
         '<div class="sj-admin-user-stats-row">' +
           '<div class="sj-admin-user-stat"><span>이용 횟수</span><b>' + loginCount + '</b></div>' +
           '<div class="sj-admin-user-stat"><span>스캔 건수</span><b>' + scanCount + '</b></div>' +
           '<div class="sj-admin-user-stat"><span>저장 건수</span><b>' + saveCount + '</b></div>' +
         '</div>' +
-      grantForm +
       violationEdit +
       '</div>';
-    // 2026-09-26 추가: 구독 중이면 "베이직 · 웹 결제 · ~09/26 만료(해지예약)"처럼
-    // 어떤 경로로 언제까지인지 한 줄로. 무료면 그냥 "무료"만 보여준다.
-    var subMetaText = "무료";
-    if(u.plan === "basic" || u.plan === "pro"){
-      var parts = [u.planLabel || PLAN_SHORT_LABELS[u.plan]];
-      if(u.subSource && SUB_SOURCE_LABELS[u.subSource]) parts.push(SUB_SOURCE_LABELS[u.subSource]);
-      if(u.subExpiresAt) parts.push((u.subCancelAtPeriodEnd ? "해지예약 · " : "") + "~" + fmtTime(u.subExpiresAt) + " 만료");
-      subMetaText = parts.join(" · ");
-    }
     return '<div class="sj-admin-user-row" data-uid="' + escapeHtmlLocal(u.uid) + '">' +
       '<div class="sj-admin-user-top">' + onlineDot +
-        '<span class="sj-admin-user-name">' + escapeHtmlLocal(name) + '</span>' + badge + planBadge + bannedBadge +
+        '<span class="sj-admin-user-name">' + escapeHtmlLocal(name) + '</span>' + badge + bannedBadge +
       '</div>' +
       '<div class="sj-admin-user-meta">' + escapeHtmlLocal(u.email || "-") + ' · ' + escapeHtmlLocal(u.provider || "-") +
         ' · 최근 접속 ' + fmtTime(u.lastSeenAt) + ' · 위반 ' + (u.violationCount || 0) + '회' +
       '</div>' +
-      '<div class="sj-admin-user-meta sj-admin-user-sub-meta">구독: ' + escapeHtmlLocal(subMetaText) + '</div>' +
       detail +
       actions +
     '</div>';
@@ -251,28 +214,6 @@
           alert("실패: " + (err && err.message ? err.message : err));
           banBtn.disabled = false;
         });
-        return;
-      }
-      var grantBtn = e.target.closest(".sj-admin-grant-btn");
-      if(grantBtn){
-        var gUid = grantBtn.dataset.uid;
-        var planSelect = container.querySelector('.sj-admin-grant-plan[data-uid="' + gUid + '"]');
-        var daysInput = container.querySelector('.sj-admin-grant-days[data-uid="' + gUid + '"]');
-        var planKey = planSelect ? planSelect.value : "basic";
-        var days = daysInput ? parseInt(daysInput.value, 10) : NaN;
-        if(!daysInput || isNaN(days) || days < 1 || days > 3650){
-          alert("부여 기간(일)은 1~3650 사이의 숫자로 입력해주세요.");
-          return;
-        }
-        if(!confirm((planKey === "pro" ? "프로" : "베이직") + " " + days + "일을 결제 없이 무료로 부여할까요?")) return;
-        grantBtn.disabled = true;
-        withIdToken(function(idToken){
-          return authedFetch(GRANT_FREE_URL, idToken, { uid: gUid, planKey: planKey, days: days });
-        }).then(function(){
-          if(typeof toast === "function"){ toast("무료 기간을 부여했습니다"); }
-        }).catch(function(err){
-          alert("부여 실패: " + (err && err.message ? err.message : err));
-        }).then(function(){ grantBtn.disabled = false; });
         return;
       }
       var saveViolationBtn = e.target.closest(".sj-admin-violation-save-btn");
@@ -710,290 +651,16 @@
     }
   }
 
-  /* ---------------- 친구추천 이벤트 관리 (2026-09-26 추가) ----------------
-     enabled 토글 / 기간 / 경품표(경품명·요금제·일수·확률가중치)를 한 화면에서
-     관리한다. 기간을 바꾸지 않는 한(그냥 켰다 끄거나 경품표만 수정) 그동안
-     쌓인 사용자별 추천/스핀 진행 상황은 서버(referral.js)가 그대로 보존한다. */
-
-  var PLAN_LABELS_FOR_PRIZE = { basic: "베이직", pro: "프로" };
-
-  function prizeRowHtml(p, idx){
-    p = p || {};
-    return '<div class="sj-admin-prize-row" data-idx="' + idx + '">' +
-      '<input type="text" class="sj-admin-prize-label" placeholder="경품명 (예: 베이직 무료 1개월)" value="' + escapeHtmlLocal(p.label || "") + '">' +
-      '<select class="sj-admin-prize-plan">' +
-        '<option value="basic"' + (p.planKey === "pro" ? "" : " selected") + '>베이직</option>' +
-        '<option value="pro"' + (p.planKey === "pro" ? " selected" : "") + '>프로</option>' +
-      '</select>' +
-      '<input type="number" class="sj-admin-prize-days" min="1" max="3650" placeholder="일수" value="' + (p.days || 30) + '"> 일' +
-      '<input type="number" class="sj-admin-prize-weight" min="0.01" max="100000" step="0.01" placeholder="확률 가중치" value="' + (p.weight != null ? p.weight : 10) + '"> %' +
-      '<button type="button" class="sj-admin-prize-remove-btn">✕</button>' +
-    '</div>';
-  }
-
-  function renderPrizeRows(prizes){
-    var host = sj("sjAdminRefPrizeRows");
-    if(!host) return;
-    var list = (prizes && prizes.length) ? prizes : [
-      { label: "베이직 무료 1개월", planKey: "basic", days: 30, weight: 80 },
-      { label: "베이직 무료 2개월", planKey: "basic", days: 60, weight: 10 },
-      { label: "베이직 무료 3개월", planKey: "basic", days: 90, weight: 9 },
-      { label: "프로 무료 3개월", planKey: "pro", days: 90, weight: 1 }
-    ];
-    host.innerHTML = list.map(prizeRowHtml).join("");
-  }
-
-  function bindPrizeRowsEvents(){
-    var host = sj("sjAdminRefPrizeRows");
-    if(!host) return;
-    host.addEventListener("click", function(e){
-      var removeBtn = e.target.closest(".sj-admin-prize-remove-btn");
-      if(removeBtn){
-        var row = removeBtn.closest(".sj-admin-prize-row");
-        if(row) row.remove();
-      }
-    });
-    var addBtn = sj("sjAdminRefAddPrizeBtn");
-    if(addBtn){
-      addBtn.addEventListener("click", function(){
-        host.insertAdjacentHTML("beforeend", prizeRowHtml({ label: "", planKey: "basic", days: 30, weight: 10 }, host.children.length));
-      });
-    }
-  }
-
-  function collectPrizesFromForm(){
-    var host = sj("sjAdminRefPrizeRows");
-    if(!host) return [];
-    return Array.prototype.map.call(host.querySelectorAll(".sj-admin-prize-row"), function(row){
-      var label = row.querySelector(".sj-admin-prize-label").value.trim();
-      var planKey = row.querySelector(".sj-admin-prize-plan").value;
-      var days = parseInt(row.querySelector(".sj-admin-prize-days").value, 10);
-      var weight = parseFloat(row.querySelector(".sj-admin-prize-weight").value);
-      return { label: label, planKey: planKey, days: days, weight: weight };
-    }).filter(function(p){
-      return p.label && (p.planKey === "basic" || p.planKey === "pro") &&
-        Number.isFinite(p.days) && p.days > 0 && Number.isFinite(p.weight) && p.weight > 0;
-    });
-  }
-
-  // datetime-local 입력칸은 "YYYY-MM-DDTHH:mm"을 로컬 시간대 기준으로 주고받는다
-  // (new Date()도 이 형식을 로컬 시간으로 해석하므로 따로 시간대 변환이 필요 없다).
-  function isoToLocalInputValue(iso){
-    if(!iso) return "";
-    var d = new Date(iso);
-    if(isNaN(d.getTime())) return "";
-    var pad = function(n){ return String(n).padStart(2, "0"); };
-    return d.getFullYear() + "-" + pad(d.getMonth() + 1) + "-" + pad(d.getDate()) + "T" + pad(d.getHours()) + ":" + pad(d.getMinutes());
-  }
-
-  function loadReferralEvent(){
-    return withIdToken(function(idToken){
-      return authedFetch(GET_REF_EVENT_URL, idToken);
-    }).then(function(data){
-      var enabledEl = sj("sjAdminRefEventEnabled");
-      var startEl = sj("sjAdminRefEventStart");
-      var endEl = sj("sjAdminRefEventEnd");
-      var badgeEl = sj("sjAdminRefEventLiveBadge");
-      if(enabledEl) enabledEl.checked = !!(data && data.enabled);
-      if(startEl) startEl.value = isoToLocalInputValue(data && data.startAt);
-      if(endEl) endEl.value = isoToLocalInputValue(data && data.endAt);
-      if(badgeEl) badgeEl.textContent = (data && data.live) ? "🟢 현재 진행중" : "⚪ 진행중 아님";
-      renderPrizeRows(data && data.prizes);
-    }).catch(function(e){
-      var status = sj("sjAdminRefStatus");
-      if(status){ status.className = "sj-status error"; status.textContent = "이벤트 정보 불러오기 실패: " + (e && e.message ? e.message : e); }
-    });
-  }
-
-  function bindReferralEventSave(){
-    var btn = sj("sjAdminRefSaveBtn");
-    if(!btn) return;
-    btn.addEventListener("click", function(){
-      var status = sj("sjAdminRefStatus");
-      var enabledEl = sj("sjAdminRefEventEnabled");
-      var startEl = sj("sjAdminRefEventStart");
-      var endEl = sj("sjAdminRefEventEnd");
-      var enabled = !!(enabledEl && enabledEl.checked);
-      var startVal = startEl && startEl.value;
-      var endVal = endEl && endEl.value;
-      if(!startVal || !endVal){
-        alert("시작일시와 종료일시를 모두 입력해주세요.");
-        return;
-      }
-      var startIso = new Date(startVal).toISOString();
-      var endIso = new Date(endVal).toISOString();
-      if(new Date(endIso).getTime() <= new Date(startIso).getTime()){
-        alert("종료일시는 시작일시보다 나중이어야 합니다.");
-        return;
-      }
-      var prizes = collectPrizesFromForm();
-      if(!prizes.length){
-        alert("유효한 경품을 1개 이상 입력해주세요 (경품명/일수/확률 가중치 모두 필요).");
-        return;
-      }
-      btn.disabled = true;
-      if(status){ status.className = "sj-status"; status.textContent = "저장 중..."; }
-      withIdToken(function(idToken){
-        return authedFetch(SET_REF_EVENT_URL, idToken, { enabled: enabled, startAt: startIso, endAt: endIso, prizes: prizes });
-      }).then(function(data){
-        if(status){ status.className = "sj-status"; status.textContent = "저장되었습니다" + (data && data.live ? " (현재 진행중)" : ""); }
-        if(typeof toast === "function"){ toast("친구추천 이벤트 설정이 저장되었습니다"); }
-        var badgeEl = sj("sjAdminRefEventLiveBadge");
-        if(badgeEl) badgeEl.textContent = (data && data.live) ? "🟢 현재 진행중" : "⚪ 진행중 아님";
-      }).catch(function(e){
-        if(status){ status.className = "sj-status error"; status.textContent = "저장 실패: " + (e && e.message ? e.message : e); }
-      }).then(function(){ btn.disabled = false; });
-    });
-  }
-
-  /* ---------------- 프로모션 쿠폰 관리 (2026-09-26 추가) ----------------
-     골프채널 인플루언서 등에게 보낼 쿠폰 코드를 발급하고(수량 여러 개 한번에
-     가능), 발급된 코드의 사용현황을 보고, 필요하면(유출 등) 비활성화한다. */
-
-  function couponRowHtml(c){
-    c = c || {};
-    var planLabel = c.planLabel || PLAN_SHORT_LABELS[c.planKey] || c.planKey;
-    var usesText = c.maxUses > 0 ? ((c.usedCount || 0) + "/" + c.maxUses + "명") : ((c.usedCount || 0) + "명/무제한");
-    var expiresText = c.expiresAt ? ("~" + fmtTime(c.expiresAt) + "까지 등록 가능") : "등록 기한 없음";
-    return '<div class="sj-admin-coupon-row" data-code="' + escapeHtmlLocal(c.code) + '">' +
-      '<div class="sj-admin-coupon-top">' +
-        '<span class="sj-admin-coupon-code">' + escapeHtmlLocal(c.code) + '</span>' +
-        '<span class="sj-admin-badge plan-' + c.planKey + '">' + escapeHtmlLocal(planLabel) + ' ' + (c.days || 0) + '일</span>' +
-        (c.active === false ? '<span class="sj-admin-badge banned">비활성</span>' : "") +
-      '</div>' +
-      '<div class="sj-admin-user-meta">사용 ' + usesText + ' · 발급 ' + fmtTime(c.createdAt) +
-        (c.note ? (' · ' + escapeHtmlLocal(c.note)) : '') + ' · ' + escapeHtmlLocal(expiresText) +
-      '</div>' +
-      '<div class="sj-admin-coupon-actions">' +
-        '<button type="button" class="sj-admin-coupon-copy-btn" data-code="' + escapeHtmlLocal(c.code) + '">코드 복사</button>' +
-        '<button type="button" class="' + (c.active === false ? "sj-admin-unban-btn" : "sj-admin-ban-btn") + ' sj-admin-coupon-toggle-btn" data-code="' + escapeHtmlLocal(c.code) + '" data-active="' + (c.active === false ? "0" : "1") + '">' +
-          (c.active === false ? "다시 활성화" : "비활성화") +
-        '</button>' +
-      '</div>' +
-    '</div>';
-  }
-
-  function renderCouponList(coupons){
-    var container = sj("sjAdminCouponList");
-    if(!container) return;
-    if(!coupons || !coupons.length){
-      container.innerHTML = '<div class="sj-admin-empty">발급된 쿠폰이 없습니다.</div>';
-      return;
-    }
-    container.innerHTML = coupons.map(couponRowHtml).join("");
-  }
-
-  function loadCoupons(){
-    var container = sj("sjAdminCouponList");
-    return withIdToken(function(idToken){
-      return authedFetch(LIST_COUPONS_URL, idToken);
-    }).then(function(data){
-      renderCouponList((data && data.coupons) || []);
-    }).catch(function(e){
-      if(container){ container.innerHTML = '<div class="sj-status error">쿠폰 목록 불러오기 실패: ' + escapeHtmlLocal(e && e.message ? e.message : e) + '</div>'; }
-    });
-  }
-
-  function bindCouponGenerate(){
-    var btn = sj("sjAdminCouponGenerateBtn");
-    if(!btn) return;
-    btn.addEventListener("click", function(){
-      var status = sj("sjAdminCouponStatus");
-      var planEl = sj("sjAdminCouponPlan");
-      var daysEl = sj("sjAdminCouponDays");
-      var qtyEl = sj("sjAdminCouponQty");
-      var maxUsesEl = sj("sjAdminCouponMaxUses");
-      var noteEl = sj("sjAdminCouponNote");
-      var expiresEl = sj("sjAdminCouponExpires");
-      var planKey = planEl ? planEl.value : "basic";
-      var days = daysEl ? parseInt(daysEl.value, 10) : NaN;
-      var quantity = qtyEl ? parseInt(qtyEl.value, 10) : NaN;
-      var maxUses = maxUsesEl ? parseInt(maxUsesEl.value, 10) : NaN;
-      if(!daysEl || isNaN(days) || days < 1 || days > 3650){
-        alert("부여 기간(일)은 1~3650 사이의 숫자로 입력해주세요.");
-        return;
-      }
-      if(!qtyEl || isNaN(quantity) || quantity < 1 || quantity > 50){
-        alert("발급 수량은 1~50 사이의 숫자로 입력해주세요.");
-        return;
-      }
-      if(isNaN(maxUses) || maxUses < 0){
-        alert("최대 사용 인원은 0(무제한) 이상의 숫자로 입력해주세요.");
-        return;
-      }
-      var note = noteEl ? noteEl.value.trim() : "";
-      var expiresIso = (expiresEl && expiresEl.value) ? new Date(expiresEl.value).toISOString() : null;
-      btn.disabled = true;
-      if(status){ status.className = "sj-status"; status.textContent = "발급 중..."; }
-      withIdToken(function(idToken){
-        return authedFetch(GENERATE_COUPON_URL, idToken, {
-          planKey: planKey, days: days, quantity: quantity, maxUses: maxUses, note: note, expiresAt: expiresIso
-        });
-      }).then(function(data){
-        var codes = (data && data.codes) || [];
-        if(status){
-          status.className = "sj-status";
-          status.textContent = codes.length + "개 발급 완료: " + codes.join(", ");
-        }
-        if(typeof toast === "function"){ toast(codes.length + "개의 쿠폰을 발급했습니다"); }
-        return loadCoupons();
-      }).catch(function(e){
-        if(status){ status.className = "sj-status error"; status.textContent = "발급 실패: " + (e && e.message ? e.message : e); }
-      }).then(function(){ btn.disabled = false; });
-    });
-  }
-
-  function bindCouponListEvents(){
-    var container = sj("sjAdminCouponList");
-    if(!container) return;
-    container.addEventListener("click", function(e){
-      var copyBtn = e.target.closest(".sj-admin-coupon-copy-btn");
-      if(copyBtn){
-        var code = copyBtn.dataset.code;
-        if(navigator.clipboard && navigator.clipboard.writeText){
-          navigator.clipboard.writeText(code).then(function(){
-            if(typeof toast === "function"){ toast("코드가 복사되었습니다: " + code); }
-          }).catch(function(){ alert("코드: " + code); });
-        } else {
-          alert("코드: " + code);
-        }
-        return;
-      }
-      var toggleBtn = e.target.closest(".sj-admin-coupon-toggle-btn");
-      if(toggleBtn){
-        var tCode = toggleBtn.dataset.code;
-        var nextActive = toggleBtn.dataset.active !== "1";
-        toggleBtn.disabled = true;
-        withIdToken(function(idToken){
-          return authedFetch(SET_COUPON_ACTIVE_URL, idToken, { code: tCode, active: nextActive });
-        }).then(function(){
-          if(typeof toast === "function"){ toast(nextActive ? "쿠폰을 다시 활성화했습니다" : "쿠폰을 비활성화했습니다"); }
-          return loadCoupons();
-        }).catch(function(err){
-          alert("실패: " + (err && err.message ? err.message : err));
-          toggleBtn.disabled = false;
-        });
-        return;
-      }
-    });
-  }
-
   function onOpen(){
     loadConfig();
     loadUsers();
     loadSubscriptionStats();
-    loadReferralEvent();
-    loadCoupons();
   }
 
   bindUserListEvents();
   bindGlobalBlockSave();
   bindRefresh();
   bindRevenueControls();
-  bindPrizeRowsEvents();
-  bindReferralEventSave();
-  bindCouponGenerate();
-  bindCouponListEvents();
 
   window.__sjAdmin = { onOpen: onOpen };
 })();
