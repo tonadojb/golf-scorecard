@@ -200,6 +200,18 @@ footer.credit{text-align:center;color:var(--muted);font-size:11px;padding:14px;}
 
 /* ---------------- User manual ---------------- */
 .sj-manual-modal{max-width:440px;}
+/* 2026-09-27 추가: 사용설명서 내용이 길어서 맨 아래까지 스크롤한 뒤 닫으려면
+   다시 위로 올려서 X를 눌러야 하는 불편함이 있었다. .sj-modal 자체가 스크롤
+   컨테이너(overflow:auto)이므로, 제목+닫기(X)를 한 줄로 묶어 position:sticky로
+   그 컨테이너 맨 위에 고정시켜서 어느 위치까지 스크롤해도 항상 보이게 한다.
+   (다른 모달의 .sj-close는 이 규칙의 영향을 받지 않도록 .sj-manual-modal
+   안에서만 float:none으로 덮어쓴다.) */
+.sj-manual-modal-head{position:sticky;top:0;z-index:5;background:#fff;display:flex;align-items:center;justify-content:space-between;gap:10px;padding-bottom:10px;margin-bottom:2px;}
+.sj-manual-modal-head h3{margin:0;}
+.sj-manual-modal .sj-close{float:none;flex:0 0 auto;}
+/* 위 sticky X와 별개로, 끝까지 다 읽은 사용자가 스크롤을 올리지 않고도 바로
+   닫을 수 있도록 맨 아래에도 닫기 버튼을 하나 더 둔다. */
+.sj-manual-close-btn{margin-top:14px;}
 .sj-manual{display:flex;flex-direction:column;gap:10px;margin-top:4px;}
 .sj-manual-section{background:#f5f6fc;border:1px solid #e5e7eb;border-radius:12px;padding:12px 14px;}
 .sj-manual-head{display:flex;align-items:center;gap:8px;margin-bottom:6px;}
