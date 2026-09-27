@@ -380,7 +380,7 @@ footer.credit{text-align:center;color:var(--muted);font-size:11px;padding:14px;}
    대부분의 input에는 그대로 둔다. 다만 관리자 전용 화면(방문자가 아닌 관리자
    본인만 쓰는 페이지)이고, 옆의 라벨/선택창(13px)에 비해 숫자만 유독 커
    보인다는 요청이 있어서 이 경품표 숫자 입력만 13px로 줄인다.*/
-.sj-admin-prize-row input.sj-admin-prize-days,.sj-admin-prize-row input.sj-admin-prize-weight{width:64px;flex:0 0 auto;padding:7px 6px;border:1px solid #ccc;border-radius:7px;font-size:13px;box-sizing:border-box;font-family:inherit;}
+.sj-admin-prize-row input.sj-admin-prize-days,.sj-admin-prize-row input.sj-admin-prize-weight{width:64px;flex:0 0 auto;padding:7px 6px;border:1px solid #ccc;border-radius:7px;font-size:10px;box-sizing:border-box;font-family:inherit;}
 .sj-admin-prize-remove-btn{flex:0 0 auto;border:none;border-radius:7px;padding:6px 9px;font-size:12px;font-weight:700;cursor:pointer;background:#fee2e2;color:#b91c1c;margin-left:auto;}
 
 /* ---------------- 관리자: 프로모션 쿠폰 발급/목록 (2026-09-26 추가) ----------------
@@ -391,9 +391,9 @@ footer.credit{text-align:center;color:var(--muted);font-size:11px;padding:14px;}
 .sj-admin-coupon-generate #sjAdminCouponPlan{width:auto;flex:0 0 auto;padding:6px 7px;border:1px solid #ccc;border-radius:7px;font-size:13px;box-sizing:border-box;font-family:inherit;}
 /* 2026-09-27 수정: 위 경품표와 같은 이유로, 옆의 메모 입력(13px)에 비해 유독
    커 보이던 일/개수/인원 숫자 입력을 13px로 줄인다. */
-.sj-admin-coupon-generate input.sj-admin-coupon-days{width:56px;flex:0 0 auto;padding:6px 7px;border:1px solid #ccc;border-radius:7px;font-size:13px;box-sizing:border-box;font-family:inherit;}
-.sj-admin-coupon-generate input.sj-admin-coupon-qty{width:56px;flex:0 0 auto;padding:6px 7px;border:1px solid #ccc;border-radius:7px;font-size:13px;box-sizing:border-box;font-family:inherit;}
-.sj-admin-coupon-generate input.sj-admin-coupon-maxuses{width:64px;flex:0 0 auto;padding:6px 7px;border:1px solid #ccc;border-radius:7px;font-size:13px;box-sizing:border-box;font-family:inherit;}
+.sj-admin-coupon-generate input.sj-admin-coupon-days{width:56px;flex:0 0 auto;padding:6px 7px;border:1px solid #ccc;border-radius:7px;font-size:10px;box-sizing:border-box;font-family:inherit;}
+.sj-admin-coupon-generate input.sj-admin-coupon-qty{width:56px;flex:0 0 auto;padding:6px 7px;border:1px solid #ccc;border-radius:7px;font-size:10px;box-sizing:border-box;font-family:inherit;}
+.sj-admin-coupon-generate input.sj-admin-coupon-maxuses{width:64px;flex:0 0 auto;padding:6px 7px;border:1px solid #ccc;border-radius:7px;font-size:10px;box-sizing:border-box;font-family:inherit;}
 .sj-admin-coupon-generate .sj-admin-coupon-note{width:auto;flex:1 1 160px;min-width:140px;padding:6px 8px;border:1px solid #ccc;border-radius:7px;font-size:13px;box-sizing:border-box;font-family:inherit;}
 .sj-admin-coupon-generate label{flex:0 0 100%;font-size:11.5px;color:#6b7a72;margin-top:2px;}
 .sj-admin-coupon-generate #sjAdminCouponExpires{flex:0 0 auto;}
@@ -401,7 +401,7 @@ footer.credit{text-align:center;color:var(--muted);font-size:11px;padding:14px;}
    .sj-modal input{font-size:16px} 전역 규칙(클래스+엘리먼트 선택자라 단일
    클래스보다 우선순위가 높음)보다 확실히 이기도록 .sj-modal과 묶은 2클래스
    선택자로 지정한다. */
-.sj-modal .sj-admin-compact-datetime{font-size:13px;padding:7px 8px;}
+.sj-modal .sj-admin-compact-datetime{font-size:10px;padding:7px 8px;}
 .sj-admin-coupon-generate .sj-primary{flex:0 0 100%;}
 .sj-admin-coupon-list{margin-top:10px;}
 .sj-admin-coupon-row{background:#fff;border:1px solid #e5e7eb;border-radius:8px;padding:9px 10px;margin-bottom:8px;}
