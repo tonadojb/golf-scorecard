@@ -166,7 +166,9 @@
     // 껐다면 즉시 반영).
     setFabVisible(!!(data && data.event && data.event.live));
     if(!data || !data.event || !data.event.live){
-      if(noEventEl) noEventEl.style.display = "";
+      // 2026-09-27 수정: "이벤트 없음" 문구는 서버가 실제로 그렇다고 확인해준
+      // 이 시점에만 세팅한다(onOpen에서는 "불러오는 중" 중립 문구만 보여줌).
+      if(noEventEl){ noEventEl.textContent = t("referralNoEventMsg"); noEventEl.style.display = ""; }
       if(bodyEl) bodyEl.style.display = "none";
       return;
     }
@@ -208,13 +210,18 @@
       return fetch(STATUS_URL, { headers: { "Authorization": "Bearer " + idToken } });
     }).then(function(res){ return res.json(); })
       .then(function(data){
-        var noEventEl = sj("sjReferralNoEvent");
-        if(noEventEl) noEventEl.textContent = t("referralNoEventMsg");
         renderStatus(data);
         return data;
       })
       .catch(function(e){
         console.error("추천 이벤트 상태 조회 실패", e);
+        // 2026-09-27 추가: 조회 자체가 실패했을 때 "불러오는 중" 문구가 그대로
+        // 남아있지 않도록, 이 경우도 "이벤트 없음/오류" 문구로 정리해준다(어차피
+        // 룰렛을 돌릴 수 없는 상태라는 점은 같다).
+        var noEventEl = sj("sjReferralNoEvent");
+        var bodyEl = sj("sjReferralBody");
+        if(noEventEl){ noEventEl.textContent = t("referralNoEventMsg"); noEventEl.style.display = ""; }
+        if(bodyEl) bodyEl.style.display = "none";
         return null;
       });
   }
@@ -301,6 +308,14 @@
     var copyStatusEl = sj("sjReferralCopyStatus");
     if(statusEl){ statusEl.className = "sj-status"; statusEl.textContent = ""; }
     if(copyStatusEl){ copyStatusEl.className = "sj-status"; copyStatusEl.textContent = ""; }
+    // 2026-09-27 추가: 모달을 열 때마다 우선 중립적인 "불러오는 중" 상태로
+    // 되돌려둔다. 그래야 직전에 열었을 때 "이벤트 없음"으로 표시돼 있던 상태가
+    // 서버 응답이 오기 전까지 그대로 남아있는 일이 없다(반대로 실제 이벤트가
+    // 있는데도 순간적으로 "없음" 문구가 먼저 보이는 깜빡임도 여기서 막힌다).
+    var noEventEl = sj("sjReferralNoEvent");
+    var bodyEl = sj("sjReferralBody");
+    if(noEventEl){ noEventEl.textContent = t("referralLoading"); noEventEl.style.display = ""; }
+    if(bodyEl) bodyEl.style.display = "none";
     refreshStatus();
   }
 
