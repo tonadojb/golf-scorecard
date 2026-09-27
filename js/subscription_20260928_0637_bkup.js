@@ -27,12 +27,7 @@
      콘솔에서 채널을 만들면 나오는 (심사 전이면 테스트) Channel Key로 교체해야
      실제로 결제가 된다. firebase-backend/functions/webBilling.js의
      PORTONE_CHANNEL_KEYS와 정확히 같은 값이어야 한다. */
-  /* 2026-09-28: 카드 결제대행사가 NHN KCP로 확정되어(포트원 PG 심사 진행 중)
-     카드 채널을 기존 "KG이니시스 테스트"(임시/플레이스홀더 채널)에서
-     "NHN KCP 테스트" 채널(공용 MID 사용)의 Channel Key로 교체했다. NHN KCP
-     실계약/심사 승인 후에는 이 값을 실연동(라이브) 채널의 Channel Key로
-     다시 교체해야 한다. */
-  var PORTONE_CHANNEL_KEY_CARD = "channel-key-ce81e8e0-5016-422a-9e8a-dfb00e07fe88";
+  var PORTONE_CHANNEL_KEY_CARD = "channel-key-9b1249e8-88bd-45d3-bb0f-ea684410cd9f";
   var PORTONE_CHANNEL_KEY_KAKAOPAY = "channel-key-KAKAOPAY_PLACEHOLDER";
   var PORTONE_CHANNEL_KEY_NAVERPAY = "channel-key-NAVERPAY_PLACEHOLDER";
 
