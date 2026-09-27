@@ -11,7 +11,7 @@
      있었을 가능성이 있습니다(정산하기 이후 화면이 확대된 채 안 풀리는
      문제). js 파일들처럼 styles.css를 고칠 때마다 이 버전 값도 반드시
      함께 올려주세요. -->
-<link rel="stylesheet" href="styles.css?v=20260927a">
+<link rel="stylesheet" href="styles.css?v=20260927c">
 
 </head>
 <body>
@@ -417,8 +417,13 @@
 </div></div>
 
 <div class="sj-modal-overlay" id="sjAdminModal"><div class="sj-modal sj-admin-modal">
-<button class="sj-close" data-close>×</button>
+<!-- 2026-09-27 추가: 사용설명서 모달과 같은 이유 -- 내용이 길어서 스크롤한 뒤
+     닫으려면 다시 위로 올려야 하는 불편함이 있었다. 제목+닫기(X)를 sticky
+     헤더로 묶어서 어디까지 스크롤해도 항상 닫을 수 있게 한다. -->
+<div class="sj-admin-modal-head">
 <h3 data-i18n="adminModalTitle">🛠 관리자 페이지</h3>
+<button class="sj-close" data-close>×</button>
+</div>
 <div class="sj-admin-global-card">
 <label class="sj-admin-toggle-row"><input type="checkbox" id="sjAdminGlobalBlockToggle"> <span data-i18n="adminGlobalToggleLabel">관리자 제외 전체 접속금지</span></label>
 <label data-i18n="adminBlockMsgLabel">접속금지 시 표시할 안내 메시지 (비워두면 "점검중입니다." 표시)</label>
@@ -460,9 +465,9 @@
 <label class="sj-admin-toggle-row"><input type="checkbox" id="sjAdminRefEventEnabled"> <span>이벤트 켜짐 (관리자 제외 사용자에게 노출)</span></label>
 <div id="sjAdminRefEventLiveBadge" style="font-size:12px;color:#666;margin-bottom:8px;"></div>
 <label>시작일시</label>
-<input type="datetime-local" id="sjAdminRefEventStart">
+<input type="datetime-local" id="sjAdminRefEventStart" class="sj-admin-compact-datetime">
 <label>종료일시</label>
-<input type="datetime-local" id="sjAdminRefEventEnd">
+<input type="datetime-local" id="sjAdminRefEventEnd" class="sj-admin-compact-datetime">
 <p style="font-size:11px;color:#9ca3af;margin:4px 0 10px;">※ 시작/종료일시를 바꾸면 새 이벤트로 취급되어 그동안 쌓인 사용자별 추천/스핀 기록이 초기화됩니다. 그냥 켰다 끄기만 하거나 경품표만 수정할 때는 초기화되지 않습니다.</p>
 <label>경품표 (확률은 상대 비율이라 합이 100이 아니어도 됩니다)</label>
 <div id="sjAdminRefPrizeRows"></div>
@@ -486,7 +491,7 @@
 <input type="number" id="sjAdminCouponMaxUses" class="sj-admin-coupon-maxuses" min="0" max="100000" value="1"><span>명까지(0=무제한)</span>
 <input type="text" id="sjAdminCouponNote" class="sj-admin-coupon-note" placeholder="메모 (예: OO채널 인플루언서)">
 <label>유효기한 (선택, 비워두면 무기한)</label>
-<input type="datetime-local" id="sjAdminCouponExpires">
+<input type="datetime-local" id="sjAdminCouponExpires" class="sj-admin-compact-datetime">
 <button type="button" class="sj-primary" id="sjAdminCouponGenerateBtn" style="margin-top:8px;">쿠폰 발급</button>
 <div class="sj-status" id="sjAdminCouponStatus"></div>
 </div>
