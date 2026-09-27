@@ -1,6 +1,6 @@
 var I18N = {
   ko:{
-    title:"Tonado_GolfScoreCard",
+    title:"⛳ Tonado_GolfScoreCard",
     subtitle:"스코어카드·정산·친구관리 올인원",
     courseNamePlaceholder:"골프장 이름을 입력하세요",
     courseSubPlaceholder:"코스(전반/후반) 예: 토마토,애플",
@@ -259,7 +259,7 @@ var I18N = {
     quotaFreeLeft:function(used, limit, left){ return "🆓 무료 스캔 "+used+"/"+limit+"회 사용 (남음 "+left+"회)"; },
     quotaCancelNote:function(date){ return " · 해지 예약됨 ("+date+"까지 이용 가능)"; },
     quotaManageBtn:"구독 관리",
-    footerTagline:'<div style="font-weight:700;font-size:13px;color:#374151;letter-spacing:.02em;display:flex;align-items:center;justify-content:center;gap:6px;"><img src="images/app-icon.png?v=1" alt="" style="width:16px;height:16px;border-radius:4px;display:block;">Tonado_GolfScoreCard</div><div style="margin-top:4px;font-size:11px;color:#9ca3af;line-height:1.6;">회원가입 후 저장하면 클라우드에 보관되어 언제든 다시 불러올 수 있어요<br>(로그인하지 않으면 이 기기에만 저장됩니다)</div>',
+    footerTagline:'<div style="font-weight:700;font-size:13px;color:#374151;letter-spacing:.02em;">⛳ Tonado_GolfScoreCard</div><div style="margin-top:4px;font-size:11px;color:#9ca3af;line-height:1.6;">회원가입 후 저장하면 클라우드에 보관되어 언제든 다시 불러올 수 있어요<br>(로그인하지 않으면 이 기기에만 저장됩니다)</div>',
     freeTrialBadge:"🆓 최초 20회, 평생 무료로 체험",
     freeTrialNote:"매달 초기화되지 않는 1회성 혜택입니다",
     pricingSectionLabel:"이후 이용료 (자동갱신)",
@@ -300,7 +300,7 @@ var I18N = {
     couponFail:function(msg){ return "쿠폰 등록에 실패했습니다: " + msg; }
   },
   en:{
-    title:"Tonado_GolfScoreCard",
+    title:"⛳ Tonado_GolfScoreCard",
     subtitle:"Scorecard · Bets · Friends",
     courseNamePlaceholder:"Enter course name",
     courseSubPlaceholder:"Nine names, e.g. Tomato, Apple",
@@ -554,7 +554,7 @@ var I18N = {
     quotaFreeLeft:function(used, limit, left){ return "🆓 Free scans used "+used+"/"+limit+" ("+left+" left)"; },
     quotaCancelNote:function(date){ return " · Cancellation scheduled (usable until "+date+")"; },
     quotaManageBtn:"Manage Subscription",
-    footerTagline:'<div style="font-weight:700;font-size:13px;color:#374151;letter-spacing:.02em;display:flex;align-items:center;justify-content:center;gap:6px;"><img src="images/app-icon.png?v=1" alt="" style="width:16px;height:16px;border-radius:4px;display:block;">Tonado_GolfScoreCard</div><div style="margin-top:4px;font-size:11px;color:#9ca3af;line-height:1.6;">Sign up and your rounds are saved to the cloud, so you can access them anytime<br>(without signing in, data is only saved on this device)</div>',
+    footerTagline:'<div style="font-weight:700;font-size:13px;color:#374151;letter-spacing:.02em;">⛳ Tonado_GolfScoreCard</div><div style="margin-top:4px;font-size:11px;color:#9ca3af;line-height:1.6;">Sign up and your rounds are saved to the cloud, so you can access them anytime<br>(without signing in, data is only saved on this device)</div>',
     freeTrialBadge:"🆓 First 20 scans free, for life",
     freeTrialNote:"A one-time benefit that never resets monthly",
     pricingSectionLabel:"Pricing after the trial (auto-renews)",
@@ -595,7 +595,7 @@ var I18N = {
     couponFail:function(msg){ return "Failed to redeem coupon: " + msg; }
   },
   ja:{
-    title:"Tonado_GolfScoreCard",
+    title:"⛳ Tonado_GolfScoreCard",
     subtitle:"スコア・精算・友達管理",
     courseNamePlaceholder:"コース名を入力してください",
     courseSubPlaceholder:"コース(前半/後半) 例: トマト、アップル",
@@ -849,7 +849,7 @@ var I18N = {
     quotaFreeLeft:function(used, limit, left){ return "🆓 無料スキャン "+used+"/"+limit+"回使用(残り"+left+"回)"; },
     quotaCancelNote:function(date){ return " · 解約予約済み("+date+"まで利用可能)"; },
     quotaManageBtn:"サブスクリプション管理",
-    footerTagline:'<div style="font-weight:700;font-size:13px;color:#374151;letter-spacing:.02em;display:flex;align-items:center;justify-content:center;gap:6px;"><img src="images/app-icon.png?v=1" alt="" style="width:16px;height:16px;border-radius:4px;display:block;">Tonado_GolfScoreCard</div><div style="margin-top:4px;font-size:11px;color:#9ca3af;line-height:1.6;">会員登録後に保存するとクラウドに保管され、いつでも呼び出せます<br>(ログインしない場合はこの端末にのみ保存されます)</div>',
+    footerTagline:'<div style="font-weight:700;font-size:13px;color:#374151;letter-spacing:.02em;">⛳ Tonado_GolfScoreCard</div><div style="margin-top:4px;font-size:11px;color:#9ca3af;line-height:1.6;">会員登録後に保存するとクラウドに保管され、いつでも呼び出せます<br>(ログインしない場合はこの端末にのみ保存されます)</div>',
     freeTrialBadge:"🆓 最初の20回、永久無料体験",
     freeTrialNote:"毎月リセットされない1回限りの特典です",
     pricingSectionLabel:"体験終了後の料金(自動更新)",
@@ -890,7 +890,7 @@ var I18N = {
     couponFail:function(msg){ return "クーポン登録に失敗しました: " + msg; }
   },
   zh:{
-    title:"Tonado_GolfScoreCard",
+    title:"⛳ Tonado_GolfScoreCard",
     subtitle:"记分卡·结算·好友管理",
     courseNamePlaceholder:"请输入球场名称",
     courseSubPlaceholder:"球道(前九/后九) 例: 番茄,苹果",
@@ -1144,7 +1144,7 @@ var I18N = {
     quotaFreeLeft:function(used, limit, left){ return "🆓 免费扫描已用"+used+"/"+limit+"次(剩余"+left+"次)"; },
     quotaCancelNote:function(date){ return " · 已预约取消(可使用至"+date+")"; },
     quotaManageBtn:"管理订阅",
-    footerTagline:'<div style="font-weight:700;font-size:13px;color:#374151;letter-spacing:.02em;display:flex;align-items:center;justify-content:center;gap:6px;"><img src="images/app-icon.png?v=1" alt="" style="width:16px;height:16px;border-radius:4px;display:block;">Tonado_GolfScoreCard</div><div style="margin-top:4px;font-size:11px;color:#9ca3af;line-height:1.6;">注册后保存的数据将存储在云端,可随时查看<br>(未登录时数据仅保存在本设备)</div>',
+    footerTagline:'<div style="font-weight:700;font-size:13px;color:#374151;letter-spacing:.02em;">⛳ Tonado_GolfScoreCard</div><div style="margin-top:4px;font-size:11px;color:#9ca3af;line-height:1.6;">注册后保存的数据将存储在云端,可随时查看<br>(未登录时数据仅保存在本设备)</div>',
     freeTrialBadge:"🆓 首次20次,永久免费体验",
     freeTrialNote:"这是不会每月重置的一次性权益",
     pricingSectionLabel:"体验结束后的费用(自动续费)",
@@ -1248,8 +1248,7 @@ function relocalizeDefaultPlayerNames(){
 function applyStaticTranslations(){
   document.documentElement.lang = state.lang;
   document.title = t('title');
-  var appTitleSpan = document.querySelector('#appTitle .app-title-text');
-  if(appTitleSpan) appTitleSpan.textContent = t('title'); else document.getElementById('appTitle').textContent = t('title');
+  document.getElementById('appTitle').textContent = t('title');
   document.getElementById('courseName').placeholder = t('courseNamePlaceholder');
   document.getElementById('courseSub').placeholder = t('courseSubPlaceholder');
   document.getElementById('tabSetupBtn').textContent = t('tabSetup');
