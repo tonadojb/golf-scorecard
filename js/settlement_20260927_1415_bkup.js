@@ -437,22 +437,6 @@ function buildSettlementImageBlob(){
   wrap.style.background = '#ffffff';
   wrap.style.padding = '18px';
   wrap.innerHTML = buildSettlementCaptureHtml(team, data, settlementCurrentGlobalStake);
-
-  /* 2026-09-27 추가: 정산 결과 이미지만 봐서는 어느 앱에서 만들었는지 알 수
-     없다는 피드백에 따라, 우측 상단에 앱 이름을 작게 워터마크로 남긴다.
-     화면에는 보이지 않고 캡쳐(html2canvas) 결과물에만 찍힌다. */
-  var settlementWatermark = document.createElement('div');
-  settlementWatermark.textContent = 'Tonado_GolfScoreCard';
-  settlementWatermark.style.position = 'absolute';
-  settlementWatermark.style.top = '10px';
-  settlementWatermark.style.right = '14px';
-  settlementWatermark.style.fontSize = '10px';
-  settlementWatermark.style.fontWeight = '700';
-  settlementWatermark.style.color = '#b7bad0';
-  settlementWatermark.style.letterSpacing = '.01em';
-  settlementWatermark.style.pointerEvents = 'none';
-  wrap.appendChild(settlementWatermark);
-
   document.body.appendChild(wrap);
 
   return html2canvas(wrap, { backgroundColor: '#ffffff', scale: 2 }).then(function(canvas){

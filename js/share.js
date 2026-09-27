@@ -106,6 +106,21 @@ function buildResultImageBlob(){
     }
   });
 
+  /* 2026-09-27 추가: 캡쳐 이미지만 봐서는 어느 앱에서 만들었는지 알 수 없다는
+     피드백에 따라, 우측 상단에 앱 이름을 작게 워터마크로 남긴다. 화면에는
+     보이지 않고 캡쳐(html2canvas) 결과물에만 찍힌다. */
+  var resultWatermark = document.createElement('div');
+  resultWatermark.textContent = 'Tonado_GolfScoreCard';
+  resultWatermark.style.position = 'absolute';
+  resultWatermark.style.top = '10px';
+  resultWatermark.style.right = '14px';
+  resultWatermark.style.fontSize = '10px';
+  resultWatermark.style.fontWeight = '700';
+  resultWatermark.style.color = '#b7bad0';
+  resultWatermark.style.letterSpacing = '.01em';
+  resultWatermark.style.pointerEvents = 'none';
+  clone.appendChild(resultWatermark);
+
   document.body.appendChild(clone);
 
   return html2canvas(clone, {backgroundColor:'#ffffff', scale:2}).then(function(canvas){
