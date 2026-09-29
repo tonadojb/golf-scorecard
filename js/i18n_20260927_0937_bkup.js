@@ -1,6 +1,6 @@
 var I18N = {
   ko:{
-    title:"Tonado_GolfScoreCard",
+    title:"⛳ Tonado_GolfScoreCard",
     subtitle:"스코어카드·정산·친구관리 올인원",
     courseNamePlaceholder:"골프장 이름을 입력하세요",
     courseSubPlaceholder:"코스(전반/후반) 예: 토마토,애플",
@@ -157,13 +157,13 @@ var I18N = {
     manualOcrTitle:"사진으로 스코어 인식",
     manualOcrDesc:'오른쪽 아래 <b>📷</b> 버튼으로 스코어카드 사진을 팀별로 한 장씩 올리고 "분석 시작"을 누르면 자동으로 스코어가 입력돼요.',
     manualOcrStep1:'<b>My 선택</b>: 본인 스코어를 표시해요. 보통 첫 줄이 자동으로 선택되지만, 본인 사진이 아니라면 다른 사람을 눌러 바꿀 수 있어요.',
-    manualOcrStep2:'<b>선택 재검토</b>: 스코어가 잘못 인식된 선수만 체크하고 눌러서 같은 사진을 다시 정밀 분석해요. (재검토도 새로운 스캔과 동일하게 <b>이용 횟수 1회가 차감</b>돼요)',
+    manualOcrStep2:'<b>선택 재검토</b>: 스코어가 잘못 인식된 선수만 체크하고 눌러서 같은 사진을 다시 정밀 분석해요.',
     manualOcrStep3:'<b>재검토 Pass (저장)</b>: 수정할 부분이 없다면 이 버튼으로 바로 창을 닫을 수 있어요.',
     manualOcrStep4:'<b>나중에 다시 수정하려면</b>: 저장한 뒤에도 📂 불러오기 목록의 <b>✏ 수정</b> 버튼으로 스코어와 My 지정을 언제든 바꿀 수 있어요.',
     manualWarningTitle:"업로드 시 주의사항",
     manualWarningDesc:'스코어카드가 아닌 사진(인물, 풍경 등 관계없는 사진)을 올리면 <b>경고 팝업</b>이 뜨고, 경고가 <b>2회</b> 누적된 뒤 <b>3번째</b>로 다시 올리면 자동으로 <b>접속이 차단</b>돼요. 반드시 실제 스코어카드 사진만 올려주세요.',
     manualSubTitle:"스캔 이용권 (무료 · 베이직 · 프로)",
-    manualSubDesc:'로그인 계정당 평생 <b>20회</b>까지 사진 스캔을 무료로 쓸 수 있어요. 다 쓰면 <b>베이직</b>(매달 6회 스캔) 또는 <b>프로</b>(무제한 스캔) 중 골라 구독할 수 있어요. 결제 방식은 이용 기기마다 달라요: <b>iOS 앱</b>은 App Store 결제(카드·통신사 결제 등 애플이 지원하는 수단, 최근 네이버페이도 Apple 계정에 등록 가능), <b>Android 앱</b>은 Google Play 결제(카드·카카오페이·네이버페이 등 선택 가능), <b>PC·웹</b>은 카드·카카오페이·네이버페이로 결제해요. 결제 시점부터 <b>30일간</b> 서비스가 제공되고, 이후 <b>결제일 기준 30일마다</b> 자동으로 갱신(재결제)돼요. 구독 안내 창에서 <b>구매 복원</b>·<b>구독 해지</b>도 언제든 가능해요.',
+    manualSubDesc:'로그인 계정당 평생 <b>20회</b>까지 사진 스캔을 무료로 쓸 수 있어요. 다 쓰면 <b>베이직</b>(매달 6회 스캔) 또는 <b>프로</b>(무제한 스캔) 중 골라 구독할 수 있어요. 결제 방식은 이용 기기마다 달라요: <b>iOS 앱</b>은 App Store 결제(카드·통신사 결제 등 애플이 지원하는 수단, 최근 네이버페이도 Apple 계정에 등록 가능), <b>Android 앱</b>은 Google Play 결제(카드·카카오페이·네이버페이 등 선택 가능), <b>PC·웹</b>은 카드·카카오페이·네이버페이로 결제해요. 구독 안내 창에서 <b>구매 복원</b>·<b>구독 해지</b>도 언제든 가능해요.',
     manualResultTitle:"결과 확인 & 공유",
     manualResultDesc:'<b>결과</b> 탭에서 팀별 · 순위별로 전체 스코어를 확인할 수 있고, 표를 옆으로 밀면 18홀까지 모두 볼 수 있어요. <b>결과 복사하기</b>를 누르면 이미지로 만들어져 카카오톡이나 SNS에 바로 붙여넣을 수 있어요.',
     manualSettlementTitle:"내기 골프 정산",
@@ -215,14 +215,6 @@ var I18N = {
        처리한다(js/subscription.js의 priceMonthly 호출부 참고). */
     paywallTitle:"💳 구독 안내",
     paywallDefaultReason:"구독하면 계속 스캔할 수 있어요.",
-    /* 2026-09-29 추가: 카카오페이 정기결제 심사 보완사항 -- "결제일 기준 30일
-       자동갱신"과 "구독 후 서비스 기간"이 구독 안내 화면에 명시돼 있지 않다는
-       지적에 따라 추가. firebase-backend/functions/subscription.js의
-       PLAN_DEFS.billingDays(=30)와 webBilling.js의 실제 재청구 로직을 그대로
-       반영한 문구 -- "매월 같은 날짜"가 아니라 "결제일로부터 30일마다"가 맞다
-       (예: 1월 31일 결제 시 다음 결제일은 2월 28일/3월 2일 등으로, 매달 정확히
-       같은 날짜가 아님). 절대로 이 문구를 실제 재청구 주기와 다르게 고치지 말 것. */
-    paywallRenewalNotice:"결제 시점부터 <b>30일간</b> 서비스가 제공되며, 이후에는 <b>결제일 기준 30일마다</b> 등록하신 결제수단으로 자동 갱신(재결제)돼요. 구독을 해지해도 이미 결제한 기간이 끝나는 날짜까지는 계속 이용할 수 있어요.",
     payMethodCard:"카드",
     payMethodKakao:"카카오페이",
     payMethodNaver:"네이버페이",
@@ -267,7 +259,7 @@ var I18N = {
     quotaFreeLeft:function(used, limit, left){ return "🆓 무료 스캔 "+used+"/"+limit+"회 사용 (남음 "+left+"회)"; },
     quotaCancelNote:function(date){ return " · 해지 예약됨 ("+date+"까지 이용 가능)"; },
     quotaManageBtn:"구독 관리",
-    footerTagline:'<div style="font-weight:700;font-size:13px;color:#374151;letter-spacing:.02em;display:flex;align-items:center;justify-content:center;gap:6px;"><img src="images/app-icon.png?v=1" alt="" style="width:16px;height:16px;border-radius:4px;display:block;">Tonado_GolfScoreCard</div><div style="margin-top:4px;font-size:11px;color:#9ca3af;line-height:1.6;">회원가입 후 저장하면 클라우드에 보관되어 언제든 다시 불러올 수 있어요<br>(로그인하지 않으면 이 기기에만 저장됩니다)</div>',
+    footerTagline:'<div style="font-weight:700;font-size:13px;color:#374151;letter-spacing:.02em;">⛳ Tonado_GolfScoreCard</div><div style="margin-top:4px;font-size:11px;color:#9ca3af;line-height:1.6;">회원가입 후 저장하면 클라우드에 보관되어 언제든 다시 불러올 수 있어요<br>(로그인하지 않으면 이 기기에만 저장됩니다)</div>',
     freeTrialBadge:"🆓 최초 20회, 평생 무료로 체험",
     freeTrialNote:"매달 초기화되지 않는 1회성 혜택입니다",
     pricingSectionLabel:"이후 이용료 (자동갱신)",
@@ -277,7 +269,6 @@ var I18N = {
     bizInfoHtml:'<div style="font-weight:700;font-size:12px;color:#374151;margin-bottom:6px;">스카이장랩스 (SkyJANG Labs)</div><div style="font-size:11px;color:#9ca3af;line-height:1.8;">대표 장중배 · 사업자등록번호 320-01-04154<br>경기도 안양시 동안구 시민대로 109, 공장동 20층 2008호<br>(호계동, 에이스하이테크시티범계)<br>통신판매업신고번호 발급 진행중 · 010-3926-4502<br><a href="mailto:manager@skyjang.com" style="color:#9ca3af;text-decoration:underline;">manager@skyjang.com</a></div>',
     referralFabTitle:"친구추천 이벤트",
     referralModalTitle:"🎁 친구추천 이벤트",
-    referralLoading:"불러오는 중...",
     referralNoEventMsg:"현재 진행중인 친구추천 이벤트가 없어요",
     referralLinkLabel:"내 추천 링크",
     referralCopyBtn:"복사",
@@ -308,7 +299,7 @@ var I18N = {
     couponFail:function(msg){ return "쿠폰 등록에 실패했습니다: " + msg; }
   },
   en:{
-    title:"Tonado_GolfScoreCard",
+    title:"⛳ Tonado_GolfScoreCard",
     subtitle:"Scorecard · Bets · Friends",
     courseNamePlaceholder:"Enter course name",
     courseSubPlaceholder:"Nine names, e.g. Tomato, Apple",
@@ -465,13 +456,13 @@ var I18N = {
     manualOcrTitle:"Recognize Score from a Photo",
     manualOcrDesc:'Tap the <b>📷</b> button in the bottom right, upload one scorecard photo per team, and tap "Start Analysis" to have the scores entered automatically.',
     manualOcrStep1:'<b>My selection</b>: Marks your own score. The first row is picked by default, but you can tap another player if the photo wasn\'t yours.',
-    manualOcrStep2:'<b>Re-check Selected</b>: Check only the players whose scores were misread, then tap this to re-analyze the same photo more carefully. (A re-check also uses up <b>1 scan</b>, just like a new scan)',
+    manualOcrStep2:'<b>Re-check Selected</b>: Check only the players whose scores were misread, then tap this to re-analyze the same photo more carefully.',
     manualOcrStep3:'<b>Skip Re-check (Save)</b>: If nothing needs fixing, use this button to close the window right away.',
     manualOcrStep4:'<b>To fix it again later</b>: After saving, you can still change the score and My selection anytime with the <b>✏ Edit</b> button in the 📂 Load list.',
     manualWarningTitle:"Upload Warning",
     manualWarningDesc:'Uploading a photo that isn\'t a scorecard (a person, a landscape, or anything unrelated) triggers a <b>warning popup</b>. After <b>2 warnings</b>, uploading one again a <b>3rd time</b> automatically <b>blocks your access</b>. Please only upload real scorecard photos.',
     manualSubTitle:"Scan Plan (Free · Basic · Pro)",
-    manualSubDesc:'Each account gets <b>20</b> free photo scans for life. Once used up, subscribe to <b>Basic</b> (6 scans/month) or <b>Pro</b> (unlimited scans). Payment method depends on your device: <b>iOS app</b> uses App Store payment (card, carrier billing, and Naver Pay can now be added as an Apple ID payment method too), <b>Android app</b> uses Google Play payment (card, KakaoPay, NaverPay, and more), and <b>PC/web</b> uses card, KakaoPay, or NaverPay. Each payment covers <b>30 days</b> of service, and it then automatically renews every <b>30 days from your payment date</b>. You can <b>restore a purchase</b> or <b>cancel your subscription</b> anytime from the subscription screen.',
+    manualSubDesc:'Each account gets <b>20</b> free photo scans for life. Once used up, subscribe to <b>Basic</b> (6 scans/month) or <b>Pro</b> (unlimited scans). Payment method depends on your device: <b>iOS app</b> uses App Store payment (card, carrier billing, and Naver Pay can now be added as an Apple ID payment method too), <b>Android app</b> uses Google Play payment (card, KakaoPay, NaverPay, and more), and <b>PC/web</b> uses card, KakaoPay, or NaverPay. You can <b>restore a purchase</b> or <b>cancel your subscription</b> anytime from the subscription screen.',
     manualResultTitle:"View & Share Results",
     manualResultDesc:'The <b>Results</b> tab shows the full scores by team or by ranking, and you can swipe the table sideways to see all 18 holes. Tap <b>Copy Results</b> to turn it into an image you can paste straight into KakaoTalk or social media.',
     manualSettlementTitle:"Betting Settlement",
@@ -518,7 +509,6 @@ var I18N = {
 
     paywallTitle:"💳 Subscribe",
     paywallDefaultReason:"Subscribe to keep scanning.",
-    paywallRenewalNotice:"Your plan provides <b>30 days</b> of service from the moment you pay, and then automatically renews every <b>30 days from your payment date</b> by charging your saved payment method. If you cancel, you can keep using it until the end of the period you've already paid for.",
     payMethodCard:"Card",
     payMethodKakao:"KakaoPay",
     payMethodNaver:"NaverPay",
@@ -563,7 +553,7 @@ var I18N = {
     quotaFreeLeft:function(used, limit, left){ return "🆓 Free scans used "+used+"/"+limit+" ("+left+" left)"; },
     quotaCancelNote:function(date){ return " · Cancellation scheduled (usable until "+date+")"; },
     quotaManageBtn:"Manage Subscription",
-    footerTagline:'<div style="font-weight:700;font-size:13px;color:#374151;letter-spacing:.02em;display:flex;align-items:center;justify-content:center;gap:6px;"><img src="images/app-icon.png?v=1" alt="" style="width:16px;height:16px;border-radius:4px;display:block;">Tonado_GolfScoreCard</div><div style="margin-top:4px;font-size:11px;color:#9ca3af;line-height:1.6;">Sign up and your rounds are saved to the cloud, so you can access them anytime<br>(without signing in, data is only saved on this device)</div>',
+    footerTagline:'<div style="font-weight:700;font-size:13px;color:#374151;letter-spacing:.02em;">⛳ Tonado_GolfScoreCard</div><div style="margin-top:4px;font-size:11px;color:#9ca3af;line-height:1.6;">Sign up and your rounds are saved to the cloud, so you can access them anytime<br>(without signing in, data is only saved on this device)</div>',
     freeTrialBadge:"🆓 First 20 scans free, for life",
     freeTrialNote:"A one-time benefit that never resets monthly",
     pricingSectionLabel:"Pricing after the trial (auto-renews)",
@@ -573,7 +563,6 @@ var I18N = {
     bizInfoHtml:'<div style="font-weight:700;font-size:12px;color:#374151;margin-bottom:6px;">SkyJANG Labs</div><div style="font-size:11px;color:#9ca3af;line-height:1.8;">CEO 장중배 · Business Reg. No. 320-01-04154<br>경기도 안양시 동안구 시민대로 109, 공장동 20층 2008호<br>(호계동, 에이스하이테크시티범계)<br>Mail-order business registration: pending · +82 10-3926-4502<br><a href="mailto:manager@skyjang.com" style="color:#9ca3af;text-decoration:underline;">manager@skyjang.com</a></div>',
     referralFabTitle:"Referral event",
     referralModalTitle:"🎁 Friend Referral Event",
-    referralLoading:"Loading...",
     referralNoEventMsg:"There is no referral event running right now",
     referralLinkLabel:"My referral link",
     referralCopyBtn:"Copy",
@@ -604,7 +593,7 @@ var I18N = {
     couponFail:function(msg){ return "Failed to redeem coupon: " + msg; }
   },
   ja:{
-    title:"Tonado_GolfScoreCard",
+    title:"⛳ Tonado_GolfScoreCard",
     subtitle:"スコア・精算・友達管理",
     courseNamePlaceholder:"コース名を入力してください",
     courseSubPlaceholder:"コース(前半/後半) 例: トマト、アップル",
@@ -761,13 +750,13 @@ var I18N = {
     manualOcrTitle:"写真でスコア認識",
     manualOcrDesc:'右下の<b>📷</b>ボタンでチームごとにスコアカード写真を1枚アップロードし、「分析開始」を押すと自動でスコアが入力されます。',
     manualOcrStep1:'<b>My選択</b>: 自分のスコアを表示します。通常は1行目が自動で選択されますが、自分の写真でない場合は他の人をタップして変更できます。',
-    manualOcrStep2:'<b>選択した項目を再確認</b>: スコアが誤って認識されたプレイヤーだけチェックして押すと、同じ写真を再度精密に分析します。(再確認も新しいスキャンと同様に<b>利用回数が1回消費</b>されます)',
+    manualOcrStep2:'<b>選択した項目を再確認</b>: スコアが誤って認識されたプレイヤーだけチェックして押すと、同じ写真を再度精密に分析します。',
     manualOcrStep3:'<b>再確認をスキップ(保存)</b>: 修正する箇所がなければ、このボタンでそのままウィンドウを閉じられます。',
     manualOcrStep4:'<b>後で修正したい場合</b>: 保存した後でも📂読み込みリストの<b>✏ 修正</b>ボタンでスコアとMy指定をいつでも変更できます。',
     manualWarningTitle:"アップロード時の注意事項",
     manualWarningDesc:'スコアカードではない写真(人物、風景など無関係な写真)をアップロードすると<b>警告ポップアップ</b>が表示されます。警告が<b>2回</b>累積した後、<b>3回目</b>にも同様の写真をアップロードすると、自動的に<b>アクセスが禁止</b>されます。必ず実際のスコアカード写真のみをアップロードしてください。',
     manualSubTitle:"スキャン利用権(無料・ベーシック・プロ)",
-    manualSubDesc:'アカウントごとに生涯<b>20回</b>まで写真スキャンを無料で使えます。使い切ったら<b>ベーシック</b>(毎月6回スキャン)または<b>プロ</b>(無制限スキャン)を選んで登録できます。決済方法は端末によって異なります: <b>iOSアプリ</b>はApp Store決済(カード・キャリア決済など。最近はNaver PayもApple IDの支払い方法として登録可能)、<b>Androidアプリ</b>はGoogle Play決済(カード・Kakao Pay・Naver Payなど選択可能)、<b>PC・Web</b>はカード・Kakao Pay・Naver Payで決済します。決済時点から<b>30日間</b>サービスが提供され、以降は<b>決済日から30日ごと</b>に自動更新(再請求)されます。サブスクリプション画面から<b>購入の復元</b>・<b>解約</b>もいつでも可能です。',
+    manualSubDesc:'アカウントごとに生涯<b>20回</b>まで写真スキャンを無料で使えます。使い切ったら<b>ベーシック</b>(毎月6回スキャン)または<b>プロ</b>(無制限スキャン)を選んで登録できます。決済方法は端末によって異なります: <b>iOSアプリ</b>はApp Store決済(カード・キャリア決済など。最近はNaver PayもApple IDの支払い方法として登録可能)、<b>Androidアプリ</b>はGoogle Play決済(カード・Kakao Pay・Naver Payなど選択可能)、<b>PC・Web</b>はカード・Kakao Pay・Naver Payで決済します。サブスクリプション画面から<b>購入の復元</b>・<b>解約</b>もいつでも可能です。',
     manualResultTitle:"結果確認 & 共有",
     manualResultDesc:'<b>結果</b>タブでチーム別・順位別に全スコアを確認でき、表を横にスワイプすると18ホールまですべて見られます。<b>結果をコピー</b>を押すと画像が作成され、KakaoTalkやSNSにそのまま貼り付けられます。',
     manualSettlementTitle:"賭けゴルフ精算",
@@ -814,7 +803,6 @@ var I18N = {
 
     paywallTitle:"💳 サブスクリプション案内",
     paywallDefaultReason:"登録するとスキャンを続けられます。",
-    paywallRenewalNotice:"決済時点から<b>30日間</b>サービスをご利用いただけ、以降は<b>決済日から30日ごと</b>に登録された決済手段で自動的に更新(再請求)されます。解約しても、すでに決済済みの期間が終了する日までは引き続きご利用いただけます。",
     payMethodCard:"カード",
     payMethodKakao:"カカオペイ",
     payMethodNaver:"ネイバーペイ",
@@ -859,7 +847,7 @@ var I18N = {
     quotaFreeLeft:function(used, limit, left){ return "🆓 無料スキャン "+used+"/"+limit+"回使用(残り"+left+"回)"; },
     quotaCancelNote:function(date){ return " · 解約予約済み("+date+"まで利用可能)"; },
     quotaManageBtn:"サブスクリプション管理",
-    footerTagline:'<div style="font-weight:700;font-size:13px;color:#374151;letter-spacing:.02em;display:flex;align-items:center;justify-content:center;gap:6px;"><img src="images/app-icon.png?v=1" alt="" style="width:16px;height:16px;border-radius:4px;display:block;">Tonado_GolfScoreCard</div><div style="margin-top:4px;font-size:11px;color:#9ca3af;line-height:1.6;">会員登録後に保存するとクラウドに保管され、いつでも呼び出せます<br>(ログインしない場合はこの端末にのみ保存されます)</div>',
+    footerTagline:'<div style="font-weight:700;font-size:13px;color:#374151;letter-spacing:.02em;">⛳ Tonado_GolfScoreCard</div><div style="margin-top:4px;font-size:11px;color:#9ca3af;line-height:1.6;">会員登録後に保存するとクラウドに保管され、いつでも呼び出せます<br>(ログインしない場合はこの端末にのみ保存されます)</div>',
     freeTrialBadge:"🆓 最初の20回、永久無料体験",
     freeTrialNote:"毎月リセットされない1回限りの特典です",
     pricingSectionLabel:"体験終了後の料金(自動更新)",
@@ -869,7 +857,6 @@ var I18N = {
     bizInfoHtml:'<div style="font-weight:700;font-size:12px;color:#374151;margin-bottom:6px;">SkyJANG Labs</div><div style="font-size:11px;color:#9ca3af;line-height:1.8;">代表 장중배 · 事業者登録番号 320-01-04154<br>경기도 안양시 동안구 시민대로 109, 공장동 20층 2008호<br>(호계동, 에이스하이테크시티범계)<br>通信販売業申告番号 発給手続き中 · +82 10-3926-4502<br><a href="mailto:manager@skyjang.com" style="color:#9ca3af;text-decoration:underline;">manager@skyjang.com</a></div>',
     referralFabTitle:"友達紹介イベント",
     referralModalTitle:"🎁 友達紹介イベント",
-    referralLoading:"読み込み中...",
     referralNoEventMsg:"現在進行中の友達紹介イベントはありません",
     referralLinkLabel:"マイ紹介リンク",
     referralCopyBtn:"コピー",
@@ -900,7 +887,7 @@ var I18N = {
     couponFail:function(msg){ return "クーポン登録に失敗しました: " + msg; }
   },
   zh:{
-    title:"Tonado_GolfScoreCard",
+    title:"⛳ Tonado_GolfScoreCard",
     subtitle:"记分卡·结算·好友管理",
     courseNamePlaceholder:"请输入球场名称",
     courseSubPlaceholder:"球道(前九/后九) 例: 番茄,苹果",
@@ -1057,13 +1044,13 @@ var I18N = {
     manualOcrTitle:"通过照片识别成绩",
     manualOcrDesc:'点击右下角的<b>📷</b>按钮,为每支队伍上传一张记分卡照片,点击"开始分析"即可自动录入成绩。',
     manualOcrStep1:'<b>My 选择</b>:标记本人的成绩。默认自动选中第一行,如果照片不是本人的,可以点击其他人进行更改。',
-    manualOcrStep2:'<b>重新检查所选</b>:只勾选识别错误的球员并点击此按钮,即可对同一张照片重新进行精细分析。(重新检查也会像新扫描一样<b>扣除1次使用次数</b>)',
+    manualOcrStep2:'<b>重新检查所选</b>:只勾选识别错误的球员并点击此按钮,即可对同一张照片重新进行精细分析。',
     manualOcrStep3:'<b>跳过重新检查(保存)</b>:如果没有需要修改的地方,可用此按钮直接关闭窗口。',
     manualOcrStep4:'<b>之后想再修改</b>:保存后仍可通过📂加载列表中的<b>✏ 编辑</b>按钮随时修改成绩和 My 指定。',
     manualWarningTitle:"上传注意事项",
     manualWarningDesc:'上传非记分卡照片(人物、风景等无关照片)时会弹出<b>警告提示</b>。累计警告<b>2次</b>后,<b>第3次</b>再次上传时将自动<b>封禁访问权限</b>。请务必只上传真实的记分卡照片。',
     manualSubTitle:"扫描套餐(免费 · 基础版 · 专业版)",
-    manualSubDesc:'每个账号终身可免费使用<b>20次</b>照片扫描。用完后可订阅<b>基础版</b>(每月6次扫描)或<b>专业版</b>(无限扫描)。付款方式因设备而异:<b>iOS应用</b>通过App Store付款(信用卡、运营商代扣等,最近还可将NaverPay添加为Apple ID付款方式),<b>Android应用</b>通过Google Play付款(可选信用卡·KakaoPay·NaverPay等),<b>电脑/网页版</b>可用信用卡·KakaoPay·NaverPay付款。每次付款可使用<b>30天</b>服务,此后将<b>每30天(以付款日为准)</b>自动续费(重新扣款)。在订阅页面随时可以<b>恢复购买</b>或<b>取消订阅</b>。',
+    manualSubDesc:'每个账号终身可免费使用<b>20次</b>照片扫描。用完后可订阅<b>基础版</b>(每月6次扫描)或<b>专业版</b>(无限扫描)。付款方式因设备而异:<b>iOS应用</b>通过App Store付款(信用卡、运营商代扣等,最近还可将NaverPay添加为Apple ID付款方式),<b>Android应用</b>通过Google Play付款(可选信用卡·KakaoPay·NaverPay等),<b>电脑/网页版</b>可用信用卡·KakaoPay·NaverPay付款。在订阅页面随时可以<b>恢复购买</b>或<b>取消订阅</b>。',
     manualResultTitle:"查看结果 & 分享",
     manualResultDesc:'在<b>结果</b>标签页可按队伍或排名查看全部成绩,左右滑动表格可查看全部18洞。点击<b>复制结果</b>会生成图片,可直接粘贴到 KakaoTalk 或社交媒体。',
     manualSettlementTitle:"打赌结算",
@@ -1110,7 +1097,6 @@ var I18N = {
 
     paywallTitle:"💳 订阅说明",
     paywallDefaultReason:"订阅后即可继续扫描。",
-    paywallRenewalNotice:"自付款之时起可使用<b>30天</b>服务,此后将<b>每30天(以付款日为准)</b>使用您登记的支付方式自动续费(重新扣款)。即使取消订阅,在已付款的当前周期结束日之前仍可继续使用。",
     payMethodCard:"信用卡",
     payMethodKakao:"KakaoPay",
     payMethodNaver:"NaverPay",
@@ -1155,7 +1141,7 @@ var I18N = {
     quotaFreeLeft:function(used, limit, left){ return "🆓 免费扫描已用"+used+"/"+limit+"次(剩余"+left+"次)"; },
     quotaCancelNote:function(date){ return " · 已预约取消(可使用至"+date+")"; },
     quotaManageBtn:"管理订阅",
-    footerTagline:'<div style="font-weight:700;font-size:13px;color:#374151;letter-spacing:.02em;display:flex;align-items:center;justify-content:center;gap:6px;"><img src="images/app-icon.png?v=1" alt="" style="width:16px;height:16px;border-radius:4px;display:block;">Tonado_GolfScoreCard</div><div style="margin-top:4px;font-size:11px;color:#9ca3af;line-height:1.6;">注册后保存的数据将存储在云端,可随时查看<br>(未登录时数据仅保存在本设备)</div>',
+    footerTagline:'<div style="font-weight:700;font-size:13px;color:#374151;letter-spacing:.02em;">⛳ Tonado_GolfScoreCard</div><div style="margin-top:4px;font-size:11px;color:#9ca3af;line-height:1.6;">注册后保存的数据将存储在云端,可随时查看<br>(未登录时数据仅保存在本设备)</div>',
     freeTrialBadge:"🆓 首次20次,永久免费体验",
     freeTrialNote:"这是不会每月重置的一次性权益",
     pricingSectionLabel:"体验结束后的费用(自动续费)",
@@ -1165,7 +1151,6 @@ var I18N = {
     bizInfoHtml:'<div style="font-weight:700;font-size:12px;color:#374151;margin-bottom:6px;">SkyJANG Labs</div><div style="font-size:11px;color:#9ca3af;line-height:1.8;">代表人 장중배 · 营业执照号 320-01-04154<br>경기도 안양시 동안구 시민대로 109, 공장동 20층 2008호<br>(호계동, 에이스하이테크시티범계)<br>邮购业申报号办理中 · +82 10-3926-4502<br><a href="mailto:manager@skyjang.com" style="color:#9ca3af;text-decoration:underline;">manager@skyjang.com</a></div>',
     referralFabTitle:"好友推荐活动",
     referralModalTitle:"🎁 好友推荐活动",
-    referralLoading:"加载中...",
     referralNoEventMsg:"目前没有进行中的好友推荐活动",
     referralLinkLabel:"我的推荐链接",
     referralCopyBtn:"复制",
@@ -1259,8 +1244,7 @@ function relocalizeDefaultPlayerNames(){
 function applyStaticTranslations(){
   document.documentElement.lang = state.lang;
   document.title = t('title');
-  var appTitleSpan = document.querySelector('#appTitle .app-title-text');
-  if(appTitleSpan) appTitleSpan.textContent = t('title'); else document.getElementById('appTitle').textContent = t('title');
+  document.getElementById('appTitle').textContent = t('title');
   document.getElementById('courseName').placeholder = t('courseNamePlaceholder');
   document.getElementById('courseSub').placeholder = t('courseSubPlaceholder');
   document.getElementById('tabSetupBtn').textContent = t('tabSetup');

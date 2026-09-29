@@ -1,0 +1,46 @@
+{
+  "project_info": {
+    "project_number": "162951012751",
+    "project_id": "skyjang-golfscore",
+    "storage_bucket": "skyjang-golfscore.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:162951012751:android:e71fa777bc48db1da02bfa",
+        "android_client_info": {
+          "package_name": "com.skyjang.golfscorecard"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "162951012751-2k3b2tofm6o3qs034ija8rcjmb5nt7gi.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyD6ebj3Hp-IelPT-pW1SYlEaHrT9W_GpZc"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "162951012751-2k3b2tofm6o3qs034ija8rcjmb5nt7gi.apps.googleusercontent.com",
+              "client_type": 3
+            },
+            {
+              "client_id": "162951012751-07p9m28h5s0gfqvlc1hvqqumbtjul28d.apps.googleusercontent.com",
+              "client_type": 2,
+              "ios_info": {
+                "bundle_id": "com.skyjang.golfscorecard"
+              }
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

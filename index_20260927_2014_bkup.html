@@ -3,9 +3,7 @@
 <head>
 <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-<title>Tonado_GolfScoreCard</title>
-<link rel="icon" href="favicon.ico?v=4">
-<link rel="apple-touch-icon" href="images/app-icon.png?v=3">
+<title>⛳ Tonado_GolfScoreCard</title>
 <!-- styles.css에도 js/*.js와 동일하게 ?v=... 캐시 무효화 버전을 붙였습니다.
      그동안 이 태그만 버전 문자열이 없어서, 네이티브 앱(WKWebView)이 이전
      버전의 styles.css를 계속 캐시에서 재사용하는 바람에 정산 화면 입력창
@@ -13,14 +11,14 @@
      있었을 가능성이 있습니다(정산하기 이후 화면이 확대된 채 안 풀리는
      문제). js 파일들처럼 styles.css를 고칠 때마다 이 버전 값도 반드시
      함께 올려주세요. -->
-<link rel="stylesheet" href="styles.css?v=20260927e">
+<link rel="stylesheet" href="styles.css?v=20260927d">
 
 </head>
 <body>
 <div class="app">
 <header class="app-header">
 <div class="app-header-top">
-<h1 id="appTitle"><img src="images/app-icon.png?v=1" alt="" class="app-icon-badge"><span class="app-title-text">Tonado_GolfScoreCard</span></h1>
+<h1 id="appTitle">⛳ Tonado_GolfScoreCard</h1>
 <div class="header-actions">
 <button id="sjManualBtn" class="lang-btn" type="button" title="사용설명서"><span class="manual-btn-icon">📖</span><span class="manual-btn-text"> 사용설명서</span></button>
 <div class="lang-switcher">
@@ -114,7 +112,7 @@
 </section>
 </main>
 <footer class="credit" id="footerText" style="padding:14px 16px 4px;text-align:center;" data-i18n-html="footerTagline">
-  <div style="font-weight:700;font-size:13px;color:#374151;letter-spacing:.02em;display:flex;align-items:center;justify-content:center;gap:6px;"><img src="images/app-icon.png?v=1" alt="" style="width:16px;height:16px;border-radius:4px;display:block;">Tonado_GolfScoreCard</div>
+  <div style="font-weight:700;font-size:13px;color:#374151;letter-spacing:.02em;">⛳ Tonado_GolfScoreCard</div>
   <div style="margin-top:4px;font-size:11px;color:#9ca3af;line-height:1.6;">
     회원가입 후 저장하면 클라우드에 보관되어 언제든 다시 불러올 수 있어요<br>
     (로그인하지 않으면 이 기기에만 저장됩니다)
@@ -288,12 +286,6 @@
 <button class="sj-close" data-close>×</button>
 <h3 data-i18n="paywallTitle">💳 구독 안내</h3>
 <p id="sjPaywallReason" style="font-size:13px;color:#666;margin-top:0;"></p>
-<!-- 2026-09-29 추가: 카카오페이 정기결제 심사 보완사항 -- 결제일 기준 30일
-     자동갱신 및 구독 후 서비스 제공 기간을 구독 안내 화면에 명시. 문구는
-     js/i18n.js의 paywallRenewalNotice(실제 재청구 주기인 30일 롤링 방식,
-     firebase-backend/functions/subscription.js의 PLAN_DEFS.billingDays=30을
-     그대로 반영)를 data-i18n-html로 채운다. -->
-<p id="sjPaywallRenewalNotice" data-i18n-html="paywallRenewalNotice" style="font-size:12px;color:#555;background:#f5f6fb;border:1px solid #e5e7eb;border-radius:8px;padding:9px 10px;margin:0 0 12px;line-height:1.5;"></p>
 <!-- 2026-09-22(2차) 추가: 결제수단 선택(카드/카카오페이/네이버페이). data-web-only라
      iOS 앱(RevenueCat)에서는 자동으로 숨겨집니다(iOS는 애플 In-App Purchase만 사용).
      카카오페이/네이버페이는 포트원 채널 심사가 끝나기 전까지는 선택은 되지만
@@ -633,8 +625,8 @@
 <script src="js/render-setup.js?v=20260823f" defer></script>
 <script src="js/render-play.js?v=20260823f" defer></script>
 <script src="js/render-result.js?v=20260823f" defer></script>
-<script src="js/settlement.js?v=20260927a" defer></script>
-<script src="js/share.js?v=20260927a" defer></script>
+<script src="js/settlement.js?v=20260926d" defer></script>
+<script src="js/share.js?v=20260823f" defer></script>
 <script src="js/app.js?v=20260823g" defer></script>
 <script src="js/friends.js?v=20260926c" defer></script>
 <!-- 2026-09-26 추가: 친구추천 이벤트 + 룰렛. auth.js(로그인 직후 추천코드

@@ -288,12 +288,6 @@
 <button class="sj-close" data-close>×</button>
 <h3 data-i18n="paywallTitle">💳 구독 안내</h3>
 <p id="sjPaywallReason" style="font-size:13px;color:#666;margin-top:0;"></p>
-<!-- 2026-09-29 추가: 카카오페이 정기결제 심사 보완사항 -- 결제일 기준 30일
-     자동갱신 및 구독 후 서비스 제공 기간을 구독 안내 화면에 명시. 문구는
-     js/i18n.js의 paywallRenewalNotice(실제 재청구 주기인 30일 롤링 방식,
-     firebase-backend/functions/subscription.js의 PLAN_DEFS.billingDays=30을
-     그대로 반영)를 data-i18n-html로 채운다. -->
-<p id="sjPaywallRenewalNotice" data-i18n-html="paywallRenewalNotice" style="font-size:12px;color:#555;background:#f5f6fb;border:1px solid #e5e7eb;border-radius:8px;padding:9px 10px;margin:0 0 12px;line-height:1.5;"></p>
 <!-- 2026-09-22(2차) 추가: 결제수단 선택(카드/카카오페이/네이버페이). data-web-only라
      iOS 앱(RevenueCat)에서는 자동으로 숨겨집니다(iOS는 애플 In-App Purchase만 사용).
      카카오페이/네이버페이는 포트원 채널 심사가 끝나기 전까지는 선택은 되지만
