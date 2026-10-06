@@ -14,22 +14,6 @@
       },
       "oauth_client": [
         {
-          "client_id": "162951012751-115mmetkls6v8n9qtvheuaini2dmnqfu.apps.googleusercontent.com",
-          "client_type": 1,
-          "android_info": {
-            "package_name": "com.skyjang.golfscorecard",
-            "certificate_hash": "d178ce6c0d329bda049ecdda6064cc30929d4fad"
-          }
-        },
-        {
-          "client_id": "162951012751-4ii84smaqelt4tk92fk0ma3ooenl8aks.apps.googleusercontent.com",
-          "client_type": 1,
-          "android_info": {
-            "package_name": "com.skyjang.golfscorecard",
-            "certificate_hash": "896d2a08a01b28cfb85f9cf7143dae4d6e66a2c9"
-          }
-        },
-        {
           "client_id": "162951012751-2k3b2tofm6o3qs034ija8rcjmb5nt7gi.apps.googleusercontent.com",
           "client_type": 3
         }
