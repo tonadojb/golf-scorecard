@@ -104,14 +104,6 @@ workflows:
           include: true
           source: true
     environment:
-      # android_signing 그룹: Codemagic 앱 설정 → Environment variables 에서 새로 만들어야 합니다.
-      # 아래 4개 변수를 이 그룹 안에 등록하세요 (전부 Secure 체크):
-      #   CM_KEYSTORE          golfscorecard-upload.jks 파일을 base64로 인코딩한 값
-      #   CM_KEYSTORE_PASSWORD keystore 생성할 때 입력한 비밀번호
-      #   CM_KEY_ALIAS          golfscorecard-upload
-      #   CM_KEY_PASSWORD       keystore 생성할 때 입력한 키 비밀번호 (보통 keystore 비밀번호와 동일)
-      groups:
-        - android_signing
       vars:
         PACKAGE_NAME: "com.skyjang.golfscorecard"
       node: 20
@@ -125,16 +117,16 @@ workflows:
       - name: 앱 아이콘/스플래시 리소스 생성
         script: |
           cd android-app && npx capacitor-assets generate --android
-      - name: 릴리즈 서명 keystore 복원
+      # ⚠ 지금은 서명 없는 디버그 APK만 빌드합니다 (Google Play 서명 키스토어와
+      # Play Console 서비스 계정이 아직 없기 때문). 테스트폰에 설치해서 앱이
+      # 제대로 뜨는지 확인하는 용도로 쓰면 됩니다.
+      #
+      # 나중에 아래 두 가지가 준비되면 이 단계를 assembleRelease/bundleRelease +
+      # 서명(keystore) + publishing.google_play 블록으로 업그레이드해야 합니다:
+      #   1) 릴리즈 서명용 keystore(.jks) 파일 + 비밀번호 (Codemagic 환경변수로 등록)
+      #   2) Google Play Console 콘솔 > 설정 > API 액세스에서 만든 서비스 계정 JSON
+      - name: 디버그 APK 빌드
         script: |
-          echo $CM_KEYSTORE | base64 --decode > $CM_BUILD_DIR/release.keystore
-          echo "CM_KEYSTORE_PATH=$CM_BUILD_DIR/release.keystore" >> $CM_ENV
-      # ⚠ Google Play 자동 업로드(publishing.google_play)는 아직 연결하지 않았습니다.
-      # Play Console 서비스 계정 JSON이 준비되고 계정 인증이 끝나면 publishing 블록을
-      # 추가해야 합니다 (iOS의 app_store_connect와 같은 역할). 지금은 서명된 AAB를
-      # 아티팩트로만 만들어서, Play Console에 수동으로 업로드하는 단계입니다.
-      - name: 릴리즈 AAB 빌드 (서명 포함)
-        script: |
-          cd android-app/android && ./gradlew bundleRelease
+          cd android-app/android && ./gradlew assembleDebug
     artifacts:
-      - android-app/android/app/build/outputs/bundle/release/*.aab
+      - android-app/android/app/build/outputs/**/*.apk

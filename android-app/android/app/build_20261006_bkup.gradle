@@ -16,25 +16,10 @@ android {
             ignoreAssetsPattern '!.svn:!.git:!.ds_store:!*.scc:.*:!CVS:!thumbs.db:!picasa.ini:!*~'
         }
     }
-    // Codemagic 빌드에서 CM_KEYSTORE_PATH / CM_KEYSTORE_PASSWORD / CM_KEY_ALIAS / CM_KEY_PASSWORD
-    // 환경변수가 설정되어 있으면(= android_signing 그룹이 연결된 빌드면) release 빌드에 실제 서명을 적용합니다.
-    // 로컬 개발 환경에는 이 값들이 없으므로, 로컬에서 release 빌드를 하면 서명 없이(unsigned) 생성됩니다 —
-    // 로컬 개발/테스트는 보통 debug 빌드를 쓰므로 문제되지 않습니다.
-    signingConfigs {
-        release {
-            if (System.getenv("CM_KEYSTORE_PATH")) {
-                storeFile file(System.getenv("CM_KEYSTORE_PATH"))
-                storePassword System.getenv("CM_KEYSTORE_PASSWORD")
-                keyAlias System.getenv("CM_KEY_ALIAS")
-                keyPassword System.getenv("CM_KEY_PASSWORD")
-            }
-        }
-    }
     buildTypes {
         release {
             minifyEnabled false
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
-            signingConfig signingConfigs.release
         }
     }
 }
