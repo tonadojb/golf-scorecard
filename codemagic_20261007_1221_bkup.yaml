@@ -143,9 +143,6 @@ workflows:
       # 아티팩트로만 만들어서, Play Console에 수동으로 업로드하는 단계입니다.
       - name: 릴리즈 AAB 빌드 (서명 포함)
         script: |
-          # Windows에서 git으로 커밋된 gradlew는 실행 권한(+x)이 빠져 있어서
-          # "Permission denied"(exit code 126)로 실패합니다. 빌드 직전에 실행
-          # 권한을 다시 부여해줍니다.
-          cd android-app/android && chmod +x gradlew && ./gradlew bundleRelease
+          cd android-app/android && ./gradlew bundleRelease
     artifacts:
       - android-app/android/app/build/outputs/bundle/release/*.aab
