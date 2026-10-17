@@ -7,11 +7,11 @@ android {
         applicationId "com.skyjang.golfscorecard"
         minSdkVersion rootProject.ext.minSdkVersion
         targetSdkVersion rootProject.ext.targetSdkVersion
-        // 2026-10-17: versionCode가 1로 고정돼 있어서 Play Console에 매번 같은 버전
-        // 코드로 업로드하려다 "이미 사용된 버전 코드" 에러가 남. Codemagic이 매 빌드마다
-        // 자동으로 올려주는 $CM_BUILD_NUMBER를 사용하도록 변경 (iOS 쪽 빌드 번호
-        // 자동 증가 로직과 같은 목적). 로컬 빌드에는 이 환경변수가 없으므로 1로 대체.
-        versionCode System.getenv("CM_BUILD_NUMBER") ? System.getenv("CM_BUILD_NUMBER").toInteger() : 1
+        // 2026-10-17: versionCode가 1�?고정???�어??Play Console??매번 같�? 버전
+        // 코드�??�로?�하?�다 "?��? ?�용??버전 코드" ?�러가 ?? Codemagic??�?빌드마다
+        // ?�동?�로 ?�려주는 $PROJECT_BUILD_NUMBER�??�용?�도�?변�?(iOS �?빌드 번호
+        // ?�동 증�? 로직�?같�? 목적). 로컬 빌드?�는 ???�경변?��? ?�으므�?1�??��?
+        versionCode System.getenv("PROJECT_BUILD_NUMBER") ? System.getenv("PROJECT_BUILD_NUMBER").toInteger() : 1
         versionName "1.0"
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
         aaptOptions {
@@ -20,10 +20,9 @@ android {
             ignoreAssetsPattern '!.svn:!.git:!.ds_store:!*.scc:.*:!CVS:!thumbs.db:!picasa.ini:!*~'
         }
     }
-    // Codemagic 빌드에서 CM_KEYSTORE_PATH / CM_KEYSTORE_PASSWORD / CM_KEY_ALIAS / CM_KEY_PASSWORD
-    // 환경변수가 설정되어 있으면(= android_signing 그룹이 연결된 빌드면) release 빌드에 실제 서명을 적용합니다.
-    // 로컬 개발 환경에는 이 값들이 없으므로, 로컬에서 release 빌드를 하면 서명 없이(unsigned) 생성됩니다 —
-    // 로컬 개발/테스트는 보통 debug 빌드를 쓰므로 문제되지 않습니다.
+    // Codemagic 빌드?�서 CM_KEYSTORE_PATH / CM_KEYSTORE_PASSWORD / CM_KEY_ALIAS / CM_KEY_PASSWORD
+    // ?�경변?��? ?�정?�어 ?�으�?= android_signing 그룹???�결??빌드�? release 빌드???�제 ?�명???�용?�니??
+    // 로컬 개발 ?�경?�는 ??값들???�으므�? 로컬?�서 release 빌드�??�면 ?�명 ?�이(unsigned) ?�성?�니????    // 로컬 개발/?�스?�는 보통 debug 빌드�??��?�?문제?��? ?�습?�다.
     signingConfigs {
         release {
             if (System.getenv("CM_KEYSTORE_PATH")) {
