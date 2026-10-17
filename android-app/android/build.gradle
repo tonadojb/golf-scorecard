@@ -7,7 +7,9 @@ buildscript {
         mavenCentral()
     }
     dependencies {
-        classpath 'com.android.tools.build:gradle:8.2.1'
+        // 2026-10-17: Play Console이 compileSdk 36 이상을 요구해서, 이를 지원하는
+        // AGP 8.11(요구 Gradle 8.13)로 올림. (8.2.1은 compileSdk 35까지만 지원)
+        classpath 'com.android.tools.build:gradle:8.11.0'
         classpath 'com.google.gms:google-services:4.4.0'
 
         // NOTE: Do not place your application dependencies here; they belong
