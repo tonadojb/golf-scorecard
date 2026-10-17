@@ -1,5 +1,8 @@
 ext {
-    minSdkVersion = 22
+    // 2026-10-17: Play Console이 "Play 자동 보호(Play Integrity 기반 변조 방지)"를
+    // 쓰려면 minSdkVersion 24 이상이 필요하다고 안내하여 22 → 24로 올림
+    // (Android 7.0 미만 기기 지원 종료, 2026년 기준 해당 기기 비중은 거의 없음).
+    minSdkVersion = 24
     compileSdkVersion = 34
     targetSdkVersion = 34
     androidxActivityVersion = '1.8.0'

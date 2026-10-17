@@ -1,0 +1,22 @@
+ext {
+    minSdkVersion = 22
+    compileSdkVersion = 34
+    targetSdkVersion = 34
+    androidxActivityVersion = '1.8.0'
+    androidxAppCompatVersion = '1.6.1'
+    androidxCoordinatorLayoutVersion = '1.2.0'
+    androidxCoreVersion = '1.12.0'
+    androidxFragmentVersion = '1.6.2'
+    coreSplashScreenVersion = '1.0.1'
+    androidxWebkitVersion = '1.9.0'
+    junitVersion = '4.13.2'
+    androidxJunitVersion = '1.1.5'
+    androidxEspressoCoreVersion = '3.5.1'
+    cordovaAndroidVersion = '10.1.1'
+
+    // 2026-09-28: capacitor.config.json에서 FirebaseAuthentication의 구글 로그인
+    // (providers: ["google.com"])을 쓰도록 돼 있는데, 이 값을 켜지 않으면
+    // GoogleSignIn 관련 클래스가 compileOnly로만 포함되어 실제 apk에는 안 들어가서
+    // 앱 실행 시 "ClassNotFoundException: GoogleSignIn" 크래시가 발생한다.
+    rgcfaIncludeGoogle = true
+}
