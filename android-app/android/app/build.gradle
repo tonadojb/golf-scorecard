@@ -7,7 +7,11 @@ android {
         applicationId "com.skyjang.golfscorecard"
         minSdkVersion rootProject.ext.minSdkVersion
         targetSdkVersion rootProject.ext.targetSdkVersion
-        versionCode 1
+        // 2026-10-17: versionCode가 1로 고정돼 있어서 Play Console에 매번 같은 버전
+        // 코드로 업로드하려다 "이미 사용된 버전 코드" 에러가 남. Codemagic이 매 빌드마다
+        // 자동으로 올려주는 $CM_BUILD_NUMBER를 사용하도록 변경 (iOS 쪽 빌드 번호
+        // 자동 증가 로직과 같은 목적). 로컬 빌드에는 이 환경변수가 없으므로 1로 대체.
+        versionCode System.getenv("CM_BUILD_NUMBER") ? System.getenv("CM_BUILD_NUMBER").toInteger() : 1
         versionName "1.0"
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
         aaptOptions {
