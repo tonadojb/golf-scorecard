@@ -1,10 +1,12 @@
 ext {
-    // 2026-10-17: Play Consoleì´ "Play ìë™ ë³´í˜¸(Play Integrity ê¸°ë°˜ ë³€ì¡° ë°©ì§€)"ë¥¼
-    // ì“°ë ¤ë©´ minSdkVersion 24 ì´ìƒì´ í•„ìš”í•˜ë‹¤ê³  ì•ˆë‚´í•˜ì—¬ 22 â†’ 24ë¡œ ì˜¬ë¦¼
-    // (Android 7.0 ë¯¸ë§Œ ê¸°ê¸° ì§€ì› ì¢…ë£Œ, 2026ë…„ ê¸°ì¤€ í•´ë‹¹ ê¸°ê¸° ë¹„ì¤‘ì€ ê±°ì˜ ì—†ìŒ).
+    // 2026-10-17: Play ConsoleÀÌ "Play ÀÚµ¿ º¸È£(Play Integrity ±â¹İ º¯Á¶ ¹æÁö)"¸¦
+    // ¾²·Á¸é minSdkVersion 24 ÀÌ»óÀÌ ÇÊ¿äÇÏ´Ù°í ¾È³»ÇÏ¿© 22 ¡æ 24·Î ¿Ã¸²
+    // (Android 7.0 ¹Ì¸¸ ±â±â Áö¿ø Á¾·á, 2026³â ±âÁØ ÇØ´ç ±â±â ºñÁßÀº °ÅÀÇ ¾øÀ½).
     minSdkVersion = 24
-    compileSdkVersion = 34
-    targetSdkVersion = 34
+    // 2026-10-18: Play ConsoleÀÌ "API ¼öÁØ 36 ÀÌ»óÀ» Å¸°ÙÆÃÇØ¾ß ÇÕ´Ï´Ù"(2026-08-31ºÎÅÍ
+    // ½ÃÇàµÈ ÃÖ½Å API ·¹º§ ¿ä±¸»çÇ×) ¿À·ù¸¦ ³»¼­ compile/target µÑ ´Ù 34 ¡æ 36À¸·Î ¿Ã¸².
+    compileSdkVersion = 36
+    targetSdkVersion = 36
     androidxActivityVersion = '1.8.0'
     androidxAppCompatVersion = '1.6.1'
     androidxCoordinatorLayoutVersion = '1.2.0'
@@ -17,9 +19,9 @@ ext {
     androidxEspressoCoreVersion = '3.5.1'
     cordovaAndroidVersion = '10.1.1'
 
-    // 2026-09-28: capacitor.config.jsonì—ì„œ FirebaseAuthenticationì˜ êµ¬ê¸€ ë¡œê·¸ì¸
-    // (providers: ["google.com"])ì„ ì“°ë„ë¡ ë¼ ìˆëŠ”ë°, ì´ ê°’ì„ ì¼œì§€ ì•Šìœ¼ë©´
-    // GoogleSignIn ê´€ë ¨ í´ë˜ìŠ¤ê°€ compileOnlyë¡œë§Œ í¬í•¨ë˜ì–´ ì‹¤ì œ apkì—ëŠ” ì•ˆ ë“¤ì–´ê°€ì„œ
-    // ì•± ì‹¤í–‰ ì‹œ "ClassNotFoundException: GoogleSignIn" í¬ë˜ì‹œê°€ ë°œìƒí•œë‹¤.
+    // 2026-09-28: capacitor.config.json¿¡¼­ FirebaseAuthenticationÀÇ ±¸±Û ·Î±×ÀÎ
+    // (providers: ["google.com"])À» ¾²µµ·Ï µÅ ÀÖ´Âµ¥, ÀÌ °ªÀ» ÄÑÁö ¾ÊÀ¸¸é
+    // GoogleSignIn °ü·Ã Å¬·¡½º°¡ compileOnly·Î¸¸ Æ÷ÇÔµÇ¾î ½ÇÁ¦ apk¿¡´Â ¾È µé¾î°¡¼­
+    // ¾Û ½ÇÇà ½Ã "ClassNotFoundException: GoogleSignIn" Å©·¡½Ã°¡ ¹ß»ıÇÑ´Ù.
     rgcfaIncludeGoogle = true
 }
